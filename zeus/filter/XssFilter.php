@@ -1,7 +1,7 @@
 <?php
 namespace zeus\filter;
 
-class XssFilter extends AbstractFilter implements FilterInterface
+class XssFilter extends AbstractFilter
 {
 	public function __construct(FilterInterface $nextFilter = null)
 	{

@@ -1,7 +1,7 @@
 <?php
 namespace zeus\filter;
 
-abstract  class AbstractFilter implements FilterInterface
+abstract class AbstractFilter implements FilterInterface
 {
 	protected $nextFilter = null;
 	
@@ -19,6 +19,16 @@ abstract  class AbstractFilter implements FilterInterface
 			return $this->nextFilter->doFilter($data);
 		}
 		return $data;
+	}
+	
+	public function getNext()
+	{
+		return $this->nextFilter;
+	}
+	
+	public function setNext(FilterInterface $filter)
+	{
+		$this->nextFilter = $filter;
 	}
 	
 	protected abstract function doChain($data);

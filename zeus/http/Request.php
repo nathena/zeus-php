@@ -17,8 +17,6 @@ class Request
 	protected $header  = [];
 	protected $server  = [];
 	
-	protected $orgin_path = '';
-	
 	public function __construct()
 	{
 		$this->get = (isset($_GET)) ? $_GET : array();
@@ -61,9 +59,9 @@ class Request
 		}
 	}
 	
-	public function setOrginPath($uri_path='',$uri_protocol='REQUEST_URI')
+	public function orginPath($uri_protocol = 'REQUEST_URI')
 	{
-		$url_path = empty($uri_path) ? self::isCli()?$this->_parse_argv():$_SERVER[$uri_protocol] : $uri_path;
+		$url_path = self::isCli()?$this->cliOrginPath():$_SERVER[$uri_protocol];
 		
 		$url_path = parse_url($url_path);
 		if( isset($url_path["query"]))
@@ -71,12 +69,7 @@ class Request
 			parse_str($url_path["query"],$this->get);
 		}
 		
-		$this->orgin_path = trim(strtolower($url_path["path"]),"/");
-	}
-	
-	public function getOrginPath()
-	{
-		return $this->orgin_path;
+		return trim(strtolower($url_path["path"]),"/");
 	}
 	
 	public function get($key = '')
@@ -102,6 +95,11 @@ class Request
 	public function delete($key = '')
 	{
 		return empty($key) ? $this->delete : isset($this->delete[$key]) ? $this->delete[$key] : '';
+	}
+	
+	public function cookie($key='')
+	{
+		return empty($key) ? $this->cookie : isset($this->cookie[$key]) ? $this->cookie[$key] : '';
 	}
 	
 	public function isAjax()
@@ -242,7 +240,7 @@ class Request
 		}
 	}
 	
-	private function _parse_argv()
+	public function cliOrginPath()
 	{
 		$args = array_slice($_SERVER['argv'], 1);
 		return $args ? implode('/', $args) : '';

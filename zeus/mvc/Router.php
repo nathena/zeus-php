@@ -19,18 +19,16 @@ class Router
 			'rewrite'					=> []
 	];
 	
-	private $orgin_path;
-	private $controller;
-	private $method;
-	private $params = [];
+	public $request;
+	public $filter;
+	
+	protected $orgin_path;
+	protected $controller;
+	protected $method;
+	protected $params = [];
 	
 	public function __construct(Request $request, FilterInterface $filter, array $config = [])
 	{
-		if( is_array($url_path) )
-		{
-			$config = $url_path;
-		}
-		
 		if (empty($config)) 
 		{
 			$config = Env::route();
@@ -38,19 +36,10 @@ class Router
 		
 		self::$config = array_merge(self::$config,array_change_key_case($config));
 		
-		if( empty($url_path) )
-		{
-			$url_path = Request::isCli()?$this->_parse_argv():$_SERVER[self::$config['uri_protocol']];
-		}
+		$this->request = $request;
+		$this->filter  = $filter;
 		
-		$url_path = parse_url($url_path);
-		
-		$this->orgin_path = trim(strtolower($url_path["path"]),"/");
-		if( isset($url_path["query"]))
-		{
-			parse_str($url_path["query"],$_GET);
-		}
-		$this->parse();
+		$this->orgin_path = $request->orginPath(self::$config['uri_protocol']);
 	}
 	
 	public function getOrginPath()
@@ -78,9 +67,20 @@ class Router
 		$this->params = $params;
 	}
 	
+	public function dispatch()
+	{
+		if( $this->doRoute() )
+		{
+			
+		}
+		
+		return false;
+	}
+	
 	protected function doRoute()
 	{
 		$uri_path = $this->orgin_path;
+		
 		if( "/" == $uri_path || "" == $uri_path )
 		{
 			if( $this->routeDefauleController() )

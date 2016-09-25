@@ -6,11 +6,11 @@ if ( strnatcasecmp(phpversion(),'5.3') <= 0 )
 
 use zeus\loader\Autoloader;
 use zeus\log\Logger;
-use zeus\mvc\Router;
-use zeus\exception\ControllerNotFoundException;
-use zeus\mvc\Controller;
+use zeus\http\Request;
+use zeus\filter\DefaultFilter;
+use zeus\env\Env;
 use zeus\filter\XssFilter;
-use zeus\Env;
+use zeus\mvc\Router;
 
 define('ZEUS_VERSION', '0.0.1');
 define('ZEUS_PATH', dirname(__FILE__));
@@ -22,34 +22,18 @@ require_once 'loader/Autoloader.php';
 
 Autoloader::getInstance()->register('zeus', dirname(__FILE__));
 
-$router = new Router();
-
 try 
 {
-	if(!$router->doRoute())
+	$request = new Request();
+	$filter  = new DefaultFilter();
+	if( Env::config('xss_clean') )
 	{
-		throw new ControllerNotFoundException($router->getOrginPath(),' not match the controller.');
+		$_xssFilter = new XssFilter();
+		$filter->setNext($_xssFilter);
 	}
 	
-	$controller = new $router->getController();
-	if( $controller instanceof Controller )
-	{
-		if( Env::config("xss_clean") )
-		{
-			$filter = new XssFilter();
-			$data = $filter->doFilter($router->getParams());
-			
-			$router->setParams($data);
-			
-			$controller->__filter($filter);
-		}
-		
-		call_user_func_array(array($controller,$router->getMethod()), $router->getParams());
-	}
-	else 
-	{
-		throw new ControllerNotFoundException($router->getOrginPath(),' not match the controller.');
-	}
+	$router = new Router($request, $filter);
+	$router->dispatch();
 }
 catch(Exception $e)
 {
