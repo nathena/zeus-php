@@ -9,8 +9,8 @@ use zeus\log\Logger;
 use zeus\mvc\Router;
 use zeus\exception\ControllerNotFoundException;
 use zeus\mvc\Controller;
-use zeus\Env;
 use zeus\filter\XssFilter;
+use zeus\Env;
 
 define('ZEUS_VERSION', '0.0.1');
 define('ZEUS_PATH', dirname(__FILE__));
@@ -55,17 +55,6 @@ catch(Exception $e)
 {
 	__exception_handler($e);
 }
-
-// if( Env::config("xss_clean") )
-// {
-// 	$filter = new XssFilter();
-	
-// 	$_GET = $filter->doFilter($_GET);
-// 	$_POST = $filter->doFilter($_POST);
-// 	$_COOKIE = $filter->doFilter($_COOKIE);
-	
-	
-// }
 
 //set_exception_handler&set_error_handler
 function __exception_handler($exception, $message = NULL, $file = NULL, $line = NULL)

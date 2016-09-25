@@ -1,9 +1,8 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\config\Config;
 use zeus\http\Request;
-use zeus\Env;
+use zeus\env\Env;
 
 class Router
 {

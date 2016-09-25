@@ -2,7 +2,7 @@
 namespace zeus\mvc;
 
 use zeus\log\Logger;
-use zeus\config\Config;
+use zeus\env\Env;
 
 class View
 {
@@ -25,7 +25,7 @@ class View
     public function __construct(array $config = [])
     {
     	if (empty($config)) {
-    		$config = Config::get('view');
+    		$config = Env::config('view');
     	}
     	
         self::$config = array_merge(self::$config,array_change_key_case($config));

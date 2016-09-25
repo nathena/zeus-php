@@ -77,6 +77,31 @@ class Autoloader
 			include_once $classFile;
 			return true;
 		}
+		
+		$sep = (strpos($class, '\\') !== false) ? '\\' : '_';
+		$classNameFragment = explode($sep, $class);
+		
+		$classFile = $this->findClassByNamespace($classNameFragment);
+		if( !is_null($classFile) && !empty($classFile) )
+		{
+			include_once $classFile;
+			return true;
+		}
+		
+		$classFile = $this->findClassByLibrary($classNameFragment);
+		if( !is_null($classFile) && !empty($classFile) )
+		{
+			include_once $classFile;
+			return true;
+		}
+		
+		$classFile = $this->findClassByZeusPath($classNameFragment);
+		if( !is_null($classFile) && !empty($classFile) )
+		{
+			include_once $classFile;
+			return true;
+		}
+		
 		return false;
 	}
 	
@@ -96,10 +121,7 @@ class Autoloader
 			}
 		}
 		
-		$sep = (strpos($class, '\\') !== false) ? '\\' : '_';
-		$classNameFragment = explode($sep, $class);
-		
-		return $this->findClassByNamespace($classNameFragment);
+		return '';
 	}
 		
 	private function findClassByNamespace($classNameFragment)
@@ -118,7 +140,7 @@ class Autoloader
 				}
 			}
 		}
-		return $this->findClassByLibrary($classNameFragment);
+		return '';
 	}
 	
 	private function findClassByLibrary($classNameFragment)
@@ -129,7 +151,7 @@ class Autoloader
 		{
 			return $_classFile;
 		}
-		return $this->findClassByZeusPath($classNameFragment);
+		return '';
 	}
 	
 	private function findClassByZeusPath($classNameFragment)
