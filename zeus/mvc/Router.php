@@ -5,7 +5,6 @@ use zeus\http\Request;
 use zeus\env\Env;
 use zeus\filter\FilterInterface;
 use zeus\exception\RouterNotFoundException;
-use zeus\http\Response;
 use zeus\filter\XssFilter;
 
 class Router
