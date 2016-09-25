@@ -23,8 +23,8 @@ require_once 'loader/Autoloader.php';
 
 Autoloader::getInstance()->register('zeus', dirname(__FILE__));
 
-//$time_zone = empty(Env::config('time_zone')) ? 'Asia/Shanghai' : Env::config('time_zone');
-$time_zone = Env::config('default_timezone');
+$time_zone = empty(Env::config('time_zone')) ? 'Asia/Shanghai' : Env::config('time_zone');
+//$time_zone = Env::config('default_timezone');
 date_default_timezone_set($time_zone);
 
 $appNamespaces = Env::config('app_ns');
