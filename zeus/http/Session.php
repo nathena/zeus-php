@@ -2,6 +2,7 @@
 namespace zeus\http;
 
 use zeus\exception\ClassNotFoundException;
+use zeus\env\Env;
 
 class Session
 {
@@ -32,7 +33,7 @@ class Session
 		{
 			if (empty($config))
 			{
-				$config = Config::get('session');
+				$config = Env::session();
 			}
 			self::$config = array_merge(self::$config, array_change_key_case($config));
 			
@@ -115,7 +116,7 @@ class Session
 	 * 启动session
 	 * @return void
 	 */
-	public static function start()
+	protected static function start()
 	{
 		self::$init || self::init();
 	
