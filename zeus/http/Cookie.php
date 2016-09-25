@@ -2,7 +2,7 @@
 namespace zeus\http;
 
 
-use zeus\Env;
+use zeus\env\Env;
 
 class Cookie
 {
@@ -163,6 +163,8 @@ class Cookie
 	 */
 	public static function clear()
 	{
+		self::$init || self::init();
+		
 		if (empty($_COOKIE)) 
 		{
 			return;
