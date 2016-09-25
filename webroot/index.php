@@ -1,7 +1,7 @@
 <?php 
 
 
-require_once '../zeus/bootstrap.php';
+require_once '../zeus/start.php';
 
 class a
 {
