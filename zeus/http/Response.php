@@ -56,9 +56,14 @@ class Response
 	
 	protected $controller;
 	
-	public function __construct(Controller $controller)
+	protected function __construct(Controller $controller)
 	{
 		$this->controller = $controller;
+	}
+	
+	public static function create(Controller $controller)
+	{
+		return new self($controller);
 	}
 	
 	public function redirect($url, $code = '302', $version = '1.1')

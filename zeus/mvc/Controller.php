@@ -20,7 +20,7 @@ class Controller
 	public function __construct()
 	{
 		$this->view = new View();
-		$this->response = new Response($this);
+		$this->response = Response::create($this);
 	}
 	
 	public function getRequest()
