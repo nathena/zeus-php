@@ -3,6 +3,7 @@ namespace zeus\mvc;
 
 use zeus\http\Request;
 use zeus\env\Env;
+use zeus\filter\FilterInterface;
 
 class Router
 {
@@ -22,15 +23,8 @@ class Router
 	private $controller;
 	private $method;
 	private $params = [];
-	private $route_not_matched = false;
 	
-	private function _parse_argv()
-	{
-		$args = array_slice($_SERVER['argv'], 1);
-		return $args ? implode('/', $args) : '';
-	}
-	
-	public function __construct($url_path = '',array $config = [])
+	public function __construct(Request $request, FilterInterface $filter, array $config = [])
 	{
 		if( is_array($url_path) )
 		{

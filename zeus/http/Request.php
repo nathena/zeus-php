@@ -13,8 +13,11 @@ class Request
 	protected $put	   = [];
 	protected $patch   = [];
 	protected $delete  = [];
+	protected $cookie  = [];
 	protected $header  = [];
 	protected $server  = [];
+	
+	protected $orgin_path = '';
 	
 	public function __construct()
 	{
@@ -22,6 +25,7 @@ class Request
 		$this->post = (isset($_POST)) ? $_POST : array();
 		$this->server = (isset($_SERVER)) ? $_SERVER : array();
 		$this->env = (isset($_ENV)) ? $_ENV : array();
+		$this->cookie = (isset($_COOKIE)) ? Cookie::get() : array();
 		
 		if (isset($_SERVER['REQUEST_METHOD'])) 
 		{
@@ -57,34 +61,22 @@ class Request
 		}
 	}
 	
-	public function merge($request)
+	public function setOrginPath($uri_path='',$uri_protocol='REQUEST_URI')
 	{
-		$vars = $this->getData();
-		if( is_object($request) && $request instanceof Request)
+		$url_path = empty($uri_path) ? self::isCli()?$this->_parse_argv():$_SERVER[$uri_protocol] : $uri_path;
+		
+		$url_path = parse_url($url_path);
+		if( isset($url_path["query"]))
 		{
-			foreach( $vars as $key => $var )
-			{
-				if( method_exists($request, $key) )
-				{
-					$this->$key = array_merge($this->$key, $request->$key());
-				}
-			}
+			parse_str($url_path["query"],$this->get);
 		}
-		else if( is_array($request) )
-		{
-			foreach( $vars as $key => $var )
-			{
-				if( method_exists($request, $key) )
-				{
-					$this->$key = array_merge($this->$key, $request[$key]);
-				}
-			}
-		}
+		
+		$this->orgin_path = trim(strtolower($url_path["path"]),"/");
 	}
 	
-	public function getData()
+	public function getOrginPath()
 	{
-		return get_object_vars($this);
+		return $this->orgin_path;
 	}
 	
 	public function get($key = '')
@@ -248,6 +240,12 @@ class Request
 				$this->delete = $paramData;
 				break;
 		}
+	}
+	
+	private function _parse_argv()
+	{
+		$args = array_slice($_SERVER['argv'], 1);
+		return $args ? implode('/', $args) : '';
 	}
 		
 	public static function isCli()
