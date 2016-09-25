@@ -1,5 +1,5 @@
 <?php
-namespace zeus;
+namespace zeus\env;
 
 defined('APP_ENV_DIR') or define('APP_ENV_DIR', ZEUS_PATH);
 
