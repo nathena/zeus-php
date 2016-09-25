@@ -1,9 +1,11 @@
 <?php
 namespace zeus\http;
 
+use zeus\mvc\Controller;
+
 class Response
 {
-	protected static $responseCodes = array(
+	public static $responseCodes = array(
 			// Informational 1xx
 			100 => 'Continue',
 			101 => 'Switching Protocols',
@@ -52,6 +54,13 @@ class Response
 			509 => 'Bandwidth Limit Exceeded'
 	);
 	
+	protected $controller;
+	
+	public function __construct(Controller $controller)
+	{
+		$this->controller = $controller;
+	}
+	
 	public function redirect($url, $code = '302', $version = '1.1')
 	{
 		if (headers_sent()) 
@@ -65,9 +74,11 @@ class Response
 		}
 	}
 	
-	public function forward($url,Request $request = null)
+	public function forward($url)
 	{
-		
+		$router = $this->controller->getRouter();
+		$router->setOrginPath($url);
+		$router->dispatch();
 	}
 	
 	public function download($filename = '', $data = '')

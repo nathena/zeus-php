@@ -17,6 +17,8 @@ class Request
 	protected $header  = [];
 	protected $server  = [];
 	
+	protected $orgin_path;
+	
 	public function __construct()
 	{
 		$this->get = (isset($_GET)) ? $_GET : array();
@@ -59,48 +61,90 @@ class Request
 		}
 	}
 	
-	public function orginPath($uri_protocol = 'REQUEST_URI')
+	public function getOrginPath($uri_protocol = 'REQUEST_URI')
 	{
-		$url_path = self::isCli()?$this->cliOrginPath():$_SERVER[$uri_protocol];
-		
+		if( !isset($this->orgin_path) )
+		{
+			$url_path = self::isCli()?$this->cliOrginPath():$_SERVER[$uri_protocol];
+			
+			$url_path = parse_url($url_path);
+			if( isset($url_path["query"]))
+			{
+				parse_str($url_path["query"],$this->get);
+			}
+			
+			$this->orgin_path = trim(strtolower($url_path["path"]),"/");
+		}
+		return $this->orgin_path;
+	}
+	
+	public function setOrginPath($orgin_path)
+	{
 		$url_path = parse_url($url_path);
 		if( isset($url_path["query"]))
 		{
 			parse_str($url_path["query"],$this->get);
 		}
-		
-		return trim(strtolower($url_path["path"]),"/");
+			
+		$this->orgin_path = trim(strtolower($url_path["path"]),"/");
 	}
 	
 	public function get($key = '')
 	{
-		return empty($key) ? $this->get : isset($this->get[$key]) ? $this->get[$key] : '';
+		return $this->data('get',$key);
 	}
 	
 	public function post($key = '')
 	{
-		return empty($key) ? $this->get : isset($this->post[$key]) ? $this->post[$key] : '';
+		return $this->data('post',$key);
 	}
 	
 	public function put($key = '')
 	{
-		return empty($key) ? $this->put : isset($this->put[$key]) ? $this->put[$key] : '';
+		return $this->data('put',$key);
 	}
 	
 	public function patch($key = '')
 	{
-		return empty($key) ? $this->patch : isset($this->patch[$key]) ? $this->patch[$key] : '';
+		return $this->data('patch',$key);
 	}
 	
 	public function delete($key = '')
 	{
-		return empty($key) ? $this->delete : isset($this->delete[$key]) ? $this->delete[$key] : '';
+		return $this->data('delete',$key);
 	}
 	
 	public function cookie($key='')
 	{
-		return empty($key) ? $this->cookie : isset($this->cookie[$key]) ? $this->cookie[$key] : '';
+		return $this->data('cookie',$key);
 	}
+	
+	private function data($data, $key='')
+	{
+		if( !property_exists($this, $data) )
+		{
+			return null;
+		}
+		
+		if( empty($key) )
+		{
+			return $this->{$data};
+		}
+		
+		if( is_array($key) )
+		{
+			foreach($key as $k => $v)
+			{
+				$this->{$data}[$k] = $v;
+			}
+			
+			return $this->{$data};
+		}
+		
+		return isset($this->{$data}[$key]) ? $this->{$data}[$key] : '';
+		
+	}
+	
 	
 	public function isAjax()
 	{

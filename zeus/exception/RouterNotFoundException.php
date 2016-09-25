@@ -1,7 +1,7 @@
 <?php
 namespace zeus\exception;
 
-class ControllerNotFoundException extends \RuntimeException
+class RouterNotFoundException extends \RuntimeException
 {
 	public function __construct ($message = null, $code = null, $previous = null) 
 	{

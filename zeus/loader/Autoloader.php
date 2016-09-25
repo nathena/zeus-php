@@ -3,6 +3,8 @@ namespace zeus\loader;
 
 class Autoloader
 {
+	private static $_instance = null;
+	
 	/**
 	 * Array of available namespaces prefixes.
 	 * @var array
@@ -14,7 +16,7 @@ class Autoloader
 	 */
 	private $classmap = array();
 	
-	private static $_instance = null;
+	
 	
 	private function __construct()
 	{
@@ -72,6 +74,7 @@ class Autoloader
 		}
 		
 		$classFile = $this->findClassFile($class);
+		//echo '1=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
 		{
 			include_once $classFile;
@@ -82,6 +85,7 @@ class Autoloader
 		$classNameFragment = explode($sep, $class);
 		
 		$classFile = $this->findClassByNamespace($classNameFragment);
+		//echo '2=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
 		{
 			include_once $classFile;
@@ -89,6 +93,7 @@ class Autoloader
 		}
 		
 		$classFile = $this->findClassByLibrary($classNameFragment);
+		//echo '3=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
 		{
 			include_once $classFile;
@@ -96,12 +101,13 @@ class Autoloader
 		}
 		
 		$classFile = $this->findClassByZeusPath($classNameFragment);
+		//echo '4=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
 		{
 			include_once $classFile;
 			return true;
 		}
-		
+		//echo '5=><br>';
 		return false;
 	}
 	

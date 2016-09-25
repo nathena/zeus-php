@@ -4,6 +4,9 @@ namespace zeus\mvc;
 use zeus\http\Request;
 use zeus\env\Env;
 use zeus\filter\FilterInterface;
+use zeus\exception\RouterNotFoundException;
+use zeus\http\Response;
+use zeus\filter\XssFilter;
 
 class Router
 {
@@ -12,15 +15,14 @@ class Router
 			'uri_protocol'				=> 'REQUEST_URI',
 			'default_controller_ns'	    => '',
 			'default_controller'		=> 'Index',
-			'default_controller_sepc'	=> 'Controller',
 			'default_controller_action'	=> 'index',
 			'404_override'				=> true,
-			//(\w) => app\controller\WelcomeController@index#$1
+			//(\w) => app\controller\Index@index#$1
 			'rewrite'					=> []
 	];
 	
-	public $request;
-	public $filter;
+	protected $request;
+	protected $filter;
 	
 	protected $orgin_path;
 	protected $controller;
@@ -31,7 +33,7 @@ class Router
 	{
 		if (empty($config)) 
 		{
-			$config = Env::route();
+			$config = Env::router();
 		}
 		
 		self::$config = array_merge(self::$config,array_change_key_case($config));
@@ -39,12 +41,29 @@ class Router
 		$this->request = $request;
 		$this->filter  = $filter;
 		
-		$this->orgin_path = $request->orginPath(self::$config['uri_protocol']);
+		$this->orgin_path = $this->getOrginPath();
 	}
 	
 	public function getOrginPath()
 	{
-		return $this->orgin_path;
+		return $this->request->getOrginPath(self::$config['uri_protocol']);
+	}
+	
+	public function setOrginPath($orgin_path)
+	{
+		$this->request->setOrginPath($orgin_path);
+		
+		$this->orgin_path = $this->getOrginPath();
+	}
+	
+	public function getRequest()
+	{
+		return $this->request;
+	}
+	
+	public function getFilter()
+	{
+		return $this->filter;
 	}
 	
 	public function getController()
@@ -71,10 +90,41 @@ class Router
 	{
 		if( $this->doRoute() )
 		{
+			$controller = new $this->controller();
+			if( $controller instanceof Controller )
+			{
+				$controller->setRouter($this);
+			}
 			
+			if( Env::config("xss_clean") )
+			{
+				$_xssFilter = new XssFilter();
+				$this->filter->setNext($_xssFilter);
+				
+				//$_GET = $this->filter->doFilter($_GET);
+				//$_POST = $this->filter->doFilter($_POST);
+				
+				$this->request->get( $this->filter->doFilter($this->request->get()) );
+				$this->request->post( $this->filter->doFilter($this->request->post()) );
+				$this->request->put( $this->filter->doFilter($this->request->put()) );
+				$this->request->patch( $this->filter->doFilter($this->request->patch()) );
+				$this->request->delete( $this->filter->doFilter($this->request->delete()) );
+				$this->request->cookie( $this->filter->doFilter($this->request->cookie()) );
+				
+				$this->params = $this->filter->doFilter($this->params);
+			}
+			
+			// echo $this->orgin_path.'<br/>';
+			// echo $this->controller.'<br/>';
+			// echo $this->method.'<br/>';
+			// print_r($this->params).'<br/>';
+			// print_r(get_included_files());
+			
+			call_user_func_array(array($controller, $this->method), $this->params);
+			
+			return false;
 		}
-		
-		return false;
+		throw new RouterNotFoundException($this->orgin_path.'路由不存在，且不自动存在默认处理');
 	}
 	
 	protected function doRoute()
@@ -118,7 +168,7 @@ class Router
 			{
 				if( preg_match("#^$pattern$#", $uri_path))
 				{
-					$rule = $preg_replace("#^$pattern$#", $replacement, $uri_path);
+					$rule = preg_replace("#^$pattern$#", $replacement, $uri_path);
 		
 					$rule = explode("@", $rule);
 					
@@ -155,7 +205,7 @@ class Router
 		$index = 0;
 		do 
 		{
-			$controller = $controller_packpage.'\\'.ucfirst($rule[$index]).self::$config['default_controller_sepc'];
+			$controller = $controller_packpage.'\\'.ucfirst($rule[$index]);
 			$controller_packpage = $controller_packpage.'\\'.$rule[$index];
 			
 			if( class_exists($controller) )
@@ -165,17 +215,27 @@ class Router
 				if( $index+1 < $count)
 				{
 					$_rule = array_slice($rule, $index+1);
-					$this->method     = $_rule[0];
+					
+					$method = $_rule[0];
+					$_params_index = $index+2;
+					if( method_exists($controller, $method))
+					{
+						$this->method     = $_rule[0];
+					}
+					else 
+					{
+						$_params_index = $index+1;
+						$this->method = self::$config['default_controller_action'];
+					}
+					
+					if( $_params_index < $count)
+					{
+						$this->params     = array_slice($rule, $_params_index);
+					}
 				}
 				else 
 				{
 					$this->method = self::$config['default_controller_action'];
-				}
-				
-				
-				if( $index+2 < $count)
-				{
-					$this->params     = array_slice($rule, $index+2);
 				}
 				
 				return true;
@@ -190,7 +250,7 @@ class Router
 	
 	private function routeDefauleController()
 	{
-		$controller = self::$config['default_controller_ns'].'\\controller\\'.self::$config['default_controller'].self::$config['default_controller_sepc'];
+		$controller = self::$config['default_controller_ns'].'\\controller\\'.self::$config['default_controller'];
 		if( class_exists($controller) )
 		{
 			$this->controller = $controller;

@@ -1,5 +1,4 @@
 ### project ###
-log
 .idea
 *.iml
 # Created by https://www.gitignore.io/api/jetbrains,eclipse,node,java,python,linux,c,c++
@@ -115,7 +114,6 @@ local.properties
 
 ### Node ###
 # Logs
-logs
 *.log
 npm-debug.log*
 

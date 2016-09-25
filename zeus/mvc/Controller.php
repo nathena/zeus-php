@@ -1,37 +1,69 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\http\Session;
+use zeus\util\UuidHelper;
 use zeus\http\Request;
 use zeus\http\Response;
-use zeus\util\UuidHelper;
 use zeus\filter\FilterInterface;
 
 class Controller
 {
-	protected $view = new View();
-	protected $request = new Request();
-	protected $response = new Response();
+	protected $view;
 	
-	protected $filter = null;
+	protected $request;
+	protected $reponse;
+	protected $router;
+	protected $filter;
 	
-	public function __request(Request $request)
+	
+	
+	public function __construct()
 	{
-		$this->request->merge($request);
+		$this->view = new View();
+		$this->response = new Response($this);
 	}
 	
-	public function __filter(FilterInterface $filter)
+	public function getRequest()
+	{
+		return $this->request;
+	}
+	
+	public function setRequest(Request $request)
+	{
+		$this->request = $request;
+	}
+	
+	public function getResponse()
+	{
+		return $this->response;
+	}
+	
+	public function setResponse(Response $response)
+	{
+		$this->response = $response;
+	}
+	
+	public function getFilter()
+	{
+		return $this->filter;
+	}
+	
+	public function setFilter(FilterInterface $filter)
 	{
 		$this->filter = $filter;
-		$params = $this->request->getData();
-		foreach( $params as $key => $param )
-		{
-			$param = $this->filter->doFilter($param);
-			
-			$params[$key] = $param;
-		}
+	}
+	
+	public function setRouter(Router $router)
+	{
+		$this->router = $router;
 		
-		$this->request->merge($params);
+		$this->request = $router->getRequest();
+		$this->filter  = $router->getFilter();
+	}
+	
+	public function getRouter()
+	{
+		return $this->router;
 	}
 	
 	public function crsf_token()

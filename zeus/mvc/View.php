@@ -1,7 +1,6 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\log\Logger;
 use zeus\env\Env;
 
 class View
@@ -27,10 +26,7 @@ class View
     	if (empty($config)) {
     		$config = Env::config('view');
     	}
-    	
         self::$config = array_merge(self::$config,array_change_key_case($config));
-        
-        Logger::debug("View Class Initialized");
     }
     
     public function __call($method, $args)

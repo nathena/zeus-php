@@ -9,7 +9,6 @@ use zeus\log\Logger;
 use zeus\http\Request;
 use zeus\filter\DefaultFilter;
 use zeus\env\Env;
-use zeus\filter\XssFilter;
 use zeus\mvc\Router;
 
 define('ZEUS_VERSION', '0.0.1');
@@ -18,21 +17,29 @@ define('ZEUS_START_TIME', microtime(true));
 define('ZEUS_START_MEM', memory_get_usage());
 define("DS", DIRECTORY_SEPARATOR);
 
+defined('APP_ENV_DIR') or define('APP_ENV_DIR', ZEUS_PATH);
+
 require_once 'loader/Autoloader.php';
 
 Autoloader::getInstance()->register('zeus', dirname(__FILE__));
 
+//$time_zone = empty(Env::config('time_zone')) ? 'Asia/Shanghai' : Env::config('time_zone');
+$time_zone = Env::config('default_timezone');
+date_default_timezone_set($time_zone);
+
+$appNamespaces = Env::config('app_ns');
+
+foreach( $appNamespaces as $ns => $path )
+{
+	if( is_dir($path) )
+	{
+		Autoloader::getInstance()->register($ns, $path);
+	}
+}
+
 try 
 {
-	$request = new Request();
-	$filter  = new DefaultFilter();
-	if( Env::config('xss_clean') )
-	{
-		$_xssFilter = new XssFilter();
-		$filter->setNext($_xssFilter);
-	}
-	
-	$router = new Router($request, $filter);
+	$router = new Router(new Request(), new DefaultFilter());
 	$router->dispatch();
 }
 catch(Exception $e)

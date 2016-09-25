@@ -1,19 +1,17 @@
 <?php
 namespace zeus\env;
 
-defined('APP_ENV_DIR') or define('APP_ENV_DIR', ZEUS_PATH);
-
 class Env
 {
 	private static $config = null;
 	private static $cookie = null;
 	private static $session = null;
 	private static $database = null;
-	private static $route = null;
+	private static $router = null;
 	
 	private static function load($config)
 	{
-		$config = APP_ENV_DIR.DS.'config'.DS.$config.'.php';
+		$config = APP_ENV_DIR.DS.$config.'.php';
 		if( is_file($config) )
 		{
 			return include_once $config;
@@ -81,18 +79,18 @@ class Env
 		return isset(self::$database[$key])?self::$database[$key]:"";
 	}
 	
-	public static function route($key = '')
+	public static function router($key = '')
 	{
-		if( is_null(self::$route))
+		if( is_null(self::$router))
 		{
-			self::$route = self::load("route");
+			self::$router = self::load("router");
 		}
-	
+		
 		if( empty($key) )
 		{
-			return self::$route;
+			return self::$router;
 		}
 	
-		return isset(self::$route[$key])?self::$route[$key]:"";
+		return isset(self::$router[$key])?self::$router[$key]:"";
 	}
 }

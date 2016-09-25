@@ -34,7 +34,7 @@ class XssFilter extends AbstractFilter
 				'/</' => '&lt;',
 				'/>/' => '&gt;',
 				//possible SQL injection remove from string with there is no '
-				'/SELECT * FROM/' => ''
+				'/SELECT \* FROM/' => ''
 		);
 		
 		$patterns = array_keys($preg_patterns);
