@@ -40,7 +40,7 @@ class Application
 		$autoloader = new Autoloader();
 		
 		$autoloader->registerNamespaces('zeus', ZEUS_PATH);
-		$autoloader->registerDirs([ZEUS_PATH,ZEUS_PATH.DS.'library']);
+		$autoloader->registerDirs([ZEUS_PATH,ZEUS_PATH.DS.'lib']);
 		
 		//timezone
 		date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
