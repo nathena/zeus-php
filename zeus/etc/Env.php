@@ -1,5 +1,5 @@
 <?php
-namespace zeus\env;
+namespace zeus\etc;
 
 class Env
 {

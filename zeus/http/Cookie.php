@@ -2,7 +2,7 @@
 namespace zeus\http;
 
 
-use zeus\env\Env;
+use zeus\etc\Env;
 
 class Cookie
 {

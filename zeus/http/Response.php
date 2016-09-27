@@ -103,7 +103,7 @@ class Response
 		$extension = end($x);
 		
 		// Load the mime types
-		$mime = include_once ZEUS_PATH.DS.'env'.DS.'mimes.php';
+		$mimes = include_once ZEUS_PATH.DS.'etc'.DS.'mimes.php';
 		
 		// Set a default mime if we can't find it
 		if ( !isset($mimes[$extension]))

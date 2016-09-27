@@ -2,7 +2,7 @@
 namespace zeus\db;
 
 use zeus\db\driver\Pdo;
-use zeus\env\Env;
+use zeus\etc\Env;
 
 class DbManager
 {

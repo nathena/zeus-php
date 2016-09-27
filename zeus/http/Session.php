@@ -2,7 +2,7 @@
 namespace zeus\http;
 
 use zeus\exception\ClassNotFoundException;
-use zeus\env\Env;
+use zeus\etc\Env;
 
 class Session
 {

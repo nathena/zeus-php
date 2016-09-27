@@ -1,8 +1,6 @@
 <?php
 namespace zeus\http;
 
-use zeus\Env;
-
 class Request
 {
 	/**

@@ -1,8 +1,7 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\http\Request;
-use zeus\env\Env;
+use zeus\etc\Env;
 use zeus\filter\FilterInterface;
 use zeus\exception\RouterNotFoundException;
 use zeus\filter\XssFilter;

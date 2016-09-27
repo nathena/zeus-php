@@ -9,8 +9,8 @@ use zeus\mvc\Router;
 use zeus\filter\FilterInterface;
 use zeus\filter\DefaultFilter;
 use zeus\mvc\Controller;
-use zeus\env\Env;
 use zeus\filter\XssFilter;
+use zeus\etc\Env;
 
 define('ZEUS_VERSION', '0.0.1');
 define('ZEUS_PATH', dirname(dirname(__FILE__)));

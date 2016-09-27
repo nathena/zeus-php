@@ -6,7 +6,7 @@
  */
 namespace zeus\logger;
 
-use zeus\env\Env;
+use zeus\etc\Env;
 use zeus\http\Request;
 
 class Logger

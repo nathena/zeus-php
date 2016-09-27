@@ -1,7 +1,7 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\env\Env;
+use zeus\etc\Env;
 
 class View
 {
