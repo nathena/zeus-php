@@ -10,7 +10,7 @@ use zeus\filter\FilterInterface;
 use zeus\filter\DefaultFilter;
 use zeus\mvc\Controller;
 use zeus\filter\XssFilter;
-use zeus\etc\Env;
+use zeus\etc\ConfigManager;
 
 define('ZEUS_VERSION', '0.0.1');
 define('ZEUS_PATH', dirname(dirname(__FILE__)));
@@ -43,9 +43,9 @@ class Application
 		$autoloader->registerDirs([ZEUS_PATH,ZEUS_PATH.DS.'library']);
 		
 		//timezone
-		date_default_timezone_set(empty(Env::config('time_zone')) ? 'Asia/Shanghai' : Env::config('time_zone'));
+		date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
 		
-		$appNamespaces = Env::config('app_ns');
+		$appNamespaces = ConfigManager::config('app_ns');
 		foreach( $appNamespaces as $ns => $path )
 		{
 			if( is_dir($path) )
@@ -107,7 +107,7 @@ class Application
 		{
 			$this->router->doRouter($orgin_path);
 			
-			if( Env::config("xss_clean") )
+			if( ConfigManager::config("xss_clean") )
 			{
 				$_xssFilter = new XssFilter();
 				$this->filter->setNext($_xssFilter);

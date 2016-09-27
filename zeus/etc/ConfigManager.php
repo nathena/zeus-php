@@ -1,7 +1,7 @@
 <?php
 namespace zeus\etc;
 
-class Env
+class ConfigManager
 {
 	private static $config = null;
 	private static $cookie = null;

@@ -6,7 +6,7 @@
  */
 namespace zeus\logger;
 
-use zeus\etc\Env;
+use zeus\etc\ConfigManager;
 use zeus\http\Request;
 
 class Logger
@@ -19,9 +19,9 @@ class Logger
     
     private static function save($message, $level = self::INFO)
     {
-    	if( is_dir(Env::config('log_path')) )
+    	if( is_dir(ConfigManager::config('log_path')) )
     	{
-    		$file = Env::config('log_path') .'/'.date('Ymd_') . strtolower($level) . '.log';
+    		$file = ConfigManager::config('log_path') .'/'.date('Ymd_') . strtolower($level) . '.log';
     		$log = sprintf('[PID] %s [IP] %s [TIME] %s [MSG] %s',getmypid(), Request::ip(), date('H:i:s'), $message) . "\n";
     		
     		file_put_contents($file, $log, FILE_APPEND|LOCK_EX);
@@ -30,7 +30,7 @@ class Logger
     
     public static function debug($message)
     {
-    	if( 0 >= intval(Env::config('log_level')) )
+    	if( 0 >= intval(ConfigManager::config('log_level')) )
     	{
     		self::save($message,self::DEBUG);
     	}
@@ -38,7 +38,7 @@ class Logger
     
     public static function info($message)
     {
-    	if( 1 >= intval(Env::config('log_level')) )
+    	if( 1 >= intval(ConfigManager::config('log_level')) )
     	{
         	self::save($message,self::INFO);
     	}
@@ -46,7 +46,7 @@ class Logger
     
     public static function warn($type, $code, $message, $file, $line)
     {
-        if( 2 >= intval(Env::config('log_level')) )
+        if( 2 >= intval(ConfigManager::config('log_level')) )
         {
             $message .= 'type   = '.$type."\n".
                         'code    = '.$code."\n".
@@ -60,7 +60,7 @@ class Logger
     
     public static function error($type, $code, $message, $file, $line)
     {
-        if( 3 >= intval(Env::config('log_level')) )
+        if( 3 >= intval(ConfigManager::config('log_level')) )
         {
             $message .= 'type   = '.$type."\n".
                         'code    = '.$code."\n".

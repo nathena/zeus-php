@@ -1,7 +1,7 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\etc\Env;
+use zeus\etc\ConfigManager;
 
 class View
 {
@@ -24,7 +24,7 @@ class View
     public function __construct(array $config = [])
     {
     	if (empty($config)) {
-    		$config = Env::config('view');
+    		$config = ConfigManager::config('view');
     	}
         self::$config = array_merge(self::$config,array_change_key_case($config));
     }

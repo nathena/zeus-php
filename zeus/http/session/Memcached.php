@@ -2,7 +2,6 @@
 namespace zeus\http\session;
 
 use SessionHandler;
-use think\Exception;
 
 class Memcached extends SessionHandler
 {

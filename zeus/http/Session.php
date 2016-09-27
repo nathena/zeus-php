@@ -2,7 +2,7 @@
 namespace zeus\http;
 
 use zeus\exception\ClassNotFoundException;
-use zeus\etc\Env;
+use zeus\etc\ConfigManager;
 
 class Session
 {
@@ -33,7 +33,7 @@ class Session
 		{
 			if (empty($config))
 			{
-				$config = Env::session();
+				$config = ConfigManager::session();
 			}
 			self::$config = array_merge(self::$config, array_change_key_case($config));
 			

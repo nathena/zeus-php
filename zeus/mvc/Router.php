@@ -1,7 +1,7 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\etc\Env;
+use zeus\etc\ConfigManager;
 use zeus\filter\FilterInterface;
 use zeus\exception\RouterNotFoundException;
 use zeus\filter\XssFilter;
@@ -31,7 +31,7 @@ class Router
 	{
 		if (empty($config)) 
 		{
-			$config = Env::router();
+			$config = ConfigManager::router();
 		}
 		
 		self::$config = array_merge(self::$config,array_change_key_case($config));

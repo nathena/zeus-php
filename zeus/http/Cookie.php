@@ -2,7 +2,7 @@
 namespace zeus\http;
 
 
-use zeus\etc\Env;
+use zeus\etc\ConfigManager;
 
 class Cookie
 {
@@ -37,7 +37,7 @@ class Cookie
 		
 		if (empty($config)) 
 		{
-			$config = Env::cookie();
+			$config = ConfigManager::cookie();
 		}
 		self::$config = array_merge(self::$config, array_change_key_case($config));
 		ini_set('session.cookie_httponly', 1);

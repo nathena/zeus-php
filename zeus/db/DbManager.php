@@ -2,7 +2,7 @@
 namespace zeus\db;
 
 use zeus\db\driver\Pdo;
-use zeus\etc\Env;
+use zeus\etc\ConfigManager;
 
 class DbManager
 {
@@ -18,7 +18,7 @@ class DbManager
 	{
 		if( !isset(self::$driver_instances[$alias]) )
 		{
-			self::$driver_instances[$alias] = new Pdo(Env::database());
+			self::$driver_instances[$alias] = new Pdo(ConfigManager::database());
 		}
 		
 		return self::$driver_instances[$alias];
@@ -31,7 +31,7 @@ class DbManager
 	 */
 	public static function openXaSession($xid)
 	{
-		$instance = new Pdo(Env::database());
+		$instance = new Pdo(ConfigManager::database());
 		$instance->xid($xid);
 		
 		self::$xa_driver_instances[] = $instance;
