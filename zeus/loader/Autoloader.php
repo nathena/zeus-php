@@ -16,7 +16,11 @@ class Autoloader
 	 */
 	private $classmap = array();
 	
-	
+	/**
+	 * Class file path array
+	 * @var array
+	 */
+	private $_includeDir = array();
 	
 	private function __construct()
 	{
@@ -33,36 +37,31 @@ class Autoloader
 		return self::$_instance;
 	}
 	
-	public function register($namespace, $directory)
+	public function registerNamespaces($namespace, $directory)
 	{
 		$this->prefixes[$namespace] = realpath($directory);
 		
 		return $this;
 	}
 	
-	public function loadClassMap($classmap)
+	public function registerDirs(array $dirs)
 	{
-		if (file_exists($classmap))
-		{
-			$newClassMap = include $classmap;
+		$this->_includeDir = array_unique(array_merge($this->_includeDir,$dirs));
 		
-			if (count($this->classmap) > 0)
-			{
-				$ary = array_merge($this->classmap, $newClassMap);
-			}
-			else
-			{
-				$this->classmap = $newClassMap;
-			}
-		}
-	
 		return $this;
 	}
 	
-	public function addClassMap($class,$map)
+	public function registerClassMap($class,$map = '')
 	{
-		$this->classmap[$class] = $map;
-		
+		if( is_array($class))
+		{
+			$this->classmap = array_merge($this->classmap, $classmap);
+		}
+		else 
+		{
+			$this->classmap[$class] = $map;
+		}
+	
 		return $this;
 	}
 	
@@ -73,7 +72,7 @@ class Autoloader
 			return true;
 		}
 		
-		$classFile = $this->findClassFile($class);
+		$classFile = $this->findClassFileByClassMap($class);
 		//echo '1=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
 		{
@@ -92,7 +91,7 @@ class Autoloader
 			return true;
 		}
 		
-		$classFile = $this->findClassByLibrary($classNameFragment);
+		$classFile = $this->findClassByIncludeDir($classNameFragment);
 		//echo '3=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
 		{
@@ -100,23 +99,11 @@ class Autoloader
 			return true;
 		}
 		
-		$classFile = $this->findClassByZeusPath($classNameFragment);
-		//echo '4=>'.$classFile.':'.$class.'<br>';
-		if( !is_null($classFile) && !empty($classFile) )
-		{
-			include_once $classFile;
-			return true;
-		}
-		//echo '5=><br>';
+		//echo '4=><br>';
 		return false;
 	}
 	
-	protected function findClassFile($class)
-	{
-		return $this->findClassFileByClassMap($class);
-	}
-	
-	private function findClassFileByClassMap($class)
+	protected function findClassFileByClassMap($class)
 	{
 		if (array_key_exists($class, $this->classmap))
 		{
@@ -130,7 +117,7 @@ class Autoloader
 		return '';
 	}
 		
-	private function findClassByNamespace($classNameFragment)
+	protected function findClassByNamespace($classNameFragment)
 	{
 		$namespace_prefix = $classNameFragment[0];
 		foreach( $this->prefixes as $ns => $dir )
@@ -149,24 +136,18 @@ class Autoloader
 		return '';
 	}
 	
-	private function findClassByLibrary($classNameFragment)
+	protected function findClassByIncludeDir($classNameFragment)
 	{
-		//library
-		$_classFile = ZEUS_PATH.DS.'library'.DS.implode(DIRECTORY_SEPARATOR, $classNameFragment).'.php';
-		if( file_exists($_classFile) )
+		foreach( $this->_includeDir as $dir)
 		{
-			return $_classFile;
+			$_classFile = $dir.DS.implode(DS, $classNameFragment).'.php';
+			if( file_exists($_classFile) )
+			{
+				return $_classFile;
+			}
 		}
+		
 		return '';
 	}
 	
-	private function findClassByZeusPath($classNameFragment)
-	{
-		$_classFile = ZEUS_PATH.DS.implode(DIRECTORY_SEPARATOR, $classNameFragment).'.php';
-		if( file_exists($_classFile) )
-		{
-			return $_classFile;
-		}
-		return "";
-	}
 }

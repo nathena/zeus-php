@@ -15,8 +15,6 @@ class Controller
 	protected $router;
 	protected $filter;
 	
-	
-	
 	public function __construct()
 	{
 		$this->view = new View();

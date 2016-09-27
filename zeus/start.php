@@ -21,14 +21,12 @@ defined('APP_ENV_DIR') or define('APP_ENV_DIR', ZEUS_PATH);
 
 require_once 'loader/Autoloader.php';
 
-Autoloader::getInstance()->register('zeus', dirname(__FILE__));
+Autoloader::getInstance()->registerNamespaces('zeus', ZEUS_PATH);
+Autoloader::getInstance()->registerDirs([ZEUS_PATH,ZEUS_PATH.DS.'library']);
 
-$time_zone = empty(Env::config('time_zone')) ? 'Asia/Shanghai' : Env::config('time_zone');
-//$time_zone = Env::config('default_timezone');
-date_default_timezone_set($time_zone);
+date_default_timezone_set(empty(Env::config('time_zone')) ? 'Asia/Shanghai' : Env::config('time_zone'));
 
 $appNamespaces = Env::config('app_ns');
-
 foreach( $appNamespaces as $ns => $path )
 {
 	if( is_dir($path) )
