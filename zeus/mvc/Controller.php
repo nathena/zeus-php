@@ -4,7 +4,7 @@ namespace zeus\mvc;
 use zeus\util\UuidHelper;
 use zeus\http\Request;
 use zeus\http\Response;
-use zeus\filter\FilterInterface;
+use zeus\Application;
 
 class Controller
 {
@@ -12,59 +12,30 @@ class Controller
 	
 	protected $request;
 	protected $reponse;
-	protected $router;
-	protected $filter;
+	
+	protected $application;
 	
 	public function __construct()
 	{
-		$this->view = new View();
-		$this->response = Response::create($this);
-	}
-	
-	public function getRequest()
-	{
-		return $this->request;
-	}
-	
-	public function setRequest(Request $request)
-	{
-		$this->request = $request;
-	}
-	
-	public function getResponse()
-	{
-		return $this->response;
-	}
-	
-	public function setResponse(Response $response)
-	{
-		$this->response = $response;
-	}
-	
-	public function getFilter()
-	{
-		return $this->filter;
-	}
-	
-	public function setFilter(FilterInterface $filter)
-	{
-		$this->filter = $filter;
-	}
-	
-	public function setRouter(Router $router)
-	{
-		$this->router = $router;
 		
-		$this->request = $router->getRequest();
-		$this->filter  = $router->getFilter();
 	}
 	
-	public function getRouter()
+	public function setApplication(Application $application)
 	{
-		return $this->router;
+		$this->application = $application;
+		
+		$this->view = new View();
+		
+		$this->setRequest($application->getRequest());
+		$this->setResponse($application->getReponse());
 	}
 	
-	public function crsf_token()
+	public function getApplication()
+	{
+		return $this->application;
+	}
+	
+	public function crsfToken()
 	{
 		$uuid = new UuidHelper();
 		$token = $uuid->randChar(5);
@@ -74,7 +45,7 @@ class Controller
 		return $token;
 	}
 	
-	public function check_crsf_token($token)
+	public function checkCrsfToken($token)
 	{
 		$_token = session::get("_token");
 		return $token == $_token;
@@ -89,5 +60,25 @@ class Controller
 		$this->view->assign("line",$line);
 		
 		$this->view->display("error");
+	}
+	
+	protected function getRequest()
+	{
+		return $this->request;
+	}
+	
+	protected function setRequest(Request $request)
+	{
+		$this->request = $request;
+	}
+	
+	protected function getResponse()
+	{
+		return $this->response;
+	}
+	
+	protected function setResponse(Response $response)
+	{
+		$this->response = $response;
 	}
 }

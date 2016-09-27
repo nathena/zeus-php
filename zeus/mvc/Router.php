@@ -6,6 +6,7 @@ use zeus\env\Env;
 use zeus\filter\FilterInterface;
 use zeus\exception\RouterNotFoundException;
 use zeus\filter\XssFilter;
+use zeus\Application;
 
 class Router
 {
@@ -20,15 +21,14 @@ class Router
 			'rewrite'					=> []
 	];
 	
-	protected $request;
-	protected $filter;
+	protected $application;
 	
 	protected $orgin_path;
 	protected $controller;
 	protected $method;
 	protected $params = [];
 	
-	public function __construct(Request $request, FilterInterface $filter, array $config = [])
+	public function __construct(Application $application, array $config = [])
 	{
 		if (empty($config)) 
 		{
@@ -37,32 +37,21 @@ class Router
 		
 		self::$config = array_merge(self::$config,array_change_key_case($config));
 		
-		$this->request = $request;
-		$this->filter  = $filter;
-		
-		$this->orgin_path = $this->getOrginPath();
+		$this->application = $application;
 	}
 	
 	public function getOrginPath()
 	{
-		return $this->request->getOrginPath(self::$config['uri_protocol']);
+		return $this->orgin_path;
 	}
 	
-	public function setOrginPath($orgin_path)
+	public function setOrginPath($orgin_path='')
 	{
-		$this->request->setOrginPath($orgin_path);
-		
-		$this->orgin_path = $this->getOrginPath();
-	}
-	
-	public function getRequest()
-	{
-		return $this->request;
-	}
-	
-	public function getFilter()
-	{
-		return $this->filter;
+		if( !empty($orgin_path) )
+		{
+			$this->application->getRequest()->setOrginPath($orgin_path);
+		}
+		$this->orgin_path = $this->application->getRequest()->getOrginPath(self::$config['uri_protocol']);
 	}
 	
 	public function getController()
@@ -85,49 +74,10 @@ class Router
 		$this->params = $params;
 	}
 	
-	public function dispatch()
+	public function doRouter($orgin_path='')
 	{
-		if( $this->doRoute() )
-		{
-			$controller = new $this->controller();
-			if( $controller instanceof Controller )
-			{
-				$controller->setRouter($this);
-			}
-			
-			if( Env::config("xss_clean") )
-			{
-				$_xssFilter = new XssFilter();
-				$this->filter->setNext($_xssFilter);
-				
-				//$_GET = $this->filter->doFilter($_GET);
-				//$_POST = $this->filter->doFilter($_POST);
-				
-				$this->request->get( $this->filter->doFilter($this->request->get()) );
-				$this->request->post( $this->filter->doFilter($this->request->post()) );
-				$this->request->put( $this->filter->doFilter($this->request->put()) );
-				$this->request->patch( $this->filter->doFilter($this->request->patch()) );
-				$this->request->delete( $this->filter->doFilter($this->request->delete()) );
-				$this->request->cookie( $this->filter->doFilter($this->request->cookie()) );
-				
-				$this->params = $this->filter->doFilter($this->params);
-			}
-			
-			// echo $this->orgin_path.'<br/>';
-			// echo $this->controller.'<br/>';
-			// echo $this->method.'<br/>';
-			// print_r($this->params).'<br/>';
-			// print_r(get_included_files());
-			
-			call_user_func_array(array($controller, $this->method), $this->params);
-			
-			return false;
-		}
-		throw new RouterNotFoundException($this->orgin_path.'路由不存在，且不自动存在默认处理');
-	}
-	
-	protected function doRoute()
-	{
+		$this->setOrginPath($orgin_path);
+		
 		$uri_path = $this->orgin_path;
 		
 		if( "/" == $uri_path || "" == $uri_path )

@@ -1,7 +1,7 @@
 <?php
 namespace zeus\http;
 
-use zeus\mvc\Controller;
+use zeus\Application;
 
 class Response
 {
@@ -54,16 +54,16 @@ class Response
 			509 => 'Bandwidth Limit Exceeded'
 	);
 	
-	protected $controller;
+	protected $application;
 	
-	protected function __construct(Controller $controller)
+	protected function __construct(Application $application)
 	{
-		$this->controller = $controller;
+		$this->application = $application;
 	}
 	
-	public static function create(Controller $controller)
+	public static function create(Application $application)
 	{
-		return new self($controller);
+		return new self($application);
 	}
 	
 	public function redirect($url, $code = '302', $version = '1.1')
@@ -81,9 +81,7 @@ class Response
 	
 	public function forward($url)
 	{
-		$router = $this->controller->getRouter();
-		$router->setOrginPath($url);
-		$router->dispatch();
+		$this->application->run($url);
 	}
 	
 	public function download($filename = '', $data = '')

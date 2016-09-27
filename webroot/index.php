@@ -4,4 +4,4 @@ error_reporting(E_ALL);
 
 define("APP_ENV_DIR", dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'config');
 
-require_once '../zeus/start.php';
+require_once '../zeus/run.php';

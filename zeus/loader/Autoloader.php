@@ -3,8 +3,6 @@ namespace zeus\loader;
 
 class Autoloader
 {
-	private static $_instance = null;
-	
 	/**
 	 * Array of available namespaces prefixes.
 	 * @var array
@@ -22,19 +20,9 @@ class Autoloader
 	 */
 	private $_includeDir = array();
 	
-	private function __construct()
+	public function __construct()
 	{
 		spl_autoload_register($this, true, true);
-	}
-	
-	public static function getInstance()
-	{
-		if(is_null(self::$_instance))
-		{
-			self::$_instance = new self();
-		}
-		
-		return self::$_instance;
 	}
 	
 	public function registerNamespaces($namespace, $directory)
