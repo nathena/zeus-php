@@ -7,7 +7,7 @@ namespace zeus\store\db\pdo;
  *
  */
 
-class Pdo extends GeneralPdo
+class Pdo extends AbstractPdoDialect
 {
     protected $transactionCount = 0;
 

@@ -7,7 +7,7 @@ namespace zeus\store\db\pdo;
  *
  */
 
-abstract class GeneralPdo
+abstract class AbstractPdoDialect
 {
 	private $insertSqlFormat = "INSERT INTO `%s` ( %s ) VALUES ( %s )";
 	private $insertsSqlFormat = "INSERT INTO `%s` ( %s ) VALUES  %s ";

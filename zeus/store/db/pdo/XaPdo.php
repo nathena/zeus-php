@@ -6,7 +6,7 @@ namespace zeus\store\db\pdo;
  * @author nathena
  *
  */
-class XaPdo extends GeneralPdo
+class XaPdo extends AbstractPdoDialect
 {
     private $xid;
 
