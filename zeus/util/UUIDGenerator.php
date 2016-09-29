@@ -1,24 +1,24 @@
 <?php
 namespace zeus\util;
 
-class UuidHelper
+class UUIDGenerator
 {
-	public function numberNo($type='')
+	public static function numberNo($type='',$length=2)
 	{
 		$no = $type.date("Ymdhis");
 		list($millisecond, $sec) = explode(" ", microtime());
 		$millisecond = sprintf("%03d",$millisecond*1000);
 	
-		return $no.$millisecond.$this->get_rand_number();
+		return $no.$millisecond.self::randNumber($length);
 	}
 	
-	public function charNo($type='')
+	public static function charNo($type='',$length=2)
 	{
 		$no = $type.date("Ymdhis");
 		list($millisecond, $sec) = explode(" ", microtime());
 		$millisecond = sprintf("%03d",$millisecond*1000);
 	
-		return $no.$millisecond.$this->get_rand_number();
+		return $no.$millisecond.self::randChar($length);
 	}
 	
 	/**
@@ -26,7 +26,7 @@ class UuidHelper
 	 * @param number $length
 	 * @return string
 	 */
-	public function randChar($length=2)
+	public static function randChar($length=2)
 	{
 		$str = "";
 		$strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
@@ -40,10 +40,16 @@ class UuidHelper
 	}
 	
 	//随机数字
-	public function randNumber($min = 0, $max = 10, $length=2)
+	public static function randNumber($length=2)
 	{
-		$num = $min + mt_rand() / mt_getrandmax() * ($max - $min);
-		$format= "%0{$length}d";
-		return sprintf($format, $num*10);
+		$str = "";
+		$strPol = "0123456789";
+		$max = strlen($strPol)-1;
+	
+		for($i=0;$i<$length;$i++)
+		{
+			$str.=$strPol[rand(0,$max)];//rand($min,$max)生成介于min和max两个数之间的一个随机整数
+		}
+		return $str;
 	}
 }
