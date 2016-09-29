@@ -7,4 +7,4 @@ if ( strnatcasecmp(phpversion(),'5.3') <= 0 )
 require_once 'mvc/Application.php';
 
 $application = new \zeus\Application();
-$application->run();
+$application->start();

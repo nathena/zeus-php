@@ -1,8 +1,8 @@
 <?php
-namespace zeus\db;
+namespace zeus\store\db;
 
-use zeus\db\driver\Pdo;
 use zeus\etc\ConfigManager;
+use zeus\store\db\driver\Pdo;
 
 class DbManager
 {
@@ -12,7 +12,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $alias
-	 * @return \zeus\db\driver\Pdo
+	 * @return \zeus\store\db\driver\Pdo
 	 */
 	public static function openSession($alias='default')
 	{
@@ -27,7 +27,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $xid
-	 * @return \zeus\db\driver\Pdo
+	 * @return \zeus\store\db\driver\Pdo
 	 */
 	public static function openXaSession($xid)
 	{

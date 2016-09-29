@@ -6,7 +6,7 @@
  * Time: 17:03
  */
 
-namespace zeus\db\driver;
+namespace zeus\store\db\driver;
 
 
 class Pdo

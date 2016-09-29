@@ -101,7 +101,7 @@ class Application
 		$this->router = $router;
 	}
 	
-	public function run($orgin_path='')
+	public function start($orgin_path='')
 	{
 		try
 		{

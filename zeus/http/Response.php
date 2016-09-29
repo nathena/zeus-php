@@ -81,7 +81,7 @@ class Response
 	
 	public function forward($url)
 	{
-		$this->application->run($url);
+		$this->application->start($url);
 	}
 	
 	public function download($filename = '', $data = '')
