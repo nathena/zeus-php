@@ -1,7 +1,8 @@
 <?php
 namespace zeus\util;
 
-use zeus\log;
+use zeus\logger\Logger;
+
 /**
  * 
  * 多进程
@@ -98,7 +99,7 @@ class Multiprocess
 		$process = new self();
 		$process->run($data);
 		
-		Log::info( ' === '.$process->getName().' ==== started === ' );
+		Logger::info( ' === '.$process->getName().' ==== started === ' );
 		
 		return $process;
 	}
@@ -107,7 +108,7 @@ class Multiprocess
 	{
 		if (isset($_GET[self::$boundary]) && ip() == gethostbyname($_SERVER['HTTP_HOST']))
 		{
-			Log::info( ' === '.__CLASS__.' '.__METHOD__.' === ');
+			Logger::info( ' === '.__CLASS__.' '.__METHOD__.' === ');
 			
 			foreach( self::$listener as $key => $val )
 			{
