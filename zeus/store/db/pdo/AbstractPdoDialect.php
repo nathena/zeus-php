@@ -34,11 +34,12 @@ abstract class AbstractPdoDialect
 		$dsn = $cfg["dsn"];
 		$user = isset($cfg["user"]) ? trim($cfg["user"]) : "";
 		$pass = isset($cfg["pass"]) ? trim($cfg["pass"]) : "";
-	
+		$charset = isset($cfg["charset"]) ? trim($cfg["charset"]) : "utf8";
+		
 		$driver_options = isset($cfg["driver_options"]) ? trim($cfg["driver_options"]) : null;
 	
 		$this->pdo = new \PDO($dsn, $user, $pass, $driver_options);
-		$this->pdo->exec("SET NAMES utf8mb4");
+		$this->pdo->exec("SET NAMES $charset");
 	
 		//取保连接关闭
 		register_shutdown_function(array($this, 'close'));
