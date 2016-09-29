@@ -2,7 +2,8 @@
 namespace zeus\store\db;
 
 use zeus\etc\ConfigManager;
-use zeus\store\db\driver\Pdo;
+use zeus\store\db\pdo\Pdo;
+use zeus\store\db\pdo\XaPdo;
 
 class DbManager
 {
@@ -31,8 +32,7 @@ class DbManager
 	 */
 	public static function openXaSession($xid)
 	{
-		$instance = new Pdo(ConfigManager::database());
-		$instance->xid($xid);
+		$instance = new XaPdo(ConfigManager::database(),$xid);
 		
 		self::$xa_driver_instances[] = $instance;
 		
