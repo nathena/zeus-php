@@ -1,10 +1,10 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\util\UuidHelper;
 use zeus\http\Request;
 use zeus\http\Response;
 use zeus\Application;
+use zeus\util\UUIDGenerator;
 
 class Controller
 {
@@ -35,20 +35,19 @@ class Controller
 		return $this->application;
 	}
 	
-	public function crsfToken()
+	public function generatCsrf()
 	{
-		$uuid = new UuidHelper();
-		$token = $uuid->randChar(5);
+		$csrf = UUIDGenerator::randChar(5);
 		
-		Session::set("_token",$token);
+		Session::set("_csrf",$csrf);
 		
 		return $token;
 	}
 	
-	public function checkCrsfToken($token)
+	public function checkCrsf($csrf)
 	{
-		$_token = session::get("_token");
-		return $token == $_token;
+		$_csrf = session::get("_csrf");
+		return $csrf == $_csrf;
 	}
 	
 	public function __errorHandler($message, $code='', $type='', $file="", $line="")
