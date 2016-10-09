@@ -241,4 +241,21 @@ abstract class AbstractPdoDialect
 	
 		return $sth->rowCount();
 	}
+	
+	
+	
+	public function beginTransaction()
+	{
+		
+	}
+	
+	public function commit()
+	{
+		
+	}
+	
+	public function rollBack()
+	{
+		
+	}
 }
