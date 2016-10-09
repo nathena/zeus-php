@@ -16,19 +16,22 @@ class Pdo extends AbstractPdoDialect
         parent::__construct($cfg);
     }
 
-    public function beginTransaction()
+    public function beginTransaction($nested=false)
     {
     	if( $this->transactionCounter == 0 )
     	{
     		return $this->pdo->beginTransaction();
     	}
     	
-    	$this->pdo->exec('SAVEPOINT transid_'.$this->transactionCounter);
+    	if( $nested )
+    	{
+    		$this->pdo->exec('SAVEPOINT transid_'.$this->transactionCounter);
+    	}
     	
     	return $this->transactionCounter++;
     }
 
-    public function commit()
+    public function commit($nested=false)
     {
     	if( $this->transactionCounter == 0 )
     	{
@@ -38,14 +41,17 @@ class Pdo extends AbstractPdoDialect
     	return $this->transactionCounter--;
     }
 
-    public function rollBack()
+    public function rollBack($nested=false)
     {
     	if( $this->transactionCounter == 0 )
     	{
     		return $this->pdo->rollBack();
     	}
     	
-    	$this->pdo->exec('ROLLBACK TO transid_'.$this->transactionCounter);
+    	if( $nested )
+    	{
+    		$this->pdo->exec('ROLLBACK TO transid_'.$this->transactionCounter);
+    	}
     	
     	return $this->transactionCounter--;
     }

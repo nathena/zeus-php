@@ -244,17 +244,17 @@ abstract class AbstractPdoDialect
 	
 	
 	
-	public function beginTransaction()
+	public function beginTransaction($nested=false)
 	{
 		
 	}
 	
-	public function commit()
+	public function commit($nested=false)
 	{
 		
 	}
 	
-	public function rollBack()
+	public function rollBack($nested=false)
 	{
 		
 	}
