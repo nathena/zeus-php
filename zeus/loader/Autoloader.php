@@ -105,7 +105,7 @@ class Autoloader
 		return '';
 	}
 		
-	protected function findClassByNamespace($classNameFragment,$pr='\\')
+	protected function findClassByNamespace($classNameFragment)
 	{
 		$namespace_prefix = $classNameFragment[0];
 		foreach( $this->prefixes as $ns => $dir )
@@ -124,7 +124,7 @@ class Autoloader
 		return '';
 	}
 	
-	protected function findClassByIncludeDir($classNameFragment,$pr='\\')
+	protected function findClassByIncludeDir($classNameFragment)
 	{
 		foreach( $this->_includeDir as $dir)
 		{
