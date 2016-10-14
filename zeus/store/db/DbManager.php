@@ -7,8 +7,8 @@ use zeus\store\db\pdo\XaPdo;
 
 class DbManager
 {
-	public static $driver_instances = [];
-	public static $xa_driver_instances = [];
+	protected static $driver_instances = [];
+	protected static $xa_driver_instances = [];
 	
 	/**
 	 * 
@@ -30,12 +30,22 @@ class DbManager
 	 * @param string $xid
 	 * @return \zeus\store\db\driver\Pdo
 	 */
-	public static function openXaSession($xid)
+	public static function openXaSession($config,$xid)
 	{
-		$instance = new XaPdo(ConfigManager::database(),$xid);
+		$instance = new XaPdo($config,$xid);
 		
 		self::$xa_driver_instances[] = $instance;
 		
 		return $instance;
+	}
+	
+	public static function getAllSessions()
+	{
+		return self::$driver_instances;
+	}
+	
+	public static function getAllXaSessions()
+	{
+		return self::$xa_driver_instances;
 	}
 }
