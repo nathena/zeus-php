@@ -41,7 +41,7 @@ abstract class AbstractPdoDialect
 		$driver_options = isset($cfg["driver_options"]) && is_array($cfg["driver_options"]) ? $cfg["driver_options"] : null;
 	
 		$this->pdo = new \PDO($dsn, $user, $pass, $driver_options);
-	
+		
 		//取保连接关闭
 		register_shutdown_function(array($this, 'close'));
 	}
@@ -243,7 +243,10 @@ abstract class AbstractPdoDialect
 		return $sth->rowCount();
 	}
 	
-	
+	public function debug()
+	{
+		return [$this->sql,$this->param];
+	}
 	
 	public function beginTransaction($nested=false)
 	{

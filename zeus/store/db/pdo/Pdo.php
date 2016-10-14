@@ -9,7 +9,7 @@ namespace zeus\store\db\pdo;
 
 class Pdo extends AbstractPdoDialect
 {
-    protected $transactionCount = 0;
+    protected $transactionCounter = 0;
 
     public function __construct( $cfg )
     {
