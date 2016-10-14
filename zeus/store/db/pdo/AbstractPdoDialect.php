@@ -22,12 +22,14 @@ abstract class AbstractPdoDialect
 	/**
 	 * @param $cfg
 	 *
+	 * mysql:host=localhost;port=3306;dbname=testdb
+	 * mysql:unix_socket=/tmp/mysql.sock;dbname=testdb
 	 * array(
-	 "dsn"=>"",
-	 "user"=>"",
-	 "pass"=>"",
-	 "driver_options"=>null
-	 )
+		 "dsn"=>"",
+		 "user"=>"",
+		 "pass"=>"",
+		 "driver_options"=>[]
+		)
 	 */
 	public function __construct( $cfg )
 	{
@@ -36,10 +38,9 @@ abstract class AbstractPdoDialect
 		$pass = isset($cfg["pass"]) ? trim($cfg["pass"]) : "";
 		$charset = isset($cfg["charset"]) ? trim($cfg["charset"]) : "utf8";
 		
-		$driver_options = isset($cfg["driver_options"]) ? trim($cfg["driver_options"]) : null;
+		$driver_options = isset($cfg["driver_options"]) && is_array($cfg["driver_options"]) ? $cfg["driver_options"] : null;
 	
 		$this->pdo = new \PDO($dsn, $user, $pass, $driver_options);
-		$this->pdo->exec("SET NAMES $charset");
 	
 		//取保连接关闭
 		register_shutdown_function(array($this, 'close'));
