@@ -32,9 +32,16 @@ class Autoloader
 		return $this;
 	}
 	
-	public function registerDirs(array $dirs)
+	public function registerDirs($dirs)
 	{
-		$this->_includeDir = array_unique(array_merge($this->_includeDir,$dirs));
+		if( is_array($dirs) )
+		{
+			$this->_includeDir = array_unique(array_merge($this->_includeDir,$dirs));
+		}
+		else 
+		{
+			$this->_includeDir = array_unique(array_push($this->_includeDir, $dirs));
+		}
 		
 		return $this;
 	}
