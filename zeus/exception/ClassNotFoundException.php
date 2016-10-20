@@ -1,7 +1,7 @@
 <?php
 namespace zeus\exception;
 
-class ClassNotFoundException extends \RuntimeException
+class ClassNotFoundException extends NestedException
 {
 	public function __construct ($message = null, $code = null, $previous = null) 
 	{

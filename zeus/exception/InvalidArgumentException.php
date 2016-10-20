@@ -1,7 +1,7 @@
 <?php
 namespace zeus\exception;
 
-class InvalidArgumentException extends \RuntimeException
+class InvalidArgumentException extends NestedException
 {
 	public function __construct ($message = null, $code = null, $previous = null) 
 	{
