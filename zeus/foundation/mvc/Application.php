@@ -11,6 +11,7 @@ use zeus\foundation\mvc\Controller;
 use zeus\foundation\filter\XssFilter;
 use zeus\foundation\logger\Logger;
 use zeus\foundation\ConfigManager;
+use zeus\foundation\exception\NestedException;
 
 define('ZEUS_VERSION', '0.0.1');
 define('ZEUS_PATH', dirname(dirname(dirname(__FILE__))));
@@ -103,6 +104,7 @@ class Application
 	
 	public function start($orgin_path='')
 	{
+		$controller = null;
 		try
 		{
 			$this->router->doRouter($orgin_path);
@@ -132,6 +134,17 @@ class Application
 				$controller->setApplication($this);
 				
 				call_user_func_array(array($controller, $this->router->getMethod()),$this->router->getParams());
+			}
+		}
+		catch(NestedException $e)
+		{
+			if( !is_null($controller) && $controller instanceof Controller )
+			{
+				$controller->errorHandler($e);
+			}
+			else 
+			{
+				throw $e;
 			}
 		}
 		catch(\Exception $e)

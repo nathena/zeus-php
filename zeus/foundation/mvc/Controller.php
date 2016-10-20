@@ -49,15 +49,9 @@ class Controller
 		return $csrf == $_csrf;
 	}
 	
-	public function __errorHandler($message, $code='', $type='', $file="", $line="")
+	public function errorHandler(\Exception $e)
 	{
-		$this->view->assign("message",$message);
-		$this->view->assign("code",$code);
-		$this->view->assign("type",$type);
-		$this->view->assign("file",$file);
-		$this->view->assign("line",$line);
-		
-		$this->view->display("error");
+		throw $e;
 	}
 	
 	protected function getRequest()
