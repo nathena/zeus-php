@@ -1,7 +1,7 @@
 <?php
 namespace app\controller\aaa;
 
-use zeus\mvc\Controller;
+use zeus\foundation\mvc\Controller;
 
 class Test extends Controller
 {

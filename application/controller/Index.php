@@ -1,8 +1,8 @@
 <?php
 namespace app\controller;
 
-use zeus\mvc\Controller;
-use zeus\store\db\DbManager;
+use zeus\foundation\mvc\Controller;
+use zeus\foundation\store\DbManager;
 
 class Index extends Controller
 {
