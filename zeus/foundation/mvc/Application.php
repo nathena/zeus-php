@@ -25,6 +25,8 @@ require_once ZEUS_PATH.DS.'foundation'.DS.'Autoloader.php';
 
 class Application 
 {
+	public $autoloader = null;
+	
 	private $request;
 	private $reponse;
 	
@@ -33,16 +35,15 @@ class Application
 	
 	public function __construct()
 	{
+		$this->autoloader = new Autoloader();
+		$this->autoloader->registerNamespaces('zeus', ZEUS_PATH);
+		$this->autoloader->registerDirs([ZEUS_PATH,ZEUS_PATH.DS.'lib']);
+		
 		$this->init();
 	}
 	
 	public function init()
 	{
-		$autoloader = new Autoloader();
-		
-		$autoloader->registerNamespaces('zeus', ZEUS_PATH);
-		$autoloader->registerDirs([ZEUS_PATH,ZEUS_PATH.DS.'lib']);
-		
 		//timezone
 		date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
 		
@@ -51,7 +52,7 @@ class Application
 		{
 			if( is_dir($path) )
 			{
-				$autoloader->registerNamespaces($ns, $path);
+				$this->autoloader->registerNamespaces($ns, $path);
 			}
 		}
 		
