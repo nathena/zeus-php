@@ -1,8 +1,8 @@
 <?php
 namespace zeus\foundation\http;
 
-use zeus\exception\ClassNotFoundException;
-use zeus\etc\ConfigManager;
+use zeus\foundation\exception\ClassNotFoundException;
+use zeus\foundation\ConfigManager;
 
 class Session
 {
@@ -84,7 +84,7 @@ class Session
 			if (!empty($config['type']))
 			{
 				// 读取session驱动
-				$class = false !== strpos($config['type'], '\\') ? $config['type'] : '\\zeus\\http\\session\\' . ucwords($config['type']);
+				$class = false !== strpos($config['type'], '\\') ? $config['type'] : '\\zeus\\foundation\\http\\session\\' . ucwords($config['type']);
 				// 检查驱动类
 				if (!class_exists($class) || !session_set_save_handler(new $class($config)))
 				{
