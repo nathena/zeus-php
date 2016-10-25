@@ -15,5 +15,7 @@ class Index extends Controller
 		print_r($this->request->post());
 		
 		//print_r($this->application);
+		
+		$this->application->debug();
 	}
 }

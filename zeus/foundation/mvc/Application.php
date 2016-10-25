@@ -35,7 +35,6 @@ class Application
 	
 	private $router;
 	private $filter;
-	
 	private $view;
 	
 	protected function __construct()
