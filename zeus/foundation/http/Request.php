@@ -1,23 +1,95 @@
 <?php
 namespace zeus\foundation\http;
 
+use zeus\foundation\mvc\Application;
+use zeus\foundation\filter\FilterInterface;
+
 class Request
 {
 	/**
 	 * @var array 请求参数
 	 */
-	protected $get     = [];
-	protected $post    = [];
-	protected $put	   = [];
-	protected $patch   = [];
-	protected $delete  = [];
-	protected $cookie  = [];
-	protected $header  = [];
-	protected $server  = [];
+	private $get     = [];
+	private $post    = [];
+	private $put	   = [];
+	private $patch   = [];
+	private $delete  = [];
+	private $cookie  = [];
+	private $header  = [];
+	private $server  = [];
 	
-	protected $orgin_path;
+	private $params  =[];
+	private $_request  =[];
+	private $orgin_path;
 	
-	public function __construct()
+	protected $application;
+	
+	public static function create(Application $application)
+	{
+		return new self($application);
+	}
+	
+	public static function isCli()
+	{
+		return stripos(PHP_SAPI, 'cli') === 0;
+	}
+	
+	public static function isCgi()
+	{
+		return stripos(PHP_SAPI, 'cgi') === 0;
+	}
+	
+	public static function ip($type = 0, $adv = false)
+	{
+		$type      = $type ? 1 : 0;
+	
+		static $ip = null;
+		if (null !== $ip)
+		{
+			return $ip[$type];
+		}
+	
+		if ($adv)
+		{
+			if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+			{
+				$arr = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+				$pos = array_search('unknown', $arr);
+				if (false !== $pos)
+				{
+					unset($arr[$pos]);
+				}
+				$ip = trim($arr[0]);
+			}
+			elseif (isset($_SERVER['HTTP_CLIENT_IP']))
+			{
+				$ip = $_SERVER['HTTP_CLIENT_IP'];
+			}
+			elseif (isset($_SERVER['REMOTE_ADDR']))
+			{
+				$ip = $_SERVER['REMOTE_ADDR'];
+			}
+		}
+		elseif (isset($_SERVER['REMOTE_ADDR']))
+		{
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+	
+		// IP地址合法验证
+		$long = sprintf("%u", ip2long($ip));
+		$ip   = $long ? array($ip, $long) : array('0.0.0.0', 0);
+	
+		return $ip[$type];
+	}
+	
+	protected function __construct(Application $application)
+	{
+		$this->application = $application;
+		
+		$this->init();
+	}
+	
+	protected function init()
 	{
 		$this->get = (isset($_GET)) ? $_GET : array();
 		$this->post = (isset($_POST)) ? $_POST : array();
@@ -25,27 +97,33 @@ class Request
 		$this->env = (isset($_ENV)) ? $_ENV : array();
 		$this->cookie = (isset($_COOKIE)) ? Cookie::get() : array();
 		
-		if (isset($_SERVER['REQUEST_METHOD'])) 
+		if (isset($_SERVER['REQUEST_METHOD']))
 		{
-			if ($this->isPut() || $this->isPatch() || $this->isDelete()) 
+			if ($this->isPut() || $this->isPatch() || $this->isDelete())
 			{
 				$this->parseData();
 			}
 		}
 		
+		$this->_request = array_merge($this->_request, $this->get);
+		$this->_request = array_merge($this->_request, $this->post);
+		$this->_request = array_merge($this->_request, $this->put);
+		$this->_request = array_merge($this->_request, $this->patch);
+		$this->_request = array_merge($this->_request, $this->delete);
+		
 		// Get any possible request headers
-		if (function_exists('getallheaders')) 
+		if (function_exists('getallheaders'))
 		{
 			$this->headers = getallheaders();
-		} 
-		else 
+		}
+		else
 		{
-			foreach ($_SERVER as $key => $value) 
+			foreach ($_SERVER as $key => $value)
 			{
-				if (substr($key, 0, 5) == 'HTTP_') 
+				if (substr($key, 0, 5) == 'HTTP_')
 				{
 					$key = ucfirst(strtolower(str_replace('HTTP_', '', $key)));
-					if (strpos($key, '_') !== false) 
+					if (strpos($key, '_') !== false)
 					{
 						$ary = explode('_', $key);
 						foreach ($ary as $k => $v){
@@ -61,14 +139,19 @@ class Request
 	
 	public function getOrginPath($uri_protocol = 'REQUEST_URI')
 	{
-		if( !isset($this->orgin_path) )
+		if(empty($uri_protocol)){
+			$uri_protocol = 'REQUEST_URI';
+		}
+		
+		if( empty($this->orgin_path) )
 		{
 			$url_path = self::isCli()?$this->cliOrginPath():$_SERVER[$uri_protocol];
-			
 			$url_path = parse_url($url_path);
 			if( isset($url_path["query"]))
 			{
 				parse_str($url_path["query"],$this->get);
+				
+				$this->params = array_merge($this->params, $this->get);
 			}
 			
 			$this->orgin_path = trim(strtolower($url_path["path"]),"/");
@@ -76,15 +159,9 @@ class Request
 		return $this->orgin_path;
 	}
 	
-	public function setOrginPath($orgin_path)
+	public function params($key = '')
 	{
-		$url_path = parse_url($url_path);
-		if( isset($url_path["query"]))
-		{
-			parse_str($url_path["query"],$this->get);
-		}
-			
-		$this->orgin_path = trim(strtolower($url_path["path"]),"/");
+		return $this->data('params',$key);
 	}
 	
 	public function get($key = '')
@@ -117,32 +194,10 @@ class Request
 		return $this->data('cookie',$key);
 	}
 	
-	private function data($data, $key='')
+	public function _request($key = '')
 	{
-		if( !property_exists($this, $data) )
-		{
-			return null;
-		}
-		
-		if( empty($key) )
-		{
-			return $this->{$data};
-		}
-		
-		if( is_array($key) )
-		{
-			foreach($key as $k => $v)
-			{
-				$this->{$data}[$k] = $v;
-			}
-			
-			return $this->{$data};
-		}
-		
-		return isset($this->{$data}[$key]) ? $this->{$data}[$key] : '';
-		
+		return $this->data('_request',$key);
 	}
-	
 	
 	public function isAjax()
 	{
@@ -237,6 +292,19 @@ class Request
 		return ($this->server['REQUEST_METHOD'] == 'PATCH');
 	}
 	
+	public function doFilter(FilterInterface $filter)
+	{
+		$this->get( $filter->doFilter($this->get()) );
+		$this->post( $filter->doFilter($this->post()) );
+		$this->put( $filter->doFilter($this->put()) );
+		$this->patch( $filter->doFilter($this->patch()) );
+		$this->delete( $filter->doFilter($this->delete()) );
+		$this->cookie( $filter->doFilter($this->cookie()) );
+		$this->params( $filter->doFilter($this->params()) );
+		
+		$this->_request( $filter->doFilter($this->_request()) );
+	}
+	
 	protected function parseData()
 	{
 		$pData = file_get_contents('php://input');
@@ -287,57 +355,30 @@ class Request
 		$args = array_slice($_SERVER['argv'], 1);
 		return $args ? implode('/', $args) : '';
 	}
-		
-	public static function isCli()
-	{
-		return stripos(PHP_SAPI, 'cli') === 0;
-	}
 	
-	public static function isCgi()
+	private function data($data, $key='')
 	{
-		return stripos(PHP_SAPI, 'cgi') === 0;
-	}
-	
-	public static function ip($type = 0, $adv = false)
-	{
-		$type      = $type ? 1 : 0;
-		
-		static $ip = null;
-		if (null !== $ip) 
+		if( !property_exists($this, $data) )
 		{
-			return $ip[$type];
+			return null;
 		}
-		
-		if ($adv) 
+	
+		if( empty($key) )
 		{
-			if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) 
+			return $this->{$data};
+		}
+	
+		if( is_array($key) )
+		{
+			foreach($key as $k => $v)
 			{
-				$arr = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-				$pos = array_search('unknown', $arr);
-				if (false !== $pos) 
-				{
-					unset($arr[$pos]);
-				}
-				$ip = trim($arr[0]);
-			} 
-			elseif (isset($_SERVER['HTTP_CLIENT_IP'])) 
-			{
-				$ip = $_SERVER['HTTP_CLIENT_IP'];
-			} 
-			elseif (isset($_SERVER['REMOTE_ADDR'])) 
-			{
-				$ip = $_SERVER['REMOTE_ADDR'];
+				$this->{$data}[$k] = $v;
 			}
-		} 
-		elseif (isset($_SERVER['REMOTE_ADDR'])) 
-		{
-			$ip = $_SERVER['REMOTE_ADDR'];
+				
+			return $this->{$data};
 		}
-		
-		// IP地址合法验证
-		$long = sprintf("%u", ip2long($ip));
-		$ip   = $long ? array($ip, $long) : array('0.0.0.0', 0);
-		
-		return $ip[$type];
+	
+		return isset($this->{$data}[$key]) ? $this->{$data}[$key] : '';
+	
 	}
 }

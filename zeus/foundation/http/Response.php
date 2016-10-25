@@ -56,14 +56,14 @@ class Response
 	
 	protected $application;
 	
-	protected function __construct(Application $application)
-	{
-		$this->application = $application;
-	}
-	
 	public static function create(Application $application)
 	{
 		return new self($application);
+	}
+	
+	protected function __construct(Application $application)
+	{
+		$this->application = $application;
 	}
 	
 	public function redirect($url, $code = '302', $version = '1.1')
@@ -82,64 +82,5 @@ class Response
 	public function forward($url)
 	{
 		$this->application->start($url);
-	}
-	
-	public function download($filename = '', $data = '')
-	{
-		if ($filename == '' OR $data == '')
-		{
-			return FALSE;
-		}
-		
-		// Try to determine if the filename includes a file extension.
-		// We need it in order to set the MIME type
-		if (FALSE === strpos($filename, '.'))
-		{
-			return FALSE;
-		}
-		
-		// Grab the file extension
-		$x = explode('.', $filename);
-		$extension = end($x);
-		
-		// Load the mime types
-		$mimes = include_once ZEUS_PATH.DS.'etc'.DS.'mimes.php';
-		
-		// Set a default mime if we can't find it
-		if ( !isset($mimes[$extension]))
-		{
-			$mime = 'application/octet-stream';
-		}
-		else
-		{
-			$mime = (is_array($mimes[$extension])) ? $mimes[$extension][0] : $mimes[$extension];
-		}
-		
-		ob_start();
-		
-		// Generate the server headers
-		if (strpos($_SERVER['HTTP_USER_AGENT'], "MSIE") !== FALSE)
-		{
-			header('Content-Type: '.$mime);
-			header('Content-Disposition: attachment; filename="'.$filename.'"');
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-			header("Content-Transfer-Encoding: binary");
-			header('Pragma: public');
-			header("Content-Length: ".strlen($data));
-		}
-		else
-		{
-			header('Content-Type: '.$mime);
-			header('Content-Disposition: attachment; filename="'.$filename.'"');
-			header("Content-Transfer-Encoding: binary");
-			header('Expires: 0');
-			header('Pragma: no-cache');
-			header("Content-Length: ".strlen($data));
-		}
-		
-		echo $data;
-		
-		ob_end_flush();
 	}
 }

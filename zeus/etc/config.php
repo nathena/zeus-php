@@ -9,7 +9,11 @@ return [
 		
 	'default_timezone' => 'Asia/Shanghai',
 	
+	//REQUEST_URI、QUERY_STRING、PATH_INFO
+	'uri_protocol' => 'REQUEST_URI',
+	
 	'xss_clean' => true,
+		
 		
 	'log_path' => $root.DIRECTORY_SEPARATOR.'logs',
 	'log_level' => 0,

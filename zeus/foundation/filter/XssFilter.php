@@ -28,7 +28,7 @@ class XssFilter extends AbstractFilter
 				'#</*\w+:\w[^>]*+>#i' => '',
 				//unwanted tags
 				'#</*(?:applet|b(?:ase|gsound|link)|embed|frame(?:set)?|i(?:frame|layer)|l(?:ayer|ink)|meta|object|s(?:cript|tyle)|title|xml)[^>]*+>#i' => '',
-				'/\'/' => '&lsquo;',
+				'/\'/' => '&apos;',
 				'/"/' => '&quot;',
 				'/&/' => '&amp;',
 				'/</' => '&lt;',
@@ -41,7 +41,6 @@ class XssFilter extends AbstractFilter
 		$replacements = array_values($preg_patterns);
 		
 		$data = preg_replace($patterns,$replacements,$data);
-		
 		return $data;
 	}
 }

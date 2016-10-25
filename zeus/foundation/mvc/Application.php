@@ -4,11 +4,12 @@ namespace zeus\foundation\mvc;
 use zeus\foundation\Autoloader;
 use zeus\foundation\http\Request;
 use zeus\foundation\http\Response;
-use zeus\foundation\mvc\Router;
+use zeus\foundation\http\RequestXssFilter;
 use zeus\foundation\filter\FilterInterface;
 use zeus\foundation\filter\DefaultFilter;
-use zeus\foundation\mvc\Controller;
 use zeus\foundation\filter\XssFilter;
+use zeus\foundation\mvc\Controller;
+use zeus\foundation\mvc\Router;
 use zeus\foundation\logger\Logger;
 use zeus\foundation\ConfigManager;
 use zeus\foundation\exception\NestedException;
@@ -25,7 +26,9 @@ require_once ZEUS_PATH.DS.'foundation'.DS.'Autoloader.php';
 
 class Application 
 {
-	public $autoloader = null;
+	private static $_applications = [];
+	
+	private $autoloader;
 	
 	private $request;
 	private $reponse;
@@ -33,7 +36,9 @@ class Application
 	private $router;
 	private $filter;
 	
-	public function __construct()
+	private $view;
+	
+	protected function __construct()
 	{
 		$this->autoloader = new Autoloader();
 		$this->autoloader->registerNamespaces('zeus', ZEUS_PATH);
@@ -42,7 +47,7 @@ class Application
 		$this->init();
 	}
 	
-	public function init()
+	protected function init()
 	{
 		//timezone
 		date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
@@ -56,11 +61,30 @@ class Application
 			}
 		}
 		
-		$this->setRequest(new Request());
+		$this->setRequest(Request::create($this));
 		$this->setResponse(Response::create($this));
 		
 		$this->setFilter(new DefaultFilter());
-		$this->setRouter(new Router($this));
+		$this->setRouter(new Router());
+		$this->setView(new View());
+	}
+	
+	/**
+	 * 
+	 * @param string $ns
+	 * @return \zeus\foundation\mvc\Application
+	 */
+	public static function getCurrentApplication($ns = 'default')
+	{
+		if(!isset(self::$_applications[$ns])){
+			self::$_applications[$ns] = new self();
+		}
+		return self::$_applications[$ns];
+	}
+	
+	public function currentAutoLoad()
+	{
+		return $this->autoloader;
 	}
 	
 	public function getRequest()
@@ -103,38 +127,40 @@ class Application
 		$this->router = $router;
 	}
 	
+	public function getView()
+	{
+		return $this->view;
+	}
+	
+	public function setView(View $view)
+	{
+		$this->view = $view;
+	}
+	
 	public function start($orgin_path='')
 	{
 		$controller = null;
 		try
 		{
-			$this->router->doRouter($orgin_path);
+			if( empty($orgin_path) ){
+				$orgin_path = $this->request->getOrginPath(ConfigManager::config("uri_protocol"));
+			}
+			
+			$this->router->route($orgin_path);
 			
 			if( ConfigManager::config("xss_clean") )
 			{
-				$_xssFilter = new XssFilter();
-				$this->filter->setNext($_xssFilter);
-			
-				//$_GET = $this->filter->doFilter($_GET);
-				//$_POST = $this->filter->doFilter($_POST);
-			
-				$this->request->get( $this->filter->doFilter($this->request->get()) );
-				$this->request->post( $this->filter->doFilter($this->request->post()) );
-				$this->request->put( $this->filter->doFilter($this->request->put()) );
-				$this->request->patch( $this->filter->doFilter($this->request->patch()) );
-				$this->request->delete( $this->filter->doFilter($this->request->delete()) );
-				$this->request->cookie( $this->filter->doFilter($this->request->cookie()) );
-				
-				$this->router->setParams($this->filter->doFilter($this->router->getParams()));
+				$this->filter->setNext(new XssFilter());
 			}
+			
+			$this->request->params($this->router->getParams());
+			$this->request->doFilter($this->filter);
 			
 			$controller = $this->router->getController();
 			$controller = new $controller();
 			if( $controller instanceof Controller )
 			{
-				$controller->setApplication($this);
-				
-				call_user_func_array(array($controller, $this->router->getMethod()),$this->router->getParams());
+				call_user_func_array(array($controller, $this->router->getMethod()),$this->request->params());
 			}
 		}
 		catch(NestedException $e)

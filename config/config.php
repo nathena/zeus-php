@@ -11,6 +11,9 @@ return [
 	
 	'xss_clean' => true,
 		
+	//REQUEST_URI、QUERY_STRING、PATH_INFO
+	//'uri_protocol' => 'REQUEST_URI',
+		
 	'log_path' => $root.DIRECTORY_SEPARATOR.'logs',
 	'log_level' => 0,
 	

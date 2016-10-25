@@ -9,8 +9,6 @@ use zeus\foundation\filter\XssFilter;
 class Router
 {
 	private static $config = [
-			//REQUEST_URI、QUERY_STRING、PATH_INFO
-			'uri_protocol'				=> 'REQUEST_URI',
 			'default_controller_ns'	    => '',
 			'default_controller'		=> 'Index',
 			'default_controller_action'	=> 'index',
@@ -21,12 +19,14 @@ class Router
 	
 	protected $application;
 	
-	protected $orgin_path;
 	protected $controller;
 	protected $method;
+	
 	protected $params = [];
 	
-	public function __construct(Application $application, array $config = [])
+	private $uri_path;
+	
+	public function __construct(array $config = [])
 	{
 		if (empty($config)) 
 		{
@@ -34,22 +34,6 @@ class Router
 		}
 		
 		self::$config = array_merge(self::$config,array_change_key_case($config));
-		
-		$this->application = $application;
-	}
-	
-	public function getOrginPath()
-	{
-		return $this->orgin_path;
-	}
-	
-	public function setOrginPath($orgin_path='')
-	{
-		if( !empty($orgin_path) )
-		{
-			$this->application->getRequest()->setOrginPath($orgin_path);
-		}
-		$this->orgin_path = $this->application->getRequest()->getOrginPath(self::$config['uri_protocol']);
 	}
 	
 	public function getController()
@@ -67,18 +51,16 @@ class Router
 		return $this->params;
 	}
 	
-	public function setParams(array $params)
+	public function getRouter()
 	{
-		$this->params = $params;
+		return $this->uri_path;
 	}
 	
-	public function doRouter($orgin_path='')
+	public function route($url_path)
 	{
-		$this->setOrginPath($orgin_path);
+		$this->uri_path = trim($url_path,"/");
 		
-		$uri_path = $this->orgin_path;
-		
-		if( "/" == $uri_path || "" == $uri_path )
+		if( "/" == $this->uri_path || "" == $this->uri_path )
 		{
 			if( $this->routeDefauleController() )
 			{
@@ -104,18 +86,17 @@ class Router
 		return false;
 	}
 	
-	protected function routerUriRewrite()
+	private function routerUriRewrite()
 	{
 		$rewrite = self::$config['rewrite'];
-		$uri_path = $this->orgin_path;
 		
 		if( !empty($rewrite) && is_array($rewrite))
 		{
 			foreach ($rewrite as $pattern => $replacement )
 			{
-				if( preg_match("#^$pattern$#", $uri_path))
+				if( preg_match("#^$pattern$#", $this->uri_path))
 				{
-					$rule = preg_replace("#^$pattern$#", $replacement, $uri_path);
+					$rule = preg_replace("#^$pattern$#", $replacement, $this->uri_path);
 		
 					$rule = explode("@", $rule);
 					
@@ -128,7 +109,7 @@ class Router
 						
 						if( count($rule)>1 )
 						{
-							$this->params = explode(",", $rule[1]);
+							$this->params(explode(",", $rule[1]));
 						}
 						
 						return true;
@@ -140,11 +121,9 @@ class Router
 		return false;
 	}
 	
-	protected function routeUriPath()
+	private function routeUriPath()
 	{
-		$uri_path = $this->orgin_path;
-		
-		$rule = explode("/", $uri_path);
+		$rule = explode("/", $this->uri_path);
 		$count = count($rule);
 		
 		$controller_packpage = self::$config['default_controller_ns'].'\\controller';
@@ -177,7 +156,7 @@ class Router
 					
 					if( $_params_index < $count)
 					{
-						$this->params     = array_slice($rule, $_params_index);
+						$this->params( array_slice($rule, $_params_index) );
 					}
 				}
 				else 
@@ -202,10 +181,15 @@ class Router
 		{
 			$this->controller = $controller;
 			$this->method     = self::$config['default_controller_action'];
-		
+			$this->params( explode("/", $this->uri_path));
 			return true;
 		}
 		
 		return false;
+	}
+	
+	private function params(array $params)
+	{
+		$this->params = array_merge($this->params,$params);
 	}
 }
