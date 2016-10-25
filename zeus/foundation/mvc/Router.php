@@ -2,9 +2,6 @@
 namespace zeus\foundation\mvc;
 
 use zeus\foundation\ConfigManager;
-use zeus\foundation\filter\FilterInterface;
-use zeus\foundation\exception\RouterNotFoundException;
-use zeus\foundation\filter\XssFilter;
 
 class Router
 {
