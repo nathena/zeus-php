@@ -23,8 +23,7 @@ class Router
 	protected $method;
 	
 	protected $params = [];
-	
-	private $uri_path;
+	protected $uri_path;
 	
 	public function __construct(array $config = [])
 	{
