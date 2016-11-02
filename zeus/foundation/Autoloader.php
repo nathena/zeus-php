@@ -135,7 +135,7 @@ class Autoloader
 	{
 		foreach( $this->_includeDir as $dir)
 		{
-			$_classFile = $dir.DS.implode(DS, $classNameFragment).'.php';
+			$_classFile = $dir.DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $classNameFragment).'.php';
 			if( file_exists($_classFile) )
 			{
 				return $_classFile;
