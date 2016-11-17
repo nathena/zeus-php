@@ -81,7 +81,7 @@ class Application
 		return self::$_applications[$ns];
 	}
 	
-	public function currentAutoLoad()
+	public function getLoader()
 	{
 		return $this->autoloader;
 	}
