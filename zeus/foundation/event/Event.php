@@ -13,11 +13,11 @@ class Event
 	public static function publish(EventObject $event)
 	{
 		$_class = get_class($event);
-		if( isset(get_class($event)) )
+		if( isset($_listener[$_class]) )
 		{
 			self::$_listener[$_class]->call($event);
 		}
 		
-		
+		$event->__publish();
 	}
 }
