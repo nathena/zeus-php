@@ -1,5 +1,5 @@
 <?php
-namespace zeus\foundation\http\session;
+namespace zeus\foundation\http\session\handle;
 
 use SessionHandler;
 

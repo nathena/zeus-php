@@ -2,6 +2,7 @@
 namespace zeus\foundation\mvc;
 
 use zeus\foundation\util\UUIDGenerator;
+use zeus\foundation\http\session\Session;
 
 class Controller
 {
@@ -30,7 +31,7 @@ class Controller
 			return $token;
 		}
 		
-		$_csrf = session::get("_csrf");
+		$_csrf = Session::get("_csrf");
 		return $csrf == $_csrf;
 	}
 	

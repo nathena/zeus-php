@@ -16,6 +16,8 @@ class Index extends Controller
 		
 		//print_r($this->application);
 		
+		echo __NAMESPACE__;
+		
 		$this->application->debug();
 	}
 }
