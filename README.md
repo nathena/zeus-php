@@ -16,7 +16,7 @@
 
 ## etc
 
-etc以约定约束项目默认配置文件，实际项目可使用APP_ENV_DIR（见webroot/index.php）常量重载。关于APP_ENV_DIR，详见[zeus\foundation\ConfigManager](#ConfigManager)
+etc以约定约束项目默认配置文件，实际项目可使用APP_ENV_DIR（见webroot/index.php）常量重载。关于APP_ENV_DIR，详见[zeus\foundation\ConfigManager] (#ConfigManager)
 - config.php 默认项目环境配置文件
 - database.php 默认的数据库配置文件
 - mimes.php 目前用处不大，文件mime头
