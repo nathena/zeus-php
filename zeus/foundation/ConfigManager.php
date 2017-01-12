@@ -1,6 +1,7 @@
 <?php
 namespace zeus\foundation;
 
+defined('APP_ENV_DIR') or define('APP_ENV_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'etc');
 class ConfigManager
 {
 	private static $config = null;
