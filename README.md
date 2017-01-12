@@ -20,7 +20,7 @@ etc以约定约束项目默认配置文件，实际项目可使用APP_ENV_DIR（
 - config.php 默认项目环境配置文件
 - database.php 默认的数据库配置文件
 - mimes.php 目前用处不大，文件mime头
-- router.php 推荐使用路由配置，而不是使用框架默认的路由判断
+- router.php 推荐使用路由配置，而不使用框架默认的路由判断
 
 ## foundation
 
