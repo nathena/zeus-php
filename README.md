@@ -44,6 +44,12 @@ ConfigManager 更多的扮演了环境变量存取的角色。默认的环境变
 
 >注意：个人一直认为，框架可以不需要任何的代码，只需要相互间的约束即可。针对相关的约束，配以有助于实现约束的函数接口即可，例如：Autoloader、ConfigManager就是上述接口的一种。
 
+### zeus\mvc\Application
+
+zeus使用mvc架构为框架的前端上下文容器（application），通过application托管response、request、loader、router等。application容器，内部自实现命名控制，因此同一个子项目内可以启动多个application，application间相互隔离。
+
+同时，在application容器内监听异常与错误handler，实现框架整体的异常捕获体系。
+
 ===========================
 
 先写到这里，待续......
