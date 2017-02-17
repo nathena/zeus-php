@@ -6,9 +6,9 @@ namespace zeus\foundation\event;
  * @author nathena
  *
  */
-class Event
+class EventNotify
 {
-	public static function publish(EventObject $event)
+	public static function publishEvent(EventObject $event)
 	{
 		$_handlers = self::getHandler($event);
 		foreach($_handlers as $handler){
