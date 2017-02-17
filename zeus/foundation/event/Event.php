@@ -1,23 +1,33 @@
 <?php
 namespace zeus\foundation\event;
 
+/**
+ * event engine
+ * @author nathena
+ *
+ */
 class Event
 {
-	protected static $_listener = [];
-	
-	public static function subscribe(EventObject $event,EventCallable $callable)
-	{
-		self::$_listener[get_class($event)] = $callable;
-	}
-	
 	public static function publish(EventObject $event)
 	{
-		$_class = get_class($event);
-		if( isset($_listener[$_class]) )
-		{
-			self::$_listener[$_class]->call($event);
+		$_handlers = self::getHandler($event);
+		foreach($_handlers as $handler){
+			if(class_exists($handler)){
+				$callable = new $handler();
+				$callable->call($event);
+			}
 		}
-		
-		$event->__publish();
+	}
+	
+	private static function getHandler($event){
+		$handler = [];
+		$_class = get_class($event);
+		if(!empty($_class)){
+			$_event_key = trim($_class);
+			if(isset(EventManager::$events[$_event_key])){
+				$handler = EventManager::$events[$_event_key];
+			}
+		}
+		return $handler;
 	}
 }

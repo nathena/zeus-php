@@ -1,15 +1,16 @@
 <?php
 namespace zeus\foundation\event;
 
+/**
+ * event消息体
+ * @author nathena
+ *
+ */
 abstract class EventObject
 {
-	protected $_handles = [];
+	protected $caller;
 	
-	public final function __publish(){
-		foreach($_handles as $_handle){
-			if( $_handle instanceof EventCallable ){
-				$_handle->call($this);
-			}
-		}
+	public function __construct($caller){
+		$this->caller = $caller;	
 	}
 }
