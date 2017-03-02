@@ -1,5 +1,5 @@
 <?php
-namespace zeus\foundation\event;
+namespace bundle\event;
 
 /**
  * event消息体
@@ -8,9 +8,21 @@ namespace zeus\foundation\event;
  */
 abstract class EventObject
 {
-	protected $caller;
+	protected $_sender;
+	protected $_listeners = [];
 	
-	public function __construct($caller){
-		$this->caller = $caller;	
+	public function __construct($_sender)
+	{
+		$this->_sender = $_sender;
+	}
+	
+	public function getSender()
+	{
+		return $this->_sender;
+	}
+	
+	public function getListeners()
+	{
+		return $this->_listeners;
 	}
 }

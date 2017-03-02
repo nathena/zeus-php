@@ -1,5 +1,5 @@
 <?php
-namespace zeus\foundation\event;
+namespace bundle\event;
 
 /**
  * event engine
@@ -10,24 +10,15 @@ class EventNotify
 {
 	public static function publishEvent(EventObject $event)
 	{
-		$_handlers = self::getHandler($event);
+		$_handlers = $event->getListeners();
 		foreach($_handlers as $handler){
-			if(class_exists($handler)){
+			if(!empty($handler) && class_exists($handler)){
+				$method_name = 'handler'.end(explode("\\",get_class($event)));
 				$callable = new $handler();
-				$callable->call($event);
+				if(is_object($callable) && method_exists($callable, $method_name)){
+					$callable->{$method_name}($event);
+				}
 			}
 		}
-	}
-	
-	private static function getHandler($event){
-		$handler = [];
-		$_class = get_class($event);
-		if(!empty($_class)){
-			$_event_key = trim($_class);
-			if(isset(EventManager::$events[$_event_key])){
-				$handler = EventManager::$events[$_event_key];
-			}
-		}
-		return $handler;
 	}
 }
