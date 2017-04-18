@@ -8,13 +8,13 @@ use zeus\foundation\store\pdo\XaPdo;
 class DbManager
 {
 	/**
-	 * \zeus\foundation\store\pdo\Pdo
+	 * \zeus\ddd\infrastructure\persistent\pdo\Pdo
 	 * @var array
 	 */
 	protected static $driver_instances = [];
 	
 	/**
-	 * \zeus\foundation\store\pdo\Pdo
+	 * \zeus\ddd\infrastructure\persistent\pdo\Pdo
 	 * @var array
 	 */
 	protected static $xa_driver_instances = [];
@@ -22,7 +22,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $alias
-	 * @return \zeus\foundation\store\pdo\Pdo
+	 * @return \zeus\ddd\infrastructure\persistent\pdo\Pdo
 	 */
 	public static function openSession($alias='default')
 	{
@@ -41,7 +41,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $xid
-	 * @return \zeus\foundation\store\pdo\Pdo
+	 * @return \zeus\ddd\infrastructure\persistent\pdo\Pdo
 	 */
 	public static function openXaSession($config,$xid)
 	{

@@ -1,5 +1,5 @@
 <?php
-namespace zeus\foundation\store\pdo;
+namespace zeus\ddd\infrastructure\persistent\pdo;
 
 /**
  * 
