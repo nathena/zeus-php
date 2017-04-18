@@ -2,7 +2,7 @@
 namespace zeus\ddd\application;
 
 use zeus\foundation\mvc\Application;
-use zeus\foundation\filter\FilterInterface;
+use zeus\ddd\application\filter\FilterInterface;
 
 class Request
 {

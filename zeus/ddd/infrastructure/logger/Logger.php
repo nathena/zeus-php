@@ -6,8 +6,8 @@
  */
 namespace zeus\ddd\infrastructure\logger;
 
-use zeus\foundation\ConfigManager;
-use zeus\foundation\http\Request;
+use zeus\ddd\application\ConfigManager;
+use zeus\ddd\application\Request;
 
 class Logger
 {

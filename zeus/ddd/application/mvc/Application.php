@@ -1,18 +1,15 @@
 <?php
-namespace zeus\foundation\mvc;
+namespace zeus\ddd\application\mvc;
 
 use zeus\foundation\Autoloader;
 use zeus\foundation\http\Request;
 use zeus\foundation\http\Response;
 use zeus\foundation\http\RequestXssFilter;
-use zeus\foundation\filter\FilterInterface;
-use zeus\foundation\filter\DefaultFilter;
-use zeus\foundation\filter\XssFilter;
+use zeus\ddd\application\filter\FilterInterface;
+use zeus\ddd\application\filter\DefaultFilter;
+use zeus\ddd\application\filter\XssFilter;
 use zeus\foundation\mvc\Controller;
 use zeus\foundation\mvc\Router;
-use zeus\foundation\logger\Logger;
-use zeus\foundation\ConfigManager;
-use zeus\foundation\exception\NestedException;
 
 define('ZEUS_VERSION', '0.0.1');
 define('ZEUS_PATH', dirname(dirname(dirname(__FILE__))));

@@ -1,5 +1,5 @@
 <?php
-namespace zeus\foundation\filter;
+namespace zeus\ddd\application\filter;
 
 class XssFilter extends AbstractFilter
 {
