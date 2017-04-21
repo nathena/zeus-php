@@ -8,7 +8,7 @@ abstract class DomainEventPublisher
 	/**
 	 * 
 	 * @param string $ns
-	 * @return \zeus\domain\event\DomainEvent
+	 * @return \zeus\domain\event\DomainEventPublisher
 	 */
 	final public static function getInstance($ns="default"){
 		if(!isset(self::$instances[$ns])){
@@ -23,20 +23,20 @@ abstract class DomainEventPublisher
 		
 	}
 	
-	public function subscribe($eventType,$handler){
+	public function subscribe($eventType,$handlerType){
 		if(!isset($this->eventHandlers[$eventType])){
 			$this->eventHandlers[$eventType] = [];
 		}
-		$this->eventHandlers[$eventType][] = $handler;
+		$this->eventHandlers[$eventType][] = $handlerType;
 	}
 	
 	public function publish(DomainEvent $event){
-		
 		$eventType = $event->eventType();
 		$eventHandlers = $this->eventHandlers[$eventType];
-		
 		foreach($eventHandlers as $handler){
-			$event->handler($handler);
+			if(!empty($handler) && class_exists($handler)){
+				$event->handler(new $handler());
+			}
 		}
 		
 		$this->eventHandlers[$eventType] = [];

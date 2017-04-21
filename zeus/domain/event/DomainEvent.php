@@ -5,15 +5,15 @@ use zeus\utils\UUIDGenerator;
 
 abstract class DomainEvent
 {
-	private $eventId;
-	private $data;
+	protected $eventId;
+	protected $data;
 	
-	private $eventType;
-	private $method;
+	protected $eventType;
+	protected $method;
 	
-	private $aggregate;
+	protected $sender;
 	
-	public function __construct($data)
+	public function __construct($sender,$data)
 	{
 		$this->eventId = UUIDGenerator::numberNo();
 		
@@ -26,11 +26,13 @@ abstract class DomainEvent
 		$this->eventType = $class;
 		$this->method = $method_name;
 		$this->data = $data;
+		
+		$this->sender = $sender;
 	}
 	
 	public function eventType()
 	{
-		return $this->eventId;
+		return $this->eventType;
 	}
 	
 	public function eventId()
@@ -43,10 +45,6 @@ abstract class DomainEvent
         return $this->data;
     }
     
-    public function setAggregate($aggregate){
-    	$this->aggregate = $aggregate;
-    }
-    
     public function handler($handler){
     	if(is_object($handler) && method_exists($handler, $this->method)){
     		$handler->{$this->method}($this);
@@ -55,7 +53,7 @@ abstract class DomainEvent
     
     public function callback($data=null){
     	if(is_object($this->aggregate) && method_exists($this->aggregate, $this->method)){
-    		$this->aggregate->{$this->method}($this,$data);
+    		$this->sender->{$this->method}($this,$data);
     	}
     }
 }
