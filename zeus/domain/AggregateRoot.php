@@ -2,7 +2,7 @@
 
 namespace zeus\domain;
 
-use CodelyTv\Shared\Domain\Bus\Event\DomainEvent;
+use zeus\domain\event\DomainEvent;
 
 abstract class AggregateRoot
 {
@@ -20,6 +20,8 @@ abstract class AggregateRoot
 
     final protected function raise(DomainEvent $domainEvent)
     {
+    	$domainEvent->setAggregate($this);
+    	
         $this->domainEvents[] = $domainEvent;
     }
     
