@@ -1,5 +1,5 @@
 <?php
-namespace zeus\ddd\infrastructure\persistent\pdo;
+namespace zeus\persistent\pdo;
 
 /**
  * 
@@ -16,7 +16,7 @@ class Pdo extends AbstractPdoDialect
         parent::__construct($cfg);
     }
 
-    public function beginTransaction($nested=false)
+    public function beginTransaction($nested=true)
     {
     	if( $this->transactionCounter == 0 )
     	{
@@ -31,7 +31,7 @@ class Pdo extends AbstractPdoDialect
     	return $this->transactionCounter++;
     }
 
-    public function commit($nested=false)
+    public function commit($nested=true)
     {
     	if( $this->transactionCounter == 0 )
     	{
@@ -41,7 +41,7 @@ class Pdo extends AbstractPdoDialect
     	return $this->transactionCounter--;
     }
 
-    public function rollBack($nested=false)
+    public function rollBack($nested=true)
     {
     	if( $this->transactionCounter == 0 )
     	{

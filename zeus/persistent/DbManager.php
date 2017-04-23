@@ -1,20 +1,20 @@
 <?php
 namespace zeus\persistent;
 
-use zeus\foundation\ConfigManager;
-use zeus\foundation\store\pdo\Pdo;
-use zeus\foundation\store\pdo\XaPdo;
+use zeus\persistent\pdo\Pdo;
+use zeus\persistent\pdo\XaPdo;
+use zeus\sandbox\ConfigManager;
 
 class DbManager
 {
 	/**
-	 * \zeus\ddd\infrastructure\persistent\pdo\Pdo
+	 * \zeus\persistent\pdo\Pdo
 	 * @var array
 	 */
 	protected static $driver_instances = [];
 	
 	/**
-	 * \zeus\ddd\infrastructure\persistent\pdo\Pdo
+	 * \zeus\persistent\pdo\Pdo
 	 * @var array
 	 */
 	protected static $xa_driver_instances = [];
@@ -22,7 +22,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $alias
-	 * @return \zeus\ddd\infrastructure\persistent\pdo\Pdo
+	 * @return \zeus\persistent\pdo\Pdo
 	 */
 	public static function openSession($alias='default')
 	{
@@ -41,7 +41,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $xid
-	 * @return \zeus\ddd\infrastructure\persistent\pdo\Pdo
+	 * @return \zeus\persistent\pdo\Pdo
 	 */
 	public static function openXaSession($config,$xid)
 	{
