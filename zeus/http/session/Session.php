@@ -1,8 +1,8 @@
 <?php
-namespace zeus\ddd\application\session;
+namespace zeus\http\session;
 
-use zeus\foundation\exception\ClassNotFoundException;
-use zeus\foundation\ConfigManager;
+use zeus\sandbox\ConfigManager;
+use zeus\exception\ClassNotFoundException;
 
 class Session
 {

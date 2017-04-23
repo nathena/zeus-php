@@ -1,9 +1,9 @@
 <?php
-namespace zeus\ddd\application\session\handle;
+namespace zeus\http\session\handle;
 
 use SessionHandler;
 
-class Memcache extends SessionHandler
+class Memcached extends SessionHandler
 {
     protected $handler = null;
     protected $config  = [
@@ -11,8 +11,9 @@ class Memcache extends SessionHandler
         'port'         => 11211, // memcache端口
         'expire'       => 3600, // session有效期
         'timeout'      => 0, // 连接超时时间（单位：毫秒）
-        'persistent'   => true, // 长连接
         'session_name' => '', // memcache key前缀
+        'username'     => '', //账号
+        'password'     => '', //密码
     ];
 
     public function __construct($config = [])
@@ -29,10 +30,14 @@ class Memcache extends SessionHandler
     public function open($savePath, $sessName)
     {
         // 检测php环境
-        if (!extension_loaded('memcache')) {
-            throw new \Exception('not support:memcache');
+        if (!extension_loaded('memcached')) {
+            throw new \Exception('not support:memcached');
         }
-        $this->handler = new \Memcache;
+        $this->handler = new \Memcached;
+        // 设置连接超时时间（单位：毫秒）
+        if ($this->config['timeout'] > 0) {
+            $this->handler->setOption(\Memcached::OPT_CONNECT_TIMEOUT, $this->config['timeout']);
+        }
         // 支持集群
         $hosts = explode(',', $this->config['host']);
         $ports = explode(',', $this->config['port']);
@@ -40,11 +45,14 @@ class Memcache extends SessionHandler
             $ports[0] = 11211;
         }
         // 建立连接
+        $servers = [];
         foreach ((array) $hosts as $i => $host) {
-            $port = isset($ports[$i]) ? $ports[$i] : $ports[0];
-            $this->config['timeout'] > 0 ?
-            $this->handler->addServer($host, $port, $this->config['persistent'], 1, $this->config['timeout']) :
-            $this->handler->addServer($host, $port, $this->config['persistent'], 1);
+            $servers[] = [$host, (isset($ports[$i]) ? $ports[$i] : $ports[0]), 1];
+        }
+        $this->handler->addServers($servers);
+        if ('' != $this->config['username']) {
+            $this->handler->setOption(\Memcached::OPT_BINARY_PROTOCOL, true);
+            $this->handler->setSaslAuthData($this->config['username'], $this->config['password']);
         }
         return true;
     }
@@ -56,7 +64,7 @@ class Memcache extends SessionHandler
     public function close()
     {
         $this->gc(ini_get('session.gc_maxlifetime'));
-        $this->handler->close();
+        $this->handler->quit();
         $this->handler = null;
         return true;
     }
@@ -74,12 +82,12 @@ class Memcache extends SessionHandler
     /**
      * 写入Session
      * @access public
-     * @param string    $sessID
-     * @param String    $sessData
+     * @param string $sessID
+     * @param String $sessData
      */
     public function write($sessID, $sessData)
     {
-        return $this->handler->set($this->config['session_name'] . $sessID, $sessData, 0, $this->config['expire']);
+        return $this->handler->set($this->config['session_name'] . $sessID, $sessData, $this->config['expire']);
     }
 
     /**

@@ -1,7 +1,5 @@
 <?php
-namespace zeus\ddd\application;
-
-use zeus\foundation\mvc\Application;
+namespace zeus\http;
 
 class Response
 {
@@ -54,18 +52,6 @@ class Response
 			509 => 'Bandwidth Limit Exceeded'
 	);
 	
-	protected $application;
-	
-	public static function create(Application $application)
-	{
-		return new self($application);
-	}
-	
-	protected function __construct(Application $application)
-	{
-		$this->application = $application;
-	}
-	
 	public function redirect($url, $code = '302', $version = '1.1')
 	{
 		if (headers_sent()) 
@@ -77,10 +63,5 @@ class Response
 			header("HTTP/{$version} {$code} " . self::$responseCodes[$code]);
 			header("Location: {$url}");
 		}
-	}
-	
-	public function forward($url)
-	{
-		$this->application->start($url);
 	}
 }

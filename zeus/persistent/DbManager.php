@@ -4,6 +4,7 @@ namespace zeus\persistent;
 use zeus\persistent\pdo\Pdo;
 use zeus\persistent\pdo\XaPdo;
 use zeus\sandbox\ConfigManager;
+use zeus\exception\UnSupportDbDriverException;
 
 class DbManager
 {
@@ -31,6 +32,9 @@ class DbManager
 			$config = ConfigManager::database();
 			$type = isset($config['type'])?trim($config['type']):'pdo';
 			$config = $config[$type];
+			if(empty($config)){
+				throw new UnSupportDbDriverException("{$type} driver not found.");
+			}
 			
 			self::$driver_instances[$alias] = new Pdo($config);
 		}

@@ -1,34 +1,14 @@
 <?php
-namespace zeus\ddd\application;
-
-use zeus\foundation\mvc\Application;
-use zeus\ddd\application\filter\FilterInterface;
+namespace zeus\http;
 
 class Request
 {
-	/**
-	 * @var array 请求参数
-	 */
-	private $get     = [];
-	private $post    = [];
-	private $put	   = [];
-	private $patch   = [];
-	private $delete  = [];
-	private $cookie  = [];
-	private $header  = [];
-	private $server  = [];
+	private $data = [];
+	private $headers = [];
+	private $orgin_path = '';
 	
-	private $params  =[];
-	private $_request  =[];
-	private $orgin_path;
-	
-	protected $application;
-	
-	public static function create(Application $application)
-	{
-		return new self($application);
-	}
-	
+	private $server;
+
 	public static function isCli()
 	{
 		return stripos(PHP_SAPI, 'cli') === 0;
@@ -82,34 +62,67 @@ class Request
 		return $ip[$type];
 	}
 	
-	protected function __construct(Application $application)
+	public function __construct($uri_protocol = 'REQUEST_URI')
 	{
-		$this->application = $application;
+		$this->server = $_SERVER;
+		if(static::isCli()){
+			$args = array_slice($_SERVER['argv'], 1);
+			$url_path = $args ? implode('/', $args) : '';
+		}else{
+			$url_path = $_SERVER[$this->uri_protocol];
+		}
+		
+		if(!empty($url_path)){
+			$url_path = parse_url($url_path);
+			if( isset($url_path["query"]))
+			{
+				parse_str($url_path["query"],$data);
+				$this->data = array_merge($this->data, $data);
+			}
+			
+			$this->orgin_path = trim(strtolower($url_path["path"]),"/");
+		}
 		
 		$this->init();
 	}
 	
-	protected function init()
+	protected function initRequest()
 	{
-		$this->get = (isset($_GET)) ? $_GET : array();
-		$this->post = (isset($_POST)) ? $_POST : array();
-		$this->server = (isset($_SERVER)) ? $_SERVER : array();
-		$this->env = (isset($_ENV)) ? $_ENV : array();
-		$this->cookie = (isset($_COOKIE)) ? Cookie::get() : array();
-		
-		if (isset($_SERVER['REQUEST_METHOD']))
-		{
-			if ($this->isPut() || $this->isPatch() || $this->isDelete())
-			{
-				$this->parseData();
-			}
+		if( $this->isGet()){
+			$this->data = array_merge($this->data,$_GET); 
+		}else if( $this->isPost() ){
+			$this->data = array_merge($this->data,$_POST);
+		}else if( $this->isPut() || $this->isPatch() || $this->isDelete() ){
+			$this->data = array_merge($this->data,$this->parseData());
+		}else{
+			$this->data = array_merge($this->data,$_GET);
 		}
+	}
+	
+	public function __get($key){
+		if(isset($this->data[$key])){
+			return $this->data[$key];
+		}
+		return '';
+	}
+	
+	public function __set($key,$val){
+		$this->data[$key] = $val;
+	}
+	
+	public function getHeader($key){
+		$headers = getAllHeaders();
+		if(isset($headers[$key])){
+			return $headers[$key];
+		}
+		return '';
+	}
+	
+	public function getAllHeaders(){
 		
-		$this->_request = array_merge($this->_request, $this->get);
-		$this->_request = array_merge($this->_request, $this->post);
-		$this->_request = array_merge($this->_request, $this->put);
-		$this->_request = array_merge($this->_request, $this->patch);
-		$this->_request = array_merge($this->_request, $this->delete);
+		if(!empty($this->headers)){
+			return $this->headers;
+		}
 		
 		// Get any possible request headers
 		if (function_exists('getallheaders'))
@@ -137,66 +150,12 @@ class Request
 		}
 	}
 	
-	public function getOrginPath($uri_protocol = 'REQUEST_URI')
-	{
-		if(empty($uri_protocol)){
-			$uri_protocol = 'REQUEST_URI';
-		}
+	public function getCookie(){
 		
-		if( empty($this->orgin_path) )
-		{
-			$url_path = self::isCli()?$this->cliOrginPath():$_SERVER[$uri_protocol];
-			$url_path = parse_url($url_path);
-			if( isset($url_path["query"]))
-			{
-				parse_str($url_path["query"],$this->get);
-				
-				$this->params = array_merge($this->params, $this->get);
-			}
-			
-			$this->orgin_path = trim(strtolower($url_path["path"]),"/");
-		}
-		return $this->orgin_path;
 	}
 	
-	public function params($key = '')
-	{
-		return $this->data('params',$key);
-	}
-	
-	public function get($key = '')
-	{
-		return $this->data('get',$key);
-	}
-	
-	public function post($key = '')
-	{
-		return $this->data('post',$key);
-	}
-	
-	public function put($key = '')
-	{
-		return $this->data('put',$key);
-	}
-	
-	public function patch($key = '')
-	{
-		return $this->data('patch',$key);
-	}
-	
-	public function delete($key = '')
-	{
-		return $this->data('delete',$key);
-	}
-	
-	public function cookie($key='')
-	{
-		return $this->data('cookie',$key);
-	}
-	
-	public function _request($key = '')
-	{
-		return $this->data('_request',$key);
+	public function getSession(){
+		
 	}
 	
 	public function isAjax()
@@ -292,19 +251,6 @@ class Request
 		return ($this->server['REQUEST_METHOD'] == 'PATCH');
 	}
 	
-	public function doFilter(FilterInterface $filter)
-	{
-		$this->get( $filter->doFilter($this->get()) );
-		$this->post( $filter->doFilter($this->post()) );
-		$this->put( $filter->doFilter($this->put()) );
-		$this->patch( $filter->doFilter($this->patch()) );
-		$this->delete( $filter->doFilter($this->delete()) );
-		$this->cookie( $filter->doFilter($this->cookie()) );
-		$this->params( $filter->doFilter($this->params()) );
-		
-		$this->_request( $filter->doFilter($this->_request()) );
-	}
-	
 	protected function parseData()
 	{
 		$pData = file_get_contents('php://input');
@@ -335,50 +281,5 @@ class Request
 			// Else, default to a regular URL-encoded string
 			parse_str($pData, $paramData);
 		}
-		
-		switch (strtoupper($this->getMethod())) 
-		{
-			case 'PUT':
-				$this->put = $paramData;
-				break;
-			case 'PATCH':
-				$this->patch = $paramData;
-				break;
-			case 'DELETE':
-				$this->delete = $paramData;
-				break;
-		}
-	}
-	
-	public function cliOrginPath()
-	{
-		$args = array_slice($_SERVER['argv'], 1);
-		return $args ? implode('/', $args) : '';
-	}
-	
-	private function data($data, $key='')
-	{
-		if( !property_exists($this, $data) )
-		{
-			return null;
-		}
-	
-		if( empty($key) )
-		{
-			return $this->{$data};
-		}
-	
-		if( is_array($key) )
-		{
-			foreach($key as $k => $v)
-			{
-				$this->{$data}[$k] = $v;
-			}
-				
-			return $this->{$data};
-		}
-	
-		return isset($this->{$data}[$key]) ? $this->{$data}[$key] : '';
-	
 	}
 }

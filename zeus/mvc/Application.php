@@ -1,31 +1,11 @@
 <?php
-namespace zeus\ddd\application\mvc;
+namespace zeus\mvc;
 
-use zeus\foundation\Autoloader;
-use zeus\foundation\http\Request;
-use zeus\foundation\http\Response;
-use zeus\foundation\http\RequestXssFilter;
-use zeus\ddd\application\filter\FilterInterface;
-use zeus\ddd\application\filter\DefaultFilter;
-use zeus\ddd\application\filter\XssFilter;
-use zeus\foundation\mvc\Controller;
-use zeus\foundation\mvc\Router;
-
-define('ZEUS_VERSION', '0.0.1');
-define('ZEUS_PATH', dirname(dirname(dirname(__FILE__))));
-define('ZEUS_START_TIME', microtime(true));
-define('ZEUS_START_MEM', memory_get_usage());
-define("DS", DIRECTORY_SEPARATOR);
-
-defined('APP_ENV_DIR') or define('APP_ENV_DIR', ZEUS_PATH);
-
-require_once ZEUS_PATH.DS.'foundation'.DS.'Autoloader.php';
+use zeus\exception\NestedException;
 
 class Application 
 {
 	private static $_applications = [];
-	
-	private $autoloader;
 	
 	private $request;
 	private $reponse;
@@ -36,101 +16,19 @@ class Application
 	
 	protected function __construct()
 	{
-		$this->autoloader = new Autoloader();
-		$this->autoloader->registerNamespaces('zeus', ZEUS_PATH);
-		$this->autoloader->registerDirs([ZEUS_PATH,ZEUS_PATH.DS.'lib']);
-		
-		$this->init();
-	}
-	
-	protected function init()
-	{
-		//timezone
-		date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
-		
-		$appNamespaces = ConfigManager::config('app_ns');
-		foreach( $appNamespaces as $ns => $path )
-		{
-			if( is_dir($path) )
-			{
-				$this->autoloader->registerNamespaces($ns, $path);
-			}
-		}
-		
-		$this->setRequest(Request::create($this));
-		$this->setResponse(Response::create($this));
-		
-		$this->setFilter(new DefaultFilter());
-		$this->setRouter(new Router());
-		$this->setView(new View());
 	}
 	
 	/**
 	 * 
 	 * @param string $ns
-	 * @return \zeus\foundation\mvc\Application
+	 * @return \zeus\mvc\Application
 	 */
-	public static function getCurrentApplication($ns = 'default')
+	public static function getInstance($ns = 'default')
 	{
 		if(!isset(self::$_applications[$ns])){
 			self::$_applications[$ns] = new self();
 		}
 		return self::$_applications[$ns];
-	}
-	
-	public function getLoader()
-	{
-		return $this->autoloader;
-	}
-	
-	public function getRequest()
-	{
-		return $this->request;
-	}
-	
-	public function setRequest(Request $request)
-	{
-		$this->request = $request;
-	}
-	
-	public function getReponse()
-	{
-		return $this->reponse;
-	}
-	
-	public function setResponse(Response $response)
-	{
-		$this->reponse = $response;
-	}
-	
-	public function getFilter()
-	{
-		return $this->filter;
-	}
-	
-	public function setFilter(FilterInterface $filter)
-	{
-		$this->filter = $filter;
-	}
-	
-	public function getRouter()
-	{
-		return $this->router;
-	}
-	
-	public function setRouter(Router $router)
-	{
-		$this->router = $router;
-	}
-	
-	public function getView()
-	{
-		return $this->view;
-	}
-	
-	public function setView(View $view)
-	{
-		$this->view = $view;
 	}
 	
 	public function start($orgin_path='')

@@ -1,5 +1,5 @@
 <?php
-namespace zeus\ddd\exception;
+namespace zeus\exception;
 
 class RouterNotFoundException extends NestedException
 {

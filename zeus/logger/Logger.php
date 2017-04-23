@@ -4,10 +4,9 @@
  * @author nathena
  *
  */
-namespace zeus\ddd\infrastructure\logger;
+namespace zeus\logger;
 
-use zeus\ddd\application\ConfigManager;
-use zeus\ddd\application\Request;
+use zeus\sandbox\ConfigManager;
 
 class Logger
 {
@@ -22,7 +21,7 @@ class Logger
     	if( is_dir(ConfigManager::config('log_path')) )
     	{
     		$file = ConfigManager::config('log_path') .'/'.date('Ymd_') . strtolower($level) . '.log';
-    		$log = sprintf('[PID] %s [IP] %s [TIME] %s [MSG] %s',getmypid(), Request::ip(), date('H:i:s'), $message) . "\n";
+    		$log = sprintf('[PID] %s [TIME] %s [MSG] %s',getmypid(), date('H:i:s'), $message) . "\n";
     		
     		file_put_contents($file, $log, FILE_APPEND|LOCK_EX);
     	}

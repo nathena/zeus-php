@@ -1,7 +1,7 @@
 <?php
-namespace zeus\ddd\exception;
+namespace zeus\exception;
 
-class InvalidArgumentException extends NestedException
+class ClassNotFoundException extends NestedException
 {
 	public function __construct ($message = null, $code = null, $previous = null) 
 	{

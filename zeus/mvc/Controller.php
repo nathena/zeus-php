@@ -1,8 +1,5 @@
 <?php
-namespace zeus\foundation\mvc;
-
-use zeus\foundation\util\UUIDGenerator;
-use zeus\foundation\http\session\Session;
+namespace zeus\mvc;
 
 class Controller
 {
