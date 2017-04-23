@@ -1,32 +1,44 @@
 <?php
-
 namespace zeus\domain;
-
-use zeus\domain\event\DomainEvent;
 
 abstract class AggregateRoot
 {
 	protected $data = [];
+	protected $id;
 	
-    private $domainEvents = [];
-
-    final public function pullDomainEvents()
-    {
-        $domainEvents       = $this->domainEvents;
-        $this->domainEvents = [];
-
-        return $domainEvents;
-    }
-
-    final protected function raise(DomainEvent $domainEvent)
-    {
-    	$domainEvent->setAggregate($this);
-    	
-        $this->domainEvents[] = $domainEvent;
+	private $idFiled;
+	
+	protected function __construct($data,$idFiled='id'){
+		if(!empty($data) && is_array($data)){
+			$this->data = $data;
+			if(isset($data[$idFiled])){
+				$this->id = trim($data[$idFiled]);
+			}
+		}
+		$this->idFiled = $idFiled;
+	}
+	
+	public function getId(){
+		return $this->id;
+	}
+	
+	public function setId($id){
+		$this->id = $id;
+		$this->data[$this->idFiled] = $id;
+	}
+	
+    public function getData(){
+    	return $this->data;
     }
     
-    public function data(){
-    	return $this->data;
+    /**
+     * 不允许更新id
+     * @param mixed|array $data
+     */
+    public function setData($data){
+    	$this->data = array_merge($this->data,$data);
+    	//不允许更新id
+    	$this->data[$this->idFiled] = $this->id;
     }
     
     public function __get($key){

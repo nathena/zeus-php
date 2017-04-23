@@ -1,22 +1,18 @@
 <?php
-namespace zeus\domain\event;
-
-use zeus\utils\UUIDGenerator;
+namespace zeus\event;
 
 abstract class DomainEvent
 {
 	protected $eventId;
-	protected $data;
-	
 	protected $eventType;
-	protected $method;
 	
 	protected $sender;
 	
+	protected $data;
+	protected $method;
+	
 	public function __construct($sender,$data)
 	{
-		$this->eventId = UUIDGenerator::numberNo();
-		
 		$class = get_class($this);
 		$classVal = explode("\\",$class);
 		$simpleClassVal = end($classVal);
@@ -24,25 +20,30 @@ abstract class DomainEvent
 		$method_name = 'handler'.$simpleClassVal;
 		
 		$this->eventType = $class;
+		$this->eventId = $this->eventType.time();
 		$this->method = $method_name;
 		$this->data = $data;
 		
 		$this->sender = $sender;
 	}
 	
-	public function eventType()
+	public function getEventType()
 	{
 		return $this->eventType;
 	}
 	
-	public function eventId()
+	public function getEventId()
     {
         return $this->eventId;
     }
 
-    public function data()
+    public function getData()
     {
         return $this->data;
+    }
+    
+    public function getSender(){
+    	return $this->sender;
     }
     
     public function handler($handler){
@@ -52,7 +53,7 @@ abstract class DomainEvent
     }
     
     public function callback($data=null){
-    	if(is_object($this->aggregate) && method_exists($this->aggregate, $this->method)){
+    	if(is_object($this->sender) && method_exists($this->sender, $this->method)){
     		$this->sender->{$this->method}($this,$data);
     	}
     }
