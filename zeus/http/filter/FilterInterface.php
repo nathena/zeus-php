@@ -1,5 +1,5 @@
 <?php
-namespace zeus\ddd\application\filter;
+namespace zeus\http\filter;
 
 interface FilterInterface
 {
