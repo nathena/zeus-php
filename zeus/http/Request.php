@@ -71,21 +71,10 @@ class Request
 			$args = array_slice($_SERVER['argv'], 1);
 			$url_path = $args ? implode('/', $args) : '';
 		}else{
-			$url_path = $_SERVER[$this->uri_protocol];
+			$url_path = $_SERVER[$uri_protocol];
 		}
-		
-		if(!empty($url_path)){
-			$url_path = parse_url($url_path);
-			if( isset($url_path["query"]))
-			{
-				parse_str($url_path["query"],$data);
-				$this->data = array_merge($this->data, $data);
-			}
-			
-			$this->orgin_path = trim(strtolower($url_path["path"]),"/");
-		}
-		
-		$this->init();
+		$this->setOrginPath($url_path);
+		$this->initRequest();
 	}
 	
 	protected function initRequest()
@@ -110,6 +99,14 @@ class Request
 	
 	public function __set($key,$val){
 		$this->data[$key] = $val;
+	}
+	
+	public function setData($data){
+		$this->data = array_merge($this->data,$data);
+	}
+	
+	public function getData(){
+		return $this->data;
 	}
 	
 	public function getHeader($key){
@@ -152,8 +149,11 @@ class Request
 		}
 	}
 	
+	/**
+	 * @return \zeus\http\Cookie
+	 */
 	public function getCookie(){
-		
+		return Cookie::getInstance();
 	}
 	
 	/**
@@ -161,6 +161,26 @@ class Request
 	 */
 	public function getSession(){
 		return Session::getInstance();
+	}
+	
+	public function getServer(){
+		return $this->server;
+	}
+	
+	public function getOrginPath(){
+		return $this->orgin_path;
+	}
+	
+	public function setOrginPath($orgin_path){
+		if(!empty($orgin_path)){
+			$url_path = parse_url($orgin_path);
+			if( isset($url_path["query"]))
+			{
+				parse_str($url_path["query"],$data);
+				$this->data = array_merge($this->data, $data);
+			}
+			$this->orgin_path = trim(strtolower($url_path["path"]),"/");
+		}
 	}
 	
 	public function isAjax()

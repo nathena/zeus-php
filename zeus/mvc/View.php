@@ -1,7 +1,7 @@
 <?php
-namespace zeus\foundation\mvc;
+namespace zeus\mvc;
 
-use zeus\foundation\ConfigManager;
+use zeus\sandbox\ConfigManager;
 
 class View
 {

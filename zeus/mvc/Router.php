@@ -1,10 +1,12 @@
 <?php
-namespace zeus\foundation\mvc;
+namespace zeus\mvc;
 
-use zeus\foundation\ConfigManager;
+use zeus\sandbox\ConfigManager;
+use zeus\http\Request;
 
 class Router
 {
+	private static $inited = false;
 	private static $config = [
 			'default_controller_ns'	    => '',
 			'default_controller'		=> 'Index',
@@ -14,22 +16,29 @@ class Router
 			'rewrite'					=> []
 	];
 	
-	protected $application;
-	
 	protected $controller;
 	protected $method;
-	
 	protected $params = [];
+	
 	protected $uri_path;
 	
-	public function __construct(array $config = [])
+	public function __construct(Request $request)
 	{
-		if (empty($config)) 
-		{
-			$config = ConfigManager::router();
+		$this->init();
+		$this->uri_path = trim($request->getOrginPath(),"/");
+		$this->params = array_merge($this->params,$request->data());
+		$this->route();
+	}
+	
+	private function init(){
+		if(static::$inited){
+			return;
 		}
+		$config = ConfigManager::router();
+		$config = array_merge(static::$config,array_change_key_case($config));
 		
-		self::$config = array_merge(self::$config,array_change_key_case($config));
+		static::$config = $config;
+		static::$inited = true;
 	}
 	
 	public function getController()
@@ -47,15 +56,8 @@ class Router
 		return $this->params;
 	}
 	
-	public function getRouter()
+	private function route()
 	{
-		return $this->uri_path;
-	}
-	
-	public function route($url_path)
-	{
-		$this->uri_path = trim($url_path,"/");
-		
 		if( "/" == $this->uri_path || "" == $this->uri_path )
 		{
 			if( $this->routeDefauleController() )

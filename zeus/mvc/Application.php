@@ -2,6 +2,11 @@
 namespace zeus\mvc;
 
 use zeus\exception\NestedException;
+use zeus\http\Request;
+use zeus\http\Response;
+use zeus\sandbox\ConfigManager;
+use zeus\http\filter\DefaultFilter;
+use zeus\http\filter\XssFilter;
 
 class Application 
 {
@@ -10,12 +15,19 @@ class Application
 	private $request;
 	private $reponse;
 	
-	private $router;
-	private $filter;
-	private $view;
+	private $filter = new DefaultFilter();
 	
 	protected function __construct()
 	{
+		if( ConfigManager::config("xss_clean") )
+		{
+			$this->filter->setNext(new XssFilter());
+		}
+		$uri_protocol = ConfigManager::config("uri_protocol");
+		$uri_protocol = empty($uri_protocol)? 'REQUEST_URI':$uri_protocol;
+		
+		$this->request = new Request($uri_protocol);
+		$this->reponse = new Response();
 	}
 	
 	/**
@@ -31,30 +43,29 @@ class Application
 		return self::$_applications[$ns];
 	}
 	
-	public function start($orgin_path='')
+	public function getRequest()
+	{
+		return $this->request;
+	}
+	
+	public function getResponse(){
+		return $this->reponse;
+	}
+	
+	public function dispatch()
 	{
 		$controller = null;
 		try
 		{
-			if( empty($orgin_path) ){
-				$orgin_path = $this->request->getOrginPath(ConfigManager::config("uri_protocol"));
-			}
+			$router = new Router($this->request);
+			$data = $this->filter->doFilter($router->getParams());
+			$this->request->setData($data);
 			
-			$this->router->route($orgin_path);
-			
-			if( ConfigManager::config("xss_clean") )
-			{
-				$this->filter->setNext(new XssFilter());
-			}
-			
-			$this->request->params($this->router->getParams());
-			$this->request->doFilter($this->filter);
-			
-			$controller = $this->router->getController();
+			$controller = $router->getController();
 			$controller = new $controller();
 			if( $controller instanceof Controller )
 			{
-				call_user_func_array(array($controller, $this->router->getMethod()),$this->request->params());
+				call_user_func_array(array($controller, $router->getMethod()),$data);
 			}
 		}
 		catch(NestedException $e)
@@ -72,6 +83,11 @@ class Application
 		{
 			__exception_handler($e);
 		}
+	}
+	
+	public function forward($url){
+		$this->request->setOrginPath($url);
+		$this->dispatch();
 	}
 	
 	public function debug()

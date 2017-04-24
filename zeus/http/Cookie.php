@@ -31,6 +31,9 @@ class Cookie
 		self::$inited = true;
 	}
 	
+	/**
+	 * @return \zeus\http\Cookie
+	 */
 	public static function getInstance(){
 		if(empty(static::$instance)){
 			static::init();

@@ -25,9 +25,9 @@ foreach( $appNamespaces as $ns => $path )
 {
 	if( is_dir($path) )
 	{
-		$this->autoloader->registerNamespaces($ns, $path);
+		$autoloader->registerNamespaces($ns, $path);
 	}
 }
 
 $application = Application::getInstance();
-$application->start();
+$application->dispatch();
