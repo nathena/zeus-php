@@ -1,6 +1,8 @@
 <?php
 namespace zeus\http;
 
+use zeus\http\session\Session;
+
 class Request
 {
 	private $data = [];
@@ -154,8 +156,11 @@ class Request
 		
 	}
 	
+	/**
+	 * @return \zeus\http\session\Session
+	 */
 	public function getSession(){
-		
+		return Session::getInstance();
 	}
 	
 	public function isAjax()
