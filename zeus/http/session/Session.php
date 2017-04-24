@@ -6,7 +6,21 @@ use zeus\exception\ClassNotFoundException;
 
 class Session
 {
+	private static $inited = false;
 	private static $instance = null;
+	
+	protected static $config = [
+			'prefix'		=> '',
+			'auto_start'	=> true,
+			//'use_trans_sid' => '',
+			//'var_session_id'=> '',
+			//'id'			=> '',
+			//'name'			=> '',
+			//'path'			=> '',
+			//'domain'		=> '',
+			'handler'			=> '',
+	];
+	
 	
 	/**
 	 * @return \zeus\http\session\Session
@@ -14,29 +28,20 @@ class Session
 	public static function getInstance()
 	{
 		if(empty(static::$instance)){
+			static::init();
 			static::$instance = new static();
 		}
 		return static::$instance;
 	}
 	
-	private $config = [
-			'auto_start'	=> true,
-			'prefix'		=> '',
-			//'use_trans_sid' => '',
-			//'var_session_id'=> '',
-			//'id'			=> '',
-			//'name'			=> '',
-			//'path'			=> '',
-			//'domain'		=> '',
-			'type'			=> '',
-	];
-	
-	private $prefix = '';
-	
-	private function __construct()
-	{
+	private static function init(){
+		
+		if(static::$inited){
+			return;
+		}
+		
 		$config = ConfigManager::session();
-		$config = array_merge($this->config, array_change_key_case($config));
+		$config = array_merge(static::$config, array_change_key_case($config));
 		
 		// 记录初始化信息
 		if (isset($config['use_trans_sid']))
@@ -88,10 +93,10 @@ class Session
 			session_cache_expire($config['cache_expire']);
 		}
 		
-		if (!empty($config['type']))
+		if (!empty($config['handler']))
 		{
 			// 读取session驱动
-			$class = false !== strpos($config['type'], '\\') ? $config['type'] : __NAMESPACE__.'\\handle\\' . ucwords($config['type']);
+			$class = false !== strpos($config['handler'], '\\') ? $config['handler'] : __NAMESPACE__.'\\handle\\' . ucwords($config['handler']);
 			// 检查驱动类
 			if (!class_exists($class) || !session_set_save_handler(new $class($config)))
 			{
@@ -109,15 +114,17 @@ class Session
 			session_start();
 		}
 		
-		if( isset($config['prefix'])){
-			$this->prefix = $config['prefix'];
-		}
+		static::$config = $config;
+		static::$inited = true;
+	}
+	
+	private function __construct()
+	{
 		
-		$this->config = $config;
 	}
 	
 	public function __get($key){
-		$key = $this->prefix.$key;
+		$key = static::$config['prefix'].$key;
 		if(isset($_SESSION[$key])){
 			return $_SESSION[$key];
 		}
@@ -125,7 +132,7 @@ class Session
 	}
 	
 	public function __set($key,$val){
-		$_SESSION[$this->prefix.$key] = $val;
+		$_SESSION[static::$config['prefix'].$key] = $val;
 	}
 	
 	/**
@@ -136,12 +143,12 @@ class Session
 	 */
 	public function delete($key)
 	{
-		unset($_SESSION[$this->prefix.$key]);
+		unset($_SESSION[static::$config['prefix'].$key]);
 	}
 	
 	public function clear()
 	{
-		$prefix = $this->prefix;
+		$prefix = static::$config['prefix'];
 		foreach( $_SESSION as $key => $val )
 		{
 			if( $prefix )
@@ -166,7 +173,8 @@ class Session
 	 */
 	public function has($key)
 	{
-		return !isset($_SESSION[$this->prefix.$key]) || empty($_SESSION[$this->prefix.$key]) ? false : true;
+		$key = static::$config['prefix'].$key;
+		return !isset($_SESSION[$key]) || empty($_SESSION[$key]) ? false : true;
 	}
 
 	/**
