@@ -26,7 +26,7 @@ class Router
 	{
 		$this->init();
 		$this->uri_path = trim($request->getOrginPath(),"/");
-		$this->params = array_merge($this->params,$request->data());
+		$this->params = array_merge($this->params,$request->getData());
 		$this->route();
 	}
 	
