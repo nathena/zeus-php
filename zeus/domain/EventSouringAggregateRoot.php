@@ -2,7 +2,7 @@
 
 namespace zeus\domain;
 
-use zeus\event\DomainEvent;
+use zeus\event\EventObject;
 
 abstract class EventSouringAggregateRoot extends AggregateRoot
 {
@@ -20,7 +20,7 @@ abstract class EventSouringAggregateRoot extends AggregateRoot
         return $domainEvents;
     }
 
-    protected function raise(DomainEvent $domainEvent)
+    protected function raise(EventObject $domainEvent)
     {
         $this->domainEvents[] = $domainEvent;
     }

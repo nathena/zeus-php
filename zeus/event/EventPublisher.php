@@ -1,14 +1,14 @@
 <?php
 namespace zeus\event;
 
-abstract class DomainEventPublisher
+abstract class EventPublisher
 {
 	private static $instances = [];
 	
 	/**
 	 * 
 	 * @param string $ns
-	 * @return \zeus\event\DomainEventPublisher
+	 * @return \zeus\event\EventPublisher
 	 */
 	final public static function getInstance($ns="default"){
 		if(!isset(self::$instances[$ns])){
@@ -30,7 +30,7 @@ abstract class DomainEventPublisher
 		$this->eventHandlers[$eventType][] = $handlerType;
 	}
 	
-	public function publish(DomainEvent $event){
+	public function publish(EventObject $event){
 		$eventType = $event->getEventType();
 		$eventHandlers = $this->eventHandlers[$eventType];
 		foreach($eventHandlers as $handler){

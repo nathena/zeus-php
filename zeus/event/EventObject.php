@@ -1,7 +1,7 @@
 <?php
 namespace zeus\event;
 
-abstract class DomainEvent
+abstract class EventObject
 {
 	protected $eventId;
 	protected $eventType;
