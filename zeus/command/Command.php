@@ -3,8 +3,8 @@ namespace zeus\command;
 
 abstract class Command
 {
-	protected $type;
-	protected $id;
+	protected $commandType;
+	protected $commandId;
 	
 	protected $method;
 	
@@ -16,25 +16,31 @@ abstract class Command
 		
 		$method_name = 'handler'.$simpleClassVal;
 	
-		$this->type = $class;
-		$this->id = $this->type.time();
+		$this->commandType = $class;
+		$this->commandId = $this->commandType.time();
 		
 		$this->method = $method_name;
 	}
 	
-	public function getType()
+	public function getCommandType()
 	{
-		return $this->type;
+		return $this->commandType;
 	}
 	
-	public function getId()
+	public function getCommandId()
 	{
-		return $this->id;
+		return $this->commandId;
 	}
 	
 	public function handler($handler){
 		if(is_object($handler) && method_exists($handler, $this->method)){
 			$handler->{$this->method}($this);
+		}else{
+			throw new \RuntimeException(get_class($handler).':'.$this->method);
 		}
+	}
+	
+	public function check(){
+		
 	}
 }

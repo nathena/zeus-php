@@ -31,7 +31,7 @@ abstract class CommandBus
 	}
 	
 	public function execute(Command $command){
-		$type = $command->getType();
+		$type = $command->getCommandType();
 		$handlers = $this->handlers[$type];
 		foreach($handlers as $handler){
 			if(!empty($handler) && class_exists($handler)){

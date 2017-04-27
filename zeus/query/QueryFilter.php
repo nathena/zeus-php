@@ -3,10 +3,11 @@ namespace zeus\query;
 
 abstract class QueryFilter
 {
-	protected $type;
-	protected $id;
-	
+	protected $queryType;
+	protected $queryId;
 	protected $method;
+	
+	protected $queryHandler;
 	
 	public function __construct()
 	{
@@ -16,25 +17,25 @@ abstract class QueryFilter
 		
 		$method_name = 'handler'.$simpleClassVal;
 	
-		$this->type = $class;
-		$this->id = $this->type.time();
-		
+		$this->queryType = $class;
+		$this->queryId = $this->queryType.time();
 		$this->method = $method_name;
 	}
 	
-	public function getType()
+	public function getQueryType()
 	{
-		return $this->type;
+		return $this->queryType;
 	}
 	
 	public function getId()
 	{
-		return $this->id;
+		return $this->queryId;
 	}
 	
-	public function handler($handler){
-		if(is_object($handler) && method_exists($handler, $this->method)){
-			$handler->{$this->method}($this);
+	public function query(){
+		if(is_object($this->queryHandler) && method_exists($this->handler, $this->method)){
+			return $this->queryHandler->{$this->method}($this);
 		}
+		return null;
 	}
 }
