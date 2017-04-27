@@ -35,7 +35,7 @@ abstract class CommandBus
 		$handlers = $this->handlers[$type];
 		foreach($handlers as $handler){
 			if(!empty($handler) && class_exists($handler)){
-				$event->handler(new $handler());
+				$command->handler(new $handler());
 			}
 		}
 	}
