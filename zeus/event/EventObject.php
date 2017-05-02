@@ -11,7 +11,7 @@ abstract class EventObject
 	protected $data;
 	protected $method;
 	
-	public function __construct($sender,$data)
+	public function __construct($sender,$data = null)
 	{
 		$class = get_class($this);
 		$classVal = explode("\\",$class);

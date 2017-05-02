@@ -39,8 +39,4 @@ abstract class Command
 			throw new \RuntimeException(get_class($handler).':'.$this->method);
 		}
 	}
-	
-	public function check(){
-		
-	}
 }
