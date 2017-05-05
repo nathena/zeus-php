@@ -1,7 +1,7 @@
 <?php
 namespace zeus\event;
 
-abstract class EventPublisher
+class EventPublisher
 {
 	private static $instances = [];
 	

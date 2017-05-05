@@ -1,7 +1,7 @@
 <?php
 namespace zeus\command;
 
-abstract class CommandBus
+class CommandBus
 {
 	private static $instances = [];
 	
