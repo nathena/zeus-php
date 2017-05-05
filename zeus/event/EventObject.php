@@ -7,11 +7,12 @@ abstract class EventObject
 	protected $eventType;
 	
 	protected $sender;
-	
-	protected $data;
 	protected $method;
 	
-	public function __construct($sender,$data = null)
+
+	protected $data = [];
+	
+	public function __construct($sender)
 	{
 		$class = get_class($this);
 		$classVal = explode("\\",$class);
@@ -22,7 +23,6 @@ abstract class EventObject
 		$this->eventType = $class;
 		$this->eventId = $this->eventType.time();
 		$this->method = $method_name;
-		$this->data = $data;
 		
 		$this->sender = $sender;
 	}
@@ -37,11 +37,6 @@ abstract class EventObject
         return $this->eventId;
     }
 
-    public function getData()
-    {
-        return $this->data;
-    }
-    
     public function getSender(){
     	return $this->sender;
     }
@@ -64,5 +59,21 @@ abstract class EventObject
     
     public function publish(){
     	EventPublisher::getInstance()->publish($this);
+    }
+    
+    public function getData()
+    {
+    	return $this->data;
+    }
+    
+    private function __get($key){
+    	if(isset($this->data[$key])){
+    		return $this->data[$key];
+    	}
+    	return null;
+    }
+    
+    private function __set($key,$val){
+    	$this->data[$key] = $val;
     }
 }

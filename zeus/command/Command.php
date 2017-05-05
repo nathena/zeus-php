@@ -8,6 +8,8 @@ abstract class Command
 	
 	protected $method;
 	
+	protected $data = [];
+	
 	public function __construct()
 	{
 		$class = get_class($this);
@@ -56,5 +58,21 @@ abstract class Command
 	
 	protected function finished(){
 	
+	}
+	
+	public function getData()
+	{
+		return $this->data;
+	}
+	
+	private function __get($key){
+		if(isset($this->data[$key])){
+			return $this->data[$key];
+		}
+		return null;
+	}
+	
+	private function __set($key,$val){
+		$this->data[$key] = $val;
 	}
 }
