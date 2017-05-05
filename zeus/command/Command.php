@@ -39,4 +39,22 @@ abstract class Command
 			throw new \RuntimeException(get_class($handler).':'.$this->method);
 		}
 	}
+	
+	public function register($commandHanlder){
+		CommandBus::getInstance()->register($this->commandType, $commandHanlder);
+	}
+	
+	public function execute(){
+		$this->start();
+		CommandBus::getInstance()->execute($this);
+		$this->finished();
+	}
+	
+	protected function start(){
+	
+	}
+	
+	protected function finished(){
+	
+	}
 }

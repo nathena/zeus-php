@@ -57,4 +57,12 @@ abstract class EventObject
     		$this->sender->{$this->method}($this,$data);
     	}
     }
+    
+    public function subscribe($eventHandler){
+    	EventPublisher::getInstance()->subscribe($this->eventType, $eventHandler);
+    }
+    
+    public function publish(){
+    	EventPublisher::getInstance()->publish($this);
+    }
 }
