@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * EventSouring 需要事件需要支持，目前暂不支持。
+ */
 namespace zeus\domain;
 
 use zeus\event\EventObject;
