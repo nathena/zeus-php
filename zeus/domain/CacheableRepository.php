@@ -1,5 +1,5 @@
 <?php
-namespace zeus\domain\repository;
+namespace zeus\domain;
 
 abstract class CacheableRepository
 {

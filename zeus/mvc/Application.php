@@ -2,11 +2,11 @@
 namespace zeus\mvc;
 
 use zeus\exception\NestedException;
+use zeus\http\filter\DefaultFilter;
+use zeus\http\filter\XssFilter;
 use zeus\http\Request;
 use zeus\http\Response;
 use zeus\sandbox\ConfigManager;
-use zeus\http\filter\DefaultFilter;
-use zeus\http\filter\XssFilter;
 
 class Application 
 {
@@ -15,10 +15,11 @@ class Application
 	private $request;
 	private $reponse;
 	
-	private $filter = new DefaultFilter();
+	private $filter;
 	
 	protected function __construct()
 	{
+	    $this->filter = new DefaultFilter();
 		if( ConfigManager::config("xss_clean") )
 		{
 			$this->filter->setNext(new XssFilter());
