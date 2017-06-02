@@ -8,20 +8,12 @@ class Request
 {
 	private $data = [];
 	private $headers = [];
-	private $orgin_path = '';
-	
+
 	private $server;
 
-	public function __construct($uri_protocol = 'REQUEST_URI')
+	public function __construct()
 	{
 		$this->server = $_SERVER;
-		if(ApplicationContext::isCli()){
-			$args = array_slice($_SERVER['argv'], 1);
-			$url_path = $args ? implode('/', $args) : '';
-		}else{
-			$url_path = $_SERVER[$uri_protocol];
-		}
-		$this->setOrginPath($url_path);
 		$this->initRequest();
 	}
 	
@@ -254,5 +246,7 @@ class Request
 			// Else, default to a regular URL-encoded string
 			parse_str($pData, $paramData);
 		}
+
+		return $paramData;
 	}
 }
