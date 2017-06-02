@@ -14,31 +14,31 @@ class ConfigManager
         }
 
         $key = strtolower(trim($key));
-        if(isset(static::$config[$key])){
-            return static::$config[$key];
-        }
-
 	    $key_frames = explode(".",$key);
 	    $key_ns = array_unshift($key_frames);
-
-        $env_config_path = static::loadConfigFile($key_ns);
-        if(file_exists($env_config_path)){
-
-        }else{
-            throw new ConfigNotFoundException("Config {$key} not found");
+	    if(!isset(static::$config[$key_ns])){
+            static::$config[$key_ns] = static::load($key_ns);
         }
 
-        $config = static::load($env_config_path);
-
+        $config = static::$config[$key_ns];
+	    if(isset($config[$key])){
+            return $config[$key];
+        }
+        throw new ConfigNotFoundException("Config {$key} not found");
 	}
 
-	private static function loadConfigFile($key){
-        $env_config_dir = '';
-        if(defined("APP_ENV_DIR")){
-            $env_config_dir = APP_ENV_DIR;
-        }else{
-            $env_config_dir = ZEUS_PATH;
+    private static function load($key)
+    {
+        $env_config_path = static::loadConfigFile($key);
+        if( is_file($env_config_path) )
+        {
+            return include_once $env_config_path;
         }
+        return array();
+    }
+
+    private static function loadConfigFile($key){
+        $env_config_dir = defined("APP_ENV_DIR") ? APP_ENV_DIR : ZEUS_PATH;
 
         $env_config_path = $env_config_dir.DS.$key.".php";
         if(file_exists($env_config_path)){
@@ -56,14 +56,5 @@ class ConfigManager
         }
 
         return '';
-    }
-
-    private static function load($config)
-    {
-        if( is_file($config) )
-        {
-            return include_once $config;
-        }
-        return array();
     }
 }
