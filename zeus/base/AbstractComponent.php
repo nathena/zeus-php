@@ -8,12 +8,6 @@ namespace zeus\base;
  */
 abstract class AbstractComponent
 {
-    public function __construct($singleton=true)
-    {
-        if($singleton){
-            ApplicationContext::currentContext()->registerComponent($this);
-        }
-    }
 
     /**
      * @param $event
@@ -21,5 +15,9 @@ abstract class AbstractComponent
     public function publishMessage(AbstractEvent $event){
         $event->publish();
         $event->callback($this);
+    }
+
+    protected function registerComponent(){
+        ApplicationContext::currentContext()->registerComponent($this);
     }
 }
