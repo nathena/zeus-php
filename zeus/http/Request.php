@@ -4,202 +4,206 @@ namespace zeus\http;
 
 class Request
 {
-	private $data = [];
-	private $headers = [];
-	private $server;
+    private $data = [];
+    private $headers = [];
+    private $server;
 
 
-	public function __construct()
-	{
-        if( $this->isPost() ){
+    public function __construct()
+    {
+        if ($this->isPost()) {
             $this->setData($_POST);
-        }else if( $this->isPut() || $this->isPatch() || $this->isDelete() ){
+        } else if ($this->isPut() || $this->isPatch() || $this->isDelete()) {
             $this->setData($this->parseData());
-        }else{
+        } else {
             $this->setData($_GET);
         }
 
         $this->server = $_SERVER;
         $this->getAllHeaders();
-	}
-	
-	public function __get($key){
-		if(isset($this->data[$key])){
-			return $this->data[$key];
-		}
-		return '';
-	}
-	
-	public function __set($key,$val){
-		$this->data[$key] = $val;
-	}
-	
-	public function setData($data){
-	    foreach($data as $key => $val ){
-	        $this->{$key} = $val;
+    }
+
+    public function __get($key)
+    {
+        if (isset($this->data[$key])) {
+            return $this->data[$key];
         }
-	}
-	
-	public function getData(){
-		return $this->data;
-	}
-	
-	public function getHeader($key){
-		if(isset($this->headers[$key])){
-			return $this->headers[$key];
-		}
-		return '';
-	}
-	
-	public function getServer(){
-		return $this->server;
-	}
-	
+        return '';
+    }
 
-	public function isAjax()
-	{
-		$value = $this->server('HTTP_X_REQUESTED_WITH');
-		return (!is_null($value) && strtolower($value) == 'xmlhttprequest') ? true : false;
-	}
-	
-	public function getMethod()
-	{
-		return $this->server['REQUEST_METHOD'];
-	}
-	
-	/**
-	 * Return whether or not the method is GET
-	 *
-	 * @return boolean
-	 */
-	public function isGet()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'GET');
-	}
-	/**
-	 * Return whether or not the method is HEAD
-	 *
-	 * @return boolean
-	 */
-	public function isHead()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'HEAD');
-	}
-	/**
-	 * Return whether or not the method is POST
-	 *
-	 * @return boolean
-	 */
-	public function isPost()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'POST');
-	}
-	/**
-	 * Return whether or not the method is PUT
-	 *
-	 * @return boolean
-	 */
-	public function isPut()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'PUT');
-	}
-	/**
-	 * Return whether or not the method is DELETE
-	 *
-	 * @return boolean
-	 */
-	public function isDelete()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'DELETE');
-	}
-	/**
-	 * Return whether or not the method is TRACE
-	 *
-	 * @return boolean
-	 */
-	public function isTrace()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'TRACE');
-	}
-	/**
-	 * Return whether or not the method is OPTIONS
-	 *
-	 * @return boolean
-	 */
-	public function isOptions()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'OPTIONS');
-	}
-	/**
-	 * Return whether or not the method is CONNECT
-	 *
-	 * @return boolean
-	 */
-	public function isConnect()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'CONNECT');
-	}
-	/**
-	 * Return whether or not the method is PATCH
-	 *
-	 * @return boolean
-	 */
-	public function isPatch()
-	{
-		return ($this->server['REQUEST_METHOD'] == 'PATCH');
-	}
-	
-	protected function parseData()
-	{
-		$pData = file_get_contents('php://input');
-		$paramData = array();
-		
-		if (isset($_SERVER['CONTENT_TYPE']) && (stripos($_SERVER['CONTENT_TYPE'], 'json') !== false)) 
-		{
-			// If the content-type is JSON
-			$paramData = json_decode($pData, true);
-		} 
-		else if (isset($_SERVER['CONTENT_TYPE']) && (stripos($_SERVER['CONTENT_TYPE'], 'xml') !== false)) 
-		{
-			// Else, if the content-type is XML
-			$matches = array();
-			preg_match_all('/<!\[cdata\[(.*?)\]\]>/is', $pData, $matches);
-			foreach ($matches[0] as $match) {
-				$strip = str_replace(
-						array('<![CDATA[', ']]>', '<', '>'),
-						array('', '', '&lt;', '&gt;'),
-						$match
-						);
-				$pData = str_replace($match, $strip, $pData);
-			}
-			$paramData = json_decode(json_encode((array) simplexml_load_string($pData)), true);
-		} 
-		else 
-		{
-			// Else, default to a regular URL-encoded string
-			parse_str($pData, $paramData);
-		}
+    public function __set($key, $val)
+    {
+        $this->data[$key] = $val;
+    }
 
-		return $paramData;
-	}
+    public function setData($data)
+    {
+        foreach ($data as $key => $val) {
+            $this->{$key} = $val;
+        }
+    }
 
-    private function getAllHeaders(){
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function getHeader($key)
+    {
+        if (isset($this->headers[$key])) {
+            return $this->headers[$key];
+        }
+        return '';
+    }
+
+    public function getServer()
+    {
+        return $this->server;
+    }
+
+
+    public function isAjax()
+    {
+        $value = $this->server('HTTP_X_REQUESTED_WITH');
+        return (!is_null($value) && strtolower($value) == 'xmlhttprequest') ? true : false;
+    }
+
+    public function getMethod()
+    {
+        return $this->server['REQUEST_METHOD'];
+    }
+
+    /**
+     * Return whether or not the method is GET
+     *
+     * @return boolean
+     */
+    public function isGet()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'GET');
+    }
+
+    /**
+     * Return whether or not the method is HEAD
+     *
+     * @return boolean
+     */
+    public function isHead()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'HEAD');
+    }
+
+    /**
+     * Return whether or not the method is POST
+     *
+     * @return boolean
+     */
+    public function isPost()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'POST');
+    }
+
+    /**
+     * Return whether or not the method is PUT
+     *
+     * @return boolean
+     */
+    public function isPut()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'PUT');
+    }
+
+    /**
+     * Return whether or not the method is DELETE
+     *
+     * @return boolean
+     */
+    public function isDelete()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'DELETE');
+    }
+
+    /**
+     * Return whether or not the method is TRACE
+     *
+     * @return boolean
+     */
+    public function isTrace()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'TRACE');
+    }
+
+    /**
+     * Return whether or not the method is OPTIONS
+     *
+     * @return boolean
+     */
+    public function isOptions()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'OPTIONS');
+    }
+
+    /**
+     * Return whether or not the method is CONNECT
+     *
+     * @return boolean
+     */
+    public function isConnect()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'CONNECT');
+    }
+
+    /**
+     * Return whether or not the method is PATCH
+     *
+     * @return boolean
+     */
+    public function isPatch()
+    {
+        return ($this->server['REQUEST_METHOD'] == 'PATCH');
+    }
+
+    protected function parseData()
+    {
+        $pData = file_get_contents('php://input');
+        $paramData = array();
+
+        if (isset($_SERVER['CONTENT_TYPE']) && (stripos($_SERVER['CONTENT_TYPE'], 'json') !== false)) {
+            // If the content-type is JSON
+            $paramData = json_decode($pData, true);
+        } else if (isset($_SERVER['CONTENT_TYPE']) && (stripos($_SERVER['CONTENT_TYPE'], 'xml') !== false)) {
+            // Else, if the content-type is XML
+            $matches = array();
+            preg_match_all('/<!\[cdata\[(.*?)\]\]>/is', $pData, $matches);
+            foreach ($matches[0] as $match) {
+                $strip = str_replace(
+                    array('<![CDATA[', ']]>', '<', '>'),
+                    array('', '', '&lt;', '&gt;'),
+                    $match
+                );
+                $pData = str_replace($match, $strip, $pData);
+            }
+            $paramData = json_decode(json_encode((array)simplexml_load_string($pData)), true);
+        } else {
+            // Else, default to a regular URL-encoded string
+            parse_str($pData, $paramData);
+        }
+
+        return $paramData;
+    }
+
+    private function getAllHeaders()
+    {
         // Get any possible request headers
-        if (function_exists('getallheaders'))
-        {
+        if (function_exists('getallheaders')) {
             $this->headers = getallheaders();
-        }
-        else
-        {
-            foreach ($_SERVER as $key => $value)
-            {
-                if (substr($key, 0, 5) == 'HTTP_')
-                {
+        } else {
+            foreach ($_SERVER as $key => $value) {
+                if (substr($key, 0, 5) == 'HTTP_') {
                     $key = ucfirst(strtolower(str_replace('HTTP_', '', $key)));
-                    if (strpos($key, '_') !== false)
-                    {
+                    if (strpos($key, '_') !== false) {
                         $ary = explode('_', $key);
-                        foreach ($ary as $k => $v){
+                        foreach ($ary as $k => $v) {
                             $ary[$k] = ucfirst(strtolower($v));
                         }
                         $key = implode('-', $ary);
