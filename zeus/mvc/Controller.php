@@ -1,28 +1,25 @@
 <?php
+
 namespace zeus\mvc;
 
 abstract class Controller
 {
-	protected $view;
-	
-	protected $request;
-	protected $response;
-	
-	protected $application;
-	
-	public function __construct()
-	{
-		$this->application = Application::getInstance();
-		
-		$this->request     = $this->application->getRequest();
-		$this->response    = $this->application->getResponse();
-		
-		$this->view        = $this->application->getView();
-	}
-	
+	public function getRequest(){
+	    return Application::getInstance()->getRequest();
+    }
+
+    public function getView($tpl_path){
+        return new View($tpl_path);
+    }
+
+    public function forward($url_path){
+        Application::getInstance()->forward($url_path);
+    }
+
 	public function errorHandler(\Exception $e)
 	{
 		throw $e;
 	}
-	
+
+
 }
