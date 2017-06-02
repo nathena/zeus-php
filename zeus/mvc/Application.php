@@ -1,98 +1,64 @@
 <?php
 namespace zeus\mvc;
 
-use zeus\exception\NestedException;
-use zeus\http\filter\DefaultFilter;
-use zeus\http\filter\XssFilter;
-use zeus\http\Request;
 use zeus\http\Response;
-use zeus\sandbox\ConfigManager;
+use zeus\http\XssWapperRequest;
 
 class Application 
 {
-	private static $_applications = [];
-	
+    private static $instance;
+
 	private $request;
-	private $reponse;
-	
-	private $filter;
-	
-	protected function __construct()
-	{
-	    $this->filter = new DefaultFilter();
-		if( ConfigManager::config("xss_clean") )
-		{
-			$this->filter->setNext(new XssFilter());
-		}
-		$uri_protocol = ConfigManager::config("uri_protocol");
-		$uri_protocol = empty($uri_protocol)? 'REQUEST_URI':$uri_protocol;
-		
-		$this->request = new Request($uri_protocol);
-		$this->reponse = new Response();
-	}
-	
+	private $response;
+
 	/**
-	 * 
-	 * @param string $ns
-	 * @return \zeus\mvc\Application
-	 */
-	public static function getInstance($ns = 'default')
-	{
-		if(!isset(self::$_applications[$ns])){
-			self::$_applications[$ns] = new self();
-		}
-		return self::$_applications[$ns];
-	}
-	
-	public function getRequest()
-	{
-		return $this->request;
-	}
-	
-	public function getResponse(){
-		return $this->reponse;
-	}
-	
-	public function dispatch()
+     * @return \zeus\mvc\Application
+     */
+	public static function getInstance(){
+        if(!isset(static::$instance)){
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
+
+	public function forward($url_path)
 	{
 		$controller = null;
 		try
 		{
-			$router = new Router($this->request);
-			$data = $this->filter->doFilter($router->getParams());
-			$this->request->setData($data);
-			
-			$controller = $router->getController();
-			$controller = new $controller();
-			if( $controller instanceof Controller )
+		    $router = new Router($url_path);
+
+			$controllerClass = $router->getController();
+			$controller = new $controllerClass();
+			if( !($controller instanceof Controller) )
 			{
-				call_user_func_array(array($controller, $router->getMethod()),$data);
+                throw new ControllerNotFoundException("{$controllerClass} 控制器不是系统控制器子类");
 			}
+            call_user_func_array(array($controller, $router->getAction()),$router->getParams());
 		}
-		catch(NestedException $e)
+		catch(\Exception $e)
 		{
-			if( !is_null($controller) && $controller instanceof Controller )
+			if( is_null($controller) || ! ($controller instanceof Controller) )
 			{
-				$controller->errorHandler($e);
+                throw $e;
 			}
-			else 
-			{
-				throw $e;
-			}
+            $controller->errorHandler($e);
 		}
 	}
-	
-	public function forward($url){
-		$this->request->setOrginPath($url);
-		$this->dispatch();
-	}
-	
-	public function debug()
-	{
-		echo '<hr>';
-		echo '<br>',microtime(true)-ZEUS_START_TIME;
-		echo '<br>',memory_get_usage()-ZEUS_START_MEM;
-		echo '<br>';
-		print_r(get_included_files());
-	}
+
+	public function getRequest(){
+	    return $this->request;
+    }
+
+    public function getResponse(){
+	    return $this->response;
+    }
+
+
+    protected function __construct($url_path)
+    {
+        $this->request = new XssWapperRequest();
+        $this->response = new Response();
+    }
+
 }

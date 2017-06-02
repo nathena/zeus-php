@@ -18,8 +18,6 @@ abstract class AbstractEntity extends AbstractComponent
 
     public function __construct($data,$idFiled='id'){
 
-        parent::__construct(false);
-
         if(!empty($data) && is_array($data)){
             $this->data = $data;
             if(isset($data[$idFiled])){

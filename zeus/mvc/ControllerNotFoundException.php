@@ -1,7 +1,9 @@
 <?php
-namespace zeus\exception;
+namespace zeus\mvc;
 
-class InvalidArgumentException extends NestedException
+use zeus\base\exception\NestedException;
+
+class ControllerNotFoundException extends NestedException
 {
 	public function __construct ($message = null, $code = null, $previous = null) 
 	{

@@ -51,17 +51,181 @@ class Response
 			505 => 'HTTP Version Not Supported',
 			509 => 'Bandwidth Limit Exceeded'
 	);
-	
-	public function redirect($url, $code = '302', $version = '1.1')
-	{
-		if (headers_sent()) 
-		{
-			exit('<meta http-equiv="refresh" content="0; url='.$url.'" />');
-		}
-		else 
-		{
-			header("HTTP/{$version} {$code} " . self::$responseCodes[$code]);
-			header("Location: {$url}");
-		}
-	}
+
+	private $code;
+	private $message;
+	private $body;
+	private $version;
+	private $headers;
+
+    public function __construct($version = '1.1')
+    {
+        $this->version = $version;
+    }
+
+
+    /**
+     * Send redirect
+     *
+     * @param  string $url
+     * @param  string $code
+     * @param  string $version
+     * @throws Exception
+     * @return void
+     */
+    public static function redirect($url, $code = '302',$version = '1.1')
+    {
+        if (headers_sent()) {
+            throw new \RuntimeException('The headers have already been sent.');
+        }
+
+        header("HTTP/{$version} {$code} " . self::$responseCodes[$code]);
+        header("Location: {$url}");
+    }
+
+
+    public function getHeadersAsString($status = true, $br = "\n")
+    {
+        $headers = '';
+        if ($status) {
+            $headers = "HTTP/{$this->version} {$this->code} {$this->message}{$br}";
+        }
+        foreach ($this->headers as $name => $value) {
+            $headers .= "{$name}: {$value}{$br}";
+        }
+        return $headers;
+    }
+
+
+    public function setCode($code)
+    {
+        if (!array_key_exists($code, self::$responseCodes)) {
+            throw new Exception('That header code ' . $code . ' is not allowed.');
+        }
+
+        $this->code = $code;
+        $this->message = self::$responseCodes[$code];
+
+        return $this;
+    }
+
+    public function setMessage($message)
+    {
+        $this->message = $message;
+
+        return $this;
+    }
+
+
+    public function setBody($body = null)
+    {
+        $this->body = $body;
+        return $this;
+    }
+
+    public function setHeader($name, $value)
+    {
+        $this->headers[$name] = $value;
+
+        return $this;
+    }
+
+
+    public function setHeaders(array $headers)
+    {
+        foreach ($headers as $name => $value) {
+            $this->headers[$name] = $value;
+        }
+
+        return $this;
+    }
+
+
+    public function setSslHeaders()
+    {
+        $this->headers['Expires'] = 0;
+        $this->headers['Cache-Control'] = 'private, must-revalidate';
+        $this->headers['Pragma'] = 'cache';
+
+        return $this;
+    }
+
+
+    public function sendHeaders()
+    {
+        header("HTTP/{$this->version} {$this->code} {$this->message}");
+        foreach ($this->headers as $name => $value) {
+            header($name . ": " . $value);
+        }
+    }
+
+
+    public function send()
+    {
+        if (headers_sent()) {
+            throw new \RuntimeException('The headers have already been sent.');
+        }
+
+        if("application/json" == $this->headers['Content-Type']){
+            $this->sendJson();
+        }else if("application/xml" == $this->headers['Content-Type']){
+            $this->sendXml();
+        }else{
+            $this->sendBody();
+        }
+    }
+
+    public function sendBody(){
+        if(!isset($this->headers["Content-Type"])){
+            $this->headers["Content-Type"] = "text/plain";
+        }
+        if (array_key_exists('Content-Encoding', $this->headers)) {
+            $body = $this->encodeBody($body, $this->headers['Content-Encoding']);
+            $this->headers['Content-Length'] = strlen($this->body);
+        }
+        $this->sendHeaders();
+        echo $this->body;
+    }
+
+    public function sendJson(){
+        $this->sendHeaders();
+        $data = [
+            'code'=>$this->code,
+            'message'=>$this->message,
+            'body'=>$this->body,
+        ];
+
+        echo json_encode($data);
+    }
+
+    public function sendXml(){
+        $this->sendHeaders();
+        $xml = "<xml><code>{$this->code}</code><message><![CDATA[{$this->message}]]></message><body><![CDATA[{$this->body}]]></body></xml>";
+
+        echo $xml;
+    }
+
+    private function encodeBody($body, $encode = 'gzip'){
+        switch ($encode) {
+            // GZIP compression
+            case 'gzip':
+                if (!function_exists('gzencode')) {
+                    throw new \RuntimeException('Gzip compression is not available.');
+                }
+                $encodedBody = gzencode($body);
+                break;
+            // Deflate compression
+            case 'deflate':
+                if (!function_exists('gzdeflate')) {
+                    throw new \RuntimeException('Deflate compression is not available.');
+                }
+                $encodedBody = gzdeflate($body);
+                break;
+            // Unknown compression
+            default:
+                $encodedBody = $body;
+        }
+        return $encodedBody;
+    }
+
 }
