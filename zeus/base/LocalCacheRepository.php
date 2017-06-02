@@ -1,14 +1,16 @@
 <?php
 namespace zeus\base;
 
-abstract class LocalCacheRepository
+abstract class LocalCacheRepository extends AbstractComponent
 {
 	private static $cache = [];
 	
 	private $_cache_key;
 	
-	protected function __construct()
+	public function __construct()
 	{
+	    parent::__construct();
+
 		$this->_cache_key = get_class($this);
 		if(!isset(static::$cache[$this->_cache_key])){
 			static::$cache[$this->_cache_key] = [];
