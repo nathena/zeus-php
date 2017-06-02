@@ -21,7 +21,7 @@ class DbManager
 	
 	/**
 	 * 
-	 * @param string $alias
+	 * @param string $database
 	 * @return \zeus\database\pdo\Pdo
 	 */
 	public static function openSession($database = "database")
@@ -48,7 +48,7 @@ class DbManager
 	
 	/**
 	 * 
-	 * @param string $xid
+	 * @param string $xa_database
 	 * @return \zeus\database\pdo\Pdo
 	 */
 	public static function openXaSession($xa_database)
