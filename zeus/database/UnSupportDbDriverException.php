@@ -1,5 +1,7 @@
 <?php
-namespace zeus\exception;
+namespace zeus\database;
+
+use zeus\base\exception\NestedException;
 
 class UnSupportDbDriverException extends NestedException
 {

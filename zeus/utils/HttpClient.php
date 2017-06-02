@@ -3,43 +3,6 @@ namespace zeus\utils;
 
 class HttpClient
 {
-	public static function ip()
-	{
-		if (isset($_SERVER))
-		{
-			if (isset($_SERVER["HTTP_X_FORWARDED_FOR"]))
-			{
-				$ipAddress = $_SERVER["HTTP_X_FORWARDED_FOR"];
-			}
-			else if (isset($_SERVER["HTTP_CLIENT_IP"]))
-			{
-				$ipAddress = $_SERVER["HTTP_CLIENT_IP"];
-			}
-			else
-			{
-				$ipAddress = $_SERVER["REMOTE_ADDR"];
-			}
-		}
-		else
-		{
-			if (getenv("HTTP_X_FORWARDED_FOR"))
-			{
-				$ipAddress = getenv("HTTP_X_FORWARDED_FOR");
-			}
-			else if (getenv("HTTP_CLIENT_IP"))
-			{
-				$ipAddress = getenv("HTTP_CLIENT_IP");
-			}
-			else
-			{
-				$ipAddress = getenv("REMOTE_ADDR");
-			}
-	
-		}
-			
-		return $ipAddress;
-	}
-	
 	public static function get($query)
 	{
 		$url = isset($query["url"]) ? $query["url"] : "";

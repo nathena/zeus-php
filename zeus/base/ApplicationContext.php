@@ -1,6 +1,7 @@
 <?php
 namespace zeus\base;
 use zeus\base\exception\ClassNotFoundException;
+use zeus\base\logger\Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,6 +24,43 @@ class ApplicationContext
         return static::$context;
     }
 
+    public static function isCli()
+    {
+        return stripos(PHP_SAPI, 'cli') === 0;
+    }
+
+    public static function isCgi()
+    {
+        return stripos(PHP_SAPI, 'cgi') === 0;
+    }
+
+    public function ip()
+    {
+        if( static::isCgi()){
+            return $this->getCgiIp();
+        }
+
+        if(static::isCli()){
+            return $this->getCliIp();
+        }
+
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
+            $arr = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            $pos = array_search('unknown', $arr);
+            if (false !== $pos){
+                unset($arr[$pos]);
+            }
+            $server_ip = trim($arr[0]);
+        }elseif (isset($_SERVER['HTTP_CLIENT_IP'])){
+            $server_ip = $_SERVER['HTTP_CLIENT_IP'];
+        }elseif (isset($_SERVER['REMOTE_ADDR'])){
+            $server_ip = $_SERVER['REMOTE_ADDR'];
+        }else {
+            $server_ip = getenv('SERVER_ADDR');
+        }
+        return $server_ip;
+    }
+
     public function registerComponent($obj){
         $this->containers[get_class($obj)] = $obj;
     }
@@ -40,4 +78,66 @@ class ApplicationContext
     private function __construct()
     {
     }
+
+    private function getCgiIp(){
+        if(getenv('HTTP_CLIENT_IP')){
+            $client_ip = getenv('HTTP_CLIENT_IP');
+        } elseif(getenv('HTTP_X_FORWARDED_FOR')) {
+            $client_ip = getenv('HTTP_X_FORWARDED_FOR');
+        } elseif(getenv('REMOTE_ADDR')) {
+            $client_ip = getenv('REMOTE_ADDR');
+        } else {
+            $client_ip = $_SERVER['REMOTE_ADDR'];
+        }
+        return $client_ip;
+    }
+
+    private function getCliIp(){
+
+    }
 }
+
+//set_exception_handler&set_error_handler
+function __error_handler($errno, $errstr, $errfile='', $errline='', $errcontext=null){
+
+    $message  = 'type   = PHP ERROR'."\n".
+        'code    = '.$errno."\n".
+        'message = '.$errstr."\n".
+        'file    = '.$errfile."\n".
+        'line    = '.$errline."\n";
+
+    __errorMsgHandler($errno,$message);
+}
+
+function __exception_handler($exception){
+    $type     = get_class($exception);
+    $code     = $exception->getCode();
+    $message  = $exception->getMessage()."\n".$exception->getTraceAsString();
+    $file     = $exception->getFile();
+    $line     = $exception->getLine();
+
+    $message  = 'type   = '.$type."\n".
+        'code    = '.$code."\n".
+        'message = '.$message."\n".
+        'file    = '.$file."\n".
+        'line    = '.$line."\n";
+
+    __errorMsgHandler($code,$message);
+}
+
+function __errorMsgHandler($code,$message){
+
+    Logger::error($message);
+
+    //应用没有处理错误
+    $str = '<style>body {font-size:12px;}</style>';
+    $str .= '<h1>操作失败！</h1><br />';
+    $str .= '<strong>错误信息：<strong><font color="red">' . $message . '</font><br />';
+
+    echo $str;
+    exit($code);
+}
+
+//异常处理
+set_error_handler(__NAMESPACE__.'\__error_handler');
+set_exception_handler(__NAMESPACE__.'\__exception_handler');

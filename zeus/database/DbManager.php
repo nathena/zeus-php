@@ -1,10 +1,9 @@
 <?php
-namespace zeus\persistent;
+namespace zeus\database;
 
-use zeus\persistent\pdo\Pdo;
-use zeus\persistent\pdo\XaPdo;
+use zeus\database\pdo\Pdo;
+use zeus\database\pdo\XaPdo;
 use zeus\sandbox\ConfigManager;
-use zeus\exception\UnSupportDbDriverException;
 
 class DbManager
 {
@@ -23,7 +22,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $alias
-	 * @return \zeus\persistent\pdo\Pdo
+	 * @return \zeus\database\pdo\Pdo
 	 */
 	public static function openSession($alias='default')
 	{
@@ -45,7 +44,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $xid
-	 * @return \zeus\persistent\pdo\Pdo
+	 * @return \zeus\database\pdo\Pdo
 	 */
 	public static function openXaSession($config,$xid)
 	{

@@ -1,19 +1,15 @@
 <?php
 /**
- * EventSouring 需要事件需要支持，目前暂不支持。
+ * EventSouring。
  */
 namespace zeus\domain;
 
-use zeus\event\EventObject;
+use zeus\base\AbstractEvent;
 
 abstract class EventSouringAggregateRoot extends AggregateRoot
 {
 	private $domainEvents = [];
-	
-	protected function __construct($data,$idFiled='id'){
-		parent::__construct($data,$idFiled);
-	}
-	
+
     public function getEvents()
     {
         $domainEvents       = $this->domainEvents;
@@ -22,7 +18,7 @@ abstract class EventSouringAggregateRoot extends AggregateRoot
         return $domainEvents;
     }
 
-    protected function raise(EventObject $domainEvent)
+    protected function raise(AbstractEvent $domainEvent)
     {
         $this->domainEvents[] = $domainEvent;
     }
