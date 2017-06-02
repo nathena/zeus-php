@@ -166,16 +166,19 @@ class Response
             throw new \RuntimeException('The headers have already been sent.');
         }
 
-        if("application/json" == $this->headers['Content-Type']){
-            $this->sendJson();
-        }else if("application/xml" == $this->headers['Content-Type']){
-            $this->sendXml();
-        }else{
-            $this->sendBody();
+        switch ($this->headers['Content-Type']){
+            case "application/json":
+                $this->sendJson();
+                break;
+            case "application/xml":
+                $this->sendXml();
+                break;
+            default:
+                $this->sendBody();
         }
     }
 
-    public function sendBody(){
+    protected function sendBody(){
         if(!isset($this->headers["Content-Type"])){
             $this->headers["Content-Type"] = "text/plain";
         }
@@ -187,18 +190,17 @@ class Response
         echo $this->body;
     }
 
-    public function sendJson(){
+    protected function sendJson(){
         $this->sendHeaders();
         $data = [
             'code'=>$this->code,
             'message'=>$this->message,
             'body'=>$this->body,
         ];
-
         echo json_encode($data);
     }
 
-    public function sendXml(){
+    protected function sendXml(){
         $this->sendHeaders();
         $xml = "<xml><code>{$this->code}</code><message><![CDATA[{$this->message}]]></message><body><![CDATA[{$this->body}]]></body></xml>";
 
