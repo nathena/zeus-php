@@ -6,6 +6,13 @@ class a {
 }
 
 class b {
+
+    public function __construct($data)
+    {
+        print_r($data);
+        echo 2;
+    }
+
     public function c(){
         echo get_class($this);
     }
@@ -13,6 +20,11 @@ class b {
 
 class bb extends b{
 
+//    public function __construct()
+//    {
+//        echo 1;
+//        parent::__construct(null);
+//    }
 }
 
 $a = new a();
