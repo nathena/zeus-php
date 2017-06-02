@@ -24,7 +24,7 @@ class ConfigManager
 	    if(isset($config[$key])){
             return $config[$key];
         }
-        throw new ConfigNotFoundException("Config {$key} not found");
+        return $config;
 	}
 
     private static function load($key)
@@ -55,6 +55,6 @@ class ConfigManager
             return $env_config_path;
         }
 
-        return '';
+        throw new ConfigNotFoundException("Config {$key} not found in {$env_config_path}");
     }
 }

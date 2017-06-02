@@ -18,7 +18,9 @@ return [
 
     //router
     'router.default_controller_ns' => 'app',
-    'router.welcome' => 'app\\controller\\Index',
+    'router.404_override' => true,
+    'router.default_controller' => 'Index',
+    'router.default_controller_action' => 'Index',
     'router.rewrite' => [
         //'test/afadf/([\\w\\/]+)' => 'app\\controller\\Index@index#$1',
     ],
