@@ -34,6 +34,15 @@ class ApplicationContext
         return stripos(PHP_SAPI, 'cgi') === 0;
     }
 
+    public static function debug()
+    {
+        echo '<hr>';
+        echo '<br>',microtime(true)-ZEUS_START_TIME;
+        echo '<br>',memory_get_usage()-ZEUS_START_MEM;
+        echo '<br>';
+        print_r(get_included_files());
+    }
+
     public function ip()
     {
         if( static::isCgi()){
