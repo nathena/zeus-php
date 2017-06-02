@@ -13,7 +13,7 @@ class a {
 
 class b {
 
-    public function __construct()
+    public function __construct($data)
     {
         echo get_class($this);
     }
@@ -42,5 +42,5 @@ class bb extends b{
     }
 }
 
-$a = new a();
-$a->test(1);
+$a = new bb();
+$a->c();
