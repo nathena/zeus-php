@@ -8,6 +8,10 @@ abstract class Controller
 	    return Application::getInstance()->getRequest();
     }
 
+    public function getResponse(){
+        return Application::getInstance()->getResponse();
+    }
+
     public function getView($tpl_path){
         return new View($tpl_path);
     }
