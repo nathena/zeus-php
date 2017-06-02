@@ -17,5 +17,6 @@ class XaIdGenerator
         if(!isset(self::$xaId)){
             self::$xaId = uniqid("xa-");
         }
+        return self::$xaId;
     }
 }
