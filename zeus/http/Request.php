@@ -1,33 +1,26 @@
 <?php
-namespace zeus\http;
 
-use zeus\base\ApplicationContext;
-use zeus\http\session\Session;
+namespace zeus\http;
 
 class Request
 {
 	private $data = [];
 	private $headers = [];
-
 	private $server;
+
 
 	public function __construct()
 	{
-		$this->server = $_SERVER;
-		$this->initRequest();
-	}
-	
-	protected function initRequest()
-	{
-		if( $this->isGet()){
-			$this->data = array_merge($this->data,$_GET); 
-		}else if( $this->isPost() ){
-			$this->data = array_merge($this->data,$_POST);
-		}else if( $this->isPut() || $this->isPatch() || $this->isDelete() ){
-			$this->data = array_merge($this->data,$this->parseData());
-		}else{
-			$this->data = array_merge($this->data,$_GET);
-		}
+        if( $this->isPost() ){
+            $this->setData($_POST);
+        }else if( $this->isPut() || $this->isPatch() || $this->isDelete() ){
+            $this->setData($this->parseData());
+        }else{
+            $this->setData($_GET);
+        }
+
+        $this->server = $_SERVER;
+        $this->getAllHeaders();
 	}
 	
 	public function __get($key){
@@ -42,7 +35,9 @@ class Request
 	}
 	
 	public function setData($data){
-		$this->data = array_merge($this->data,$data);
+	    foreach($data as $key => $val ){
+	        $this->{$key} = $val;
+        }
 	}
 	
 	public function getData(){
@@ -50,79 +45,17 @@ class Request
 	}
 	
 	public function getHeader($key){
-		$headers = getAllHeaders();
-		if(isset($headers[$key])){
-			return $headers[$key];
+		if(isset($this->headers[$key])){
+			return $this->headers[$key];
 		}
 		return '';
-	}
-	
-	public function getAllHeaders(){
-		
-		if(!empty($this->headers)){
-			return $this->headers;
-		}
-		
-		// Get any possible request headers
-		if (function_exists('getallheaders'))
-		{
-			$this->headers = getallheaders();
-		}
-		else
-		{
-			foreach ($_SERVER as $key => $value)
-			{
-				if (substr($key, 0, 5) == 'HTTP_')
-				{
-					$key = ucfirst(strtolower(str_replace('HTTP_', '', $key)));
-					if (strpos($key, '_') !== false)
-					{
-						$ary = explode('_', $key);
-						foreach ($ary as $k => $v){
-							$ary[$k] = ucfirst(strtolower($v));
-						}
-						$key = implode('-', $ary);
-					}
-					$this->headers[$key] = $value;
-				}
-			}
-		}
-	}
-	
-	/**
-	 * @return \zeus\http\Cookie
-	 */
-	public function getCookie(){
-		return Cookie::getInstance();
-	}
-	
-	/**
-	 * @return \zeus\http\session\Session
-	 */
-	public function getSession(){
-		return Session::getInstance();
 	}
 	
 	public function getServer(){
 		return $this->server;
 	}
 	
-	public function getOrginPath(){
-		return $this->orgin_path;
-	}
-	
-	public function setOrginPath($orgin_path){
-		if(!empty($orgin_path)){
-			$url_path = parse_url($orgin_path);
-			if( isset($url_path["query"]))
-			{
-				parse_str($url_path["query"],$data);
-				$this->data = array_merge($this->data, $data);
-			}
-			$this->orgin_path = trim(strtolower($url_path["path"]),"/");
-		}
-	}
-	
+
 	public function isAjax()
 	{
 		$value = $this->server('HTTP_X_REQUESTED_WITH');
@@ -249,4 +182,31 @@ class Request
 
 		return $paramData;
 	}
+
+    private function getAllHeaders(){
+        // Get any possible request headers
+        if (function_exists('getallheaders'))
+        {
+            $this->headers = getallheaders();
+        }
+        else
+        {
+            foreach ($_SERVER as $key => $value)
+            {
+                if (substr($key, 0, 5) == 'HTTP_')
+                {
+                    $key = ucfirst(strtolower(str_replace('HTTP_', '', $key)));
+                    if (strpos($key, '_') !== false)
+                    {
+                        $ary = explode('_', $key);
+                        foreach ($ary as $k => $v){
+                            $ary[$k] = ucfirst(strtolower($v));
+                        }
+                        $key = implode('-', $ary);
+                    }
+                    $this->headers[$key] = $value;
+                }
+            }
+        }
+    }
 }
