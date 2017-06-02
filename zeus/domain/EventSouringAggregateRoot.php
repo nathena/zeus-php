@@ -10,6 +10,11 @@ abstract class EventSouringAggregateRoot extends AggregateRoot
 {
 	private $domainEvents = [];
 
+	public function __construct($data, $idFiled = 'id')
+    {
+        parent::__construct($data, $idFiled);
+    }
+
     public function getEvents()
     {
         $domainEvents       = $this->domainEvents;
