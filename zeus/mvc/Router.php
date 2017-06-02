@@ -6,39 +6,21 @@ use zeus\http\Request;
 
 class Router
 {
-	private static $inited = false;
-	private static $config = [
-			'default_controller_ns'	    => '',
-			'default_controller'		=> 'Index',
-			'default_controller_action'	=> 'index',
-			'404_override'				=> true,
-			//(\w) => app\controller\Index@index#$1
-			'rewrite'					=> []
-	];
-	
 	protected $controller;
-	protected $method;
+	protected $action;
 	protected $params = [];
-	
-	protected $uri_path;
-	
+
+    private $uri_path;
+	private $config;
+
 	public function __construct(Request $request)
 	{
-		$this->init();
+	    $this->config = ConfigManager::config("router");
+
 		$this->uri_path = trim($request->getOrginPath(),"/");
 		$this->params = array_merge($this->params,$request->getData());
+
 		$this->route();
-	}
-	
-	private function init(){
-		if(static::$inited){
-			return;
-		}
-		$config = ConfigManager::router();
-		$config = array_merge(static::$config,array_change_key_case($config));
-		
-		static::$config = $config;
-		static::$inited = true;
 	}
 	
 	public function getController()
@@ -46,9 +28,9 @@ class Router
 		return $this->controller;
 	}
 	
-	public function getMethod()
+	public function getAction()
 	{
-		return $this->method;
+		return $this->action;
 	}
 	
 	public function getParams()
@@ -60,7 +42,7 @@ class Router
 	{
 		if( "/" == $this->uri_path || "" == $this->uri_path )
 		{
-			if( $this->routeDefauleController() )
+			if( $this->routeDefaultController() )
 			{
 				return true;
 			}
@@ -78,7 +60,7 @@ class Router
 		
 		if( self::$config['404_override'] )
 		{
-			return $this->routeDefauleController();
+			return $this->routeDefaultController();
 		}
 		
 		return false;
@@ -95,7 +77,6 @@ class Router
 				if( preg_match("#^$pattern$#", $this->uri_path))
 				{
 					$rule = preg_replace("#^$pattern$#", $replacement, $this->uri_path);
-		
 					$rule = explode("@", $rule);
 					
 					if( class_exists($rule[0]))//autoload
@@ -103,7 +84,7 @@ class Router
 						$this->controller = $rule[0];
 						
 						$rule = explode("#",$rule[1]);
-						$this->method = $rule[0];
+						$this->action = $rule[0];
 						
 						if( count($rule)>1 )
 						{
@@ -124,7 +105,7 @@ class Router
 		$rule = explode("/", $this->uri_path);
 		$count = count($rule);
 		
-		$controller_packpage = self::$config['default_controller_ns'].'\\controller';
+		$controller_packpage = $this->config['router.default_controller_ns'].'\\controller';
 		
 		$index = 0;
 		do 
@@ -144,12 +125,12 @@ class Router
 					$_params_index = $index+2;
 					if( method_exists($controller, $method))
 					{
-						$this->method     = $_rule[0];
+						$this->action = $_rule[0];
 					}
 					else 
 					{
 						$_params_index = $index+1;
-						$this->method = self::$config['default_controller_action'];
+						$this->action = $this->config['router.default_controller_action'];
 					}
 					
 					if( $_params_index < $count)
@@ -159,7 +140,7 @@ class Router
 				}
 				else 
 				{
-					$this->method = self::$config['default_controller_action'];
+					$this->action = $this->config['router.default_controller_action'];
 				}
 				
 				return true;
@@ -172,13 +153,13 @@ class Router
 		return false;
 	}
 	
-	private function routeDefauleController()
+	private function routeDefaultController()
 	{
-		$controller = self::$config['default_controller_ns'].'\\controller\\'.self::$config['default_controller'];
+		$controller = $this->config['router.default_controller_ns'].'\\controller\\'.$this->config['router.default_controller'];
 		if( class_exists($controller) )
 		{
 			$this->controller = $controller;
-			$this->method     = self::$config['default_controller_action'];
+			$this->action     = $this->config['router.default_controller_action'];
 			$this->params( explode("/", $this->uri_path));
 			return true;
 		}
