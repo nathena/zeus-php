@@ -78,10 +78,10 @@ class ApplicationContext
         if(!$prototype){
             return new $clazz();
         }
-        if(isset($this->containers[$clazz])){
-            return $this->containers[$clazz];
+        if(!isset($this->containers[$clazz])){
+            $this->containers[$clazz] = new $clazz();
         }
-        throw new ClassNotFoundException("未找到对应的{$clazz}实例");
+        return $this->containers[$clazz];
     }
 
     private function __construct()

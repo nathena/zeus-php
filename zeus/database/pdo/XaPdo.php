@@ -1,5 +1,6 @@
 <?php
 namespace zeus\database\pdo;
+use zeus\base\ApplicationContext;
 
 /**
  * 
@@ -12,14 +13,14 @@ class XaPdo extends AbstractPdoDialect
 
     protected $xaCount = 0;
     
-    public function __construct( $cfg ,$xid )
+    public function __construct($cfg)
     {
         parent::__construct($cfg);
-        
-        $this->xid = $xid;
+
+        $this->xid = XaIdGenerator::getXaId();
     }
 
-    public function start()
+    public function beginTransaction()
     {
     	if($this->xaCount == 0)
     	{
@@ -29,13 +30,9 @@ class XaPdo extends AbstractPdoDialect
     	return $this->xaCount++;
     }
     
-    public function end()
-    {
-    	return $this->pdo->exec("XA END ".$this->xid);
-    }
-    
     public function prepare()
     {
+        return $this->pdo->exec("XA END ".$this->xid);
     	return $this->pdo->exec("XA PREPARE ".$this->xid);
     }
     

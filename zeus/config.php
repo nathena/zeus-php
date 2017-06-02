@@ -35,7 +35,7 @@ return [
     'log.level' => 0,
 
     //database
-    'database.pdo.dsn' => 'mysql:host=localhost;dbname=t_my',
+    'database.pdo.dsn' => 'mysql:host=localhost;dbname=t_my;charset=utf8',
     'database.pdo.user' => 'root',
     'database.pdo.pass' => '123456',
     'database.pdo.driver_options' => [

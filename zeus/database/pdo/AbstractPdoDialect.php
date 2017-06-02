@@ -9,15 +9,15 @@ namespace zeus\database\pdo;
 
 abstract class AbstractPdoDialect
 {
-	private $insertSqlFormat = "INSERT INTO `%s` ( %s ) VALUES ( %s )";
-	private $insertsSqlFormat = "INSERT INTO `%s` ( %s ) VALUES  %s ";
-	private $updateSqlFormat = "UPDATE `%s` set %s %s ";
-	private $deleteSqlFormat = "DELETE FROM `%s` %s ";
-	
 	protected $pdo;
 	
-	public $sql = array();
-	public $param = array();
+	protected $sql = array();
+    protected $param = array();
+
+    private $insertSqlFormat = "INSERT INTO `%s` ( %s ) VALUES ( %s )";
+    private $insertsSqlFormat = "INSERT INTO `%s` ( %s ) VALUES  %s ";
+    private $updateSqlFormat = "UPDATE `%s` set %s %s ";
+    private $deleteSqlFormat = "DELETE FROM `%s` %s ";
 	
 	/**
 	 * @param $cfg
@@ -36,11 +36,13 @@ abstract class AbstractPdoDialect
 		$dsn = $cfg["dsn"];
 		$user = isset($cfg["user"]) ? trim($cfg["user"]) : "";
 		$pass = isset($cfg["pass"]) ? trim($cfg["pass"]) : "";
-		$charset = isset($cfg["charset"]) ? trim($cfg["charset"]) : "utf8";
+		//$charset = isset($cfg["charset"]) ? trim($cfg["charset"]) : "utf8";
 		
 		$driver_options = isset($cfg["driver_options"]) && is_array($cfg["driver_options"]) ? $cfg["driver_options"] : null;
 	
 		$this->pdo = new \PDO($dsn, $user, $pass, $driver_options);
+		//old php5.3
+        //$this->pdo->exec("set names utf8");
 		
 		//取保连接关闭
 		register_shutdown_function(array($this, 'close'));

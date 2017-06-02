@@ -24,21 +24,26 @@ class DbManager
 	 * @param string $alias
 	 * @return \zeus\database\pdo\Pdo
 	 */
-	public static function openSession($alias='default')
+	public static function openSession($database = "database")
 	{
-		if( !isset(self::$driver_instances[$alias]) )
+		if( !isset(self::$driver_instances[$database]) )
 		{
-			$config = ConfigManager::database();
-			$type = isset($config['type'])?trim($config['type']):'pdo';
-			$config = $config[$type];
-			if(empty($config)){
-				throw new UnSupportDbDriverException("{$type} driver not found.");
-			}
-			
-			self::$driver_instances[$alias] = new Pdo($config);
+			$config = ConfigManager::config($database);
+            if(empty($config)){
+                throw new DbCofigNotFoundException("Pdo {$alias} 配置文件找不到.");
+            }
+
+            $cfg = [
+                "dsn" => $config["{$database}.pdo.dsn"],
+                "user" => $config["{$database}.pdo.user"],
+                "pass" => $config["{$database}.pdo.pass"],
+                "driver_options" => $config["{$database}.pdo.driver_options"],
+            ];
+
+			self::$driver_instances[$database] = new Pdo($cfg);
 		}
 		
-		return self::$driver_instances[$alias];
+		return self::$driver_instances[$database];
 	}
 	
 	/**
@@ -46,13 +51,26 @@ class DbManager
 	 * @param string $xid
 	 * @return \zeus\database\pdo\Pdo
 	 */
-	public static function openXaSession($config,$xid)
+	public static function openXaSession($xa_database)
 	{
-		$instance = new XaPdo($config,$xid);
-		
-		self::$xa_driver_instances[] = $instance;
-		
-		return $instance;
+        if( !isset(self::$xa_driver_instances[$xa_database]) )
+        {
+            $config = ConfigManager::config($xa_database);
+            if(empty($config)){
+                throw new DbCofigNotFoundException("Pdo {$xa_database} 配置文件找不到.");
+            }
+
+            $cfg = [
+                "dsn" => $config["{$xa_database}.pdo.dsn"],
+                "user" => $config["{$xa_database}.pdo.user"],
+                "pass" => $config["{$xa_database}.pdo.pass"],
+                "driver_options" => $config["{$xa_database}.pdo.driver_options"],
+            ];
+
+            self::$xa_driver_instances[$xa_database] = new XaPdo($cfg);
+        }
+
+		return self::$driver_instances[$xa_database];
 	}
 	
 	public static function getAllSessions()
