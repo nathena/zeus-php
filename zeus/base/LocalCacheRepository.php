@@ -1,7 +1,7 @@
 <?php
-namespace zeus\domain;
+namespace zeus\base;
 
-abstract class CacheableRepository
+abstract class LocalCacheRepository
 {
 	private static $cache = [];
 	

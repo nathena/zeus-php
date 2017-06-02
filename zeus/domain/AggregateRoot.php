@@ -1,14 +1,19 @@
 <?php
 namespace zeus\domain;
 
-abstract class AggregateRoot
+use zeus\base\AbstractComponent;
+
+abstract class AggregateRoot extends AbstractComponent
 {
 	protected $data = [];
 	protected $id;
 	
 	private $idFiled;
-	
-	protected function __construct($data,$idFiled='id'){
+
+    public function __construct($data,$idFiled='id'){
+
+	    parent::__construct(false);
+
 		if(!empty($data) && is_array($data)){
 			$this->data = $data;
 			if(isset($data[$idFiled])){

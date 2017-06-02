@@ -1,5 +1,5 @@
 <?php
-namespace zeus\application;
+namespace zeus\base;
 /**
  * User: nathena
  * Date: 2017/5/27 0027

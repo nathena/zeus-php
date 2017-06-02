@@ -1,5 +1,5 @@
 <?php
-namespace zeus\exception;
+namespace zeus\base\exception;
 
 use RuntimeException;
 
