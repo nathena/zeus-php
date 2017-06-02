@@ -102,7 +102,8 @@ class ApplicationContext
     }
 
     private function getCliIp(){
-
+        //TODO
+        return "0.0.0.0";
     }
 }
 
