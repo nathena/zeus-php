@@ -55,7 +55,7 @@ class Application
     }
 
 
-    protected function __construct($url_path)
+    protected function __construct()
     {
         $this->request = new XssWapperRequest();
         $this->response = new Response();
