@@ -1,6 +1,5 @@
 <?php
 namespace zeus\sandbox;
-use zeus\base\exception\ClassNotFoundException;
 use zeus\base\logger\Logger;
 
 /**
@@ -87,17 +86,7 @@ class ApplicationContext
     }
 
     public function start(){
-        //timezone
-        date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
-    }
-
-    private function __construct()
-    {
-        $this->loader = new Autoloader();
-        $this->loader->registerNamespaces('zeus', ZEUS_PATH);
-
-        ConfigManager::init();
-
+        //register components
         $components = ConfigManager::config("app_ns");
         foreach( $components as $ns => $path )
         {
@@ -108,9 +97,26 @@ class ApplicationContext
                 if(is_file($components_url_ini)){
                     $url_ini = parse_ini_file($components_url_ini,false);
                     ConfigManager::addRouter($url_ini);
+                }else{
+                    Logger::warn("{$components_url_ini} not found");
                 }
+            }else{
+                Logger::warn("component => {$ns} {$path} not found");
             }
         }
+        //timezone
+        date_default_timezone_set(empty(ConfigManager::config('default_timezone')) ? 'Asia/Shanghai' : ConfigManager::config('default_timezone'));
+    }
+
+    private function __construct()
+    {
+        include_once "Autoloader.php";
+        include_once "ConfigManager.php";
+
+        $this->loader = new Autoloader();
+        $this->loader->registerNamespaces('zeus', ZEUS_PATH);
+
+        ConfigManager::init();
     }
 
     private function getCgiIp(){
