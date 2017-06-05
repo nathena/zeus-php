@@ -86,6 +86,8 @@ class ApplicationContext
     }
 
     public function start(){
+        //config init
+        ConfigManager::init();
         //register components
         $components = ConfigManager::config("app_ns");
         foreach( $components as $ns => $path )
@@ -115,8 +117,6 @@ class ApplicationContext
 
         $this->loader = new Autoloader();
         $this->loader->registerNamespaces('zeus', ZEUS_PATH);
-
-        ConfigManager::init();
     }
 
     private function getCgiIp(){
