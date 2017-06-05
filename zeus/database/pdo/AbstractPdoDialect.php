@@ -361,6 +361,13 @@ abstract class AbstractPdoDialect
 		
 	}
 
+    /**
+     * @return \PDO
+     */
+	public function getConnection(){
+	    return $this->pdo;
+    }
+
     public function debug()
     {
         return [$this->benchmark,$this->sql];
