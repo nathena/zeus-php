@@ -49,9 +49,14 @@ abstract class AbstractPdoDialect
             $driver_options[\PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES {$charset}";
         }
 
-		$this->pdo = new \PDO($dsn, $user, $pass, $driver_options);
-		//取保连接关闭
-		register_shutdown_function(array($this, 'close'));
+        try {
+            $this->pdo = new \PDO($dsn, $user, $pass, $driver_options);
+            //取保连接关闭
+            register_shutdown_function(array($this, 'close'));
+        } catch (\PDOException $e) {
+            Logger::error(">> PDO connect Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) );
+            throw $e;
+        }
 	}
 	
 	public function close()
@@ -64,20 +69,21 @@ abstract class AbstractPdoDialect
         $_sql = $this->log($prepare,$params);
         list($sm, $ss) = explode(' ', microtime());
 
-		$sth = $this->pdo->prepare($prepare);
-		if(!$sth){
-		    Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-		    throw new \PDOException("数据库查询异常",$this->pdo->errorCode());
+        try {
+            $sth = $this->pdo->prepare($prepare);
+            $sth->execute($params);
+            $result = $sth->fetch();
+
+            list($em, $es) = explode(' ', microtime());
+            $benchmark = ($em + $es) - ($sm + $ss);
+            $this->benchmark += $benchmark;
+            $this->sql[$benchmark] = $_sql;
+
+            return (!empty($result) && is_array($result)) ? $result[$index] : null;
+        } catch (\PDOException $e) {
+            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
+            throw $e;
         }
-		$sth->execute($params);
-		$result = $sth->fetch();
-
-        list($em, $es) = explode(' ', microtime());
-        $benchmark = ($em + $es) - ($sm + $ss);
-        $this->benchmark+=$benchmark;
-        $this->sql[$benchmark] = $_sql;
-
-		return (!empty($result) && is_array($result)) ? $result[$index] : null;
 	}
 	
 	public function query($prepare,$params=null)
@@ -85,20 +91,21 @@ abstract class AbstractPdoDialect
         $_sql = $this->log($prepare,$params);
         list($sm, $ss) = explode(' ', microtime());
 
-		$sth = $this->pdo->prepare($prepare);
-        if(!$sth){
-            Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-            throw new \PDOException("数据库查询异常",$this->pdo->errorCode());
+        try {
+            $sth = $this->pdo->prepare($prepare);
+            $sth->execute($params);
+            $result = $sth->fetch();
+
+            list($em, $es) = explode(' ', microtime());
+            $benchmark = ($em + $es) - ($sm + $ss);
+            $this->benchmark+=$benchmark;
+            $this->sql[$benchmark] = $_sql;
+
+            return $result;
+        } catch (\PDOException $e) {
+            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
+            throw $e;
         }
-		$sth->execute($params);
-        $result = $sth->fetch();
-
-        list($em, $es) = explode(' ', microtime());
-        $benchmark = ($em + $es) - ($sm + $ss);
-        $this->benchmark+=$benchmark;
-        $this->sql[$benchmark] = $_sql;
-
-		return $result;
 	}
 	
 	public function queryForList($prepare,$params=null)
@@ -106,20 +113,25 @@ abstract class AbstractPdoDialect
         $_sql = $this->log($prepare,$params);
         list($sm, $ss) = explode(' ', microtime());
 
-		$sth = $this->pdo->prepare($prepare);
-        if(!$sth){
-            Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-            throw new \PDOException("数据库查询异常",$this->pdo->errorCode());
+	    try{
+            $sth = $this->pdo->prepare($prepare);
+            if(!$sth){
+                Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
+                throw new \PDOException("数据库查询异常",$this->pdo->errorCode());
+            }
+            $sth->execute($params);
+            $result = $sth->fetchAll();
+
+            list($em, $es) = explode(' ', microtime());
+            $benchmark = ($em + $es) - ($sm + $ss);
+            $this->benchmark+=$benchmark;
+            $this->sql[$benchmark] = $_sql;
+
+            return $result;
+        } catch (\PDOException $e) {
+            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
+            throw $e;
         }
-		$sth->execute($params);
-        $result = $sth->fetchAll();
-
-        list($em, $es) = explode(' ', microtime());
-        $benchmark = ($em + $es) - ($sm + $ss);
-        $this->benchmark+=$benchmark;
-        $this->sql[$benchmark] = $_sql;
-
-		return $result;
 	}
 	
 	public function exec($prepare,$params=null)
@@ -127,17 +139,19 @@ abstract class AbstractPdoDialect
         $_sql = $this->log($prepare,$params);
         list($sm, $ss) = explode(' ', microtime());
 
-		$sth = $this->pdo->prepare($prepare);
-        if(!$sth){
-            Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-            throw new \PDOException("数据库查询异常",$this->pdo->errorCode());
-        }
-		$sth->execute($params);
+        try {
+            $sth = $this->pdo->prepare($prepare);
+            $sth->execute($params);
 
-        list($em, $es) = explode(' ', microtime());
-        $benchmark = ($em + $es) - ($sm + $ss);
-        $this->benchmark+=$benchmark;
-        $this->sql[$benchmark] = $_sql;
+            list($em, $es) = explode(' ', microtime());
+            $benchmark = ($em + $es) - ($sm + $ss);
+            $this->benchmark+=$benchmark;
+            $this->sql[$benchmark] = $_sql;
+        } catch (\PDOException $e) {
+            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
+            throw $e;
+        }
+
 	}
 	
 	public function insert($table,$fields)
@@ -160,20 +174,21 @@ abstract class AbstractPdoDialect
         $_sql = $this->log($sql,$params);
         list($sm, $ss) = explode(' ', microtime());
 
-		$sth = $this->pdo->prepare($sql);
-        if(!$sth){
-            Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-            throw new \PDOException("数据库执行异常",$this->pdo->errorCode());
+        try {
+            $sth = $this->pdo->prepare($sql);
+            $sth->execute($params);
+            $result = $this->pdo->lastInsertId();
+
+            list($em, $es) = explode(' ', microtime());
+            $benchmark = ($em + $es) - ($sm + $ss);
+            $this->benchmark+=$benchmark;
+            $this->sql[$benchmark] = $_sql;
+
+            return $result;
+        } catch (\PDOException $e) {
+            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
+            throw $e;
         }
-		$sth->execute($params);
-        $result = $this->pdo->lastInsertId();
-
-        list($em, $es) = explode(' ', microtime());
-        $benchmark = ($em + $es) - ($sm + $ss);
-        $this->benchmark+=$benchmark;
-        $this->sql[$benchmark] = $_sql;
-
-        return $result;
 	}
 	
 	public function update($table,$fields,$wheresql)
@@ -215,20 +230,21 @@ abstract class AbstractPdoDialect
         $_sql = $this->log($sql,$values);
         list($sm, $ss) = explode(' ', microtime());
 
-		$sth = $this->pdo->prepare($sql);
-        if(!$sth){
-            Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-            throw new \PDOException("数据库执行异常",$this->pdo->errorCode());
+        try {
+            $sth = $this->pdo->prepare($sql);
+            $sth->execute($values);
+            $result = $sth->rowCount();
+
+            list($em, $es) = explode(' ', microtime());
+            $benchmark = ($em + $es) - ($sm + $ss);
+            $this->benchmark+=$benchmark;
+            $this->sql[$benchmark] = $_sql;
+
+            return $result;
+        } catch (\PDOException $e) {
+            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
+            throw $e;
         }
-		$sth->execute($values);
-        $result = $sth->rowCount();
-
-        list($em, $es) = explode(' ', microtime());
-        $benchmark = ($em + $es) - ($sm + $ss);
-        $this->benchmark+=$benchmark;
-        $this->sql[$benchmark] = $_sql;
-
-        return $result;
 	}
 	
 	public function delete($table,$wheresql)
@@ -261,20 +277,21 @@ abstract class AbstractPdoDialect
         $_sql = $this->log($sql,$values);
         list($sm, $ss) = explode(' ', microtime());
 
-		$sth = $this->pdo->prepare($sql);
-        if(!$sth){
-            Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-            throw new \PDOException("数据库执行异常",$this->pdo->errorCode());
+        try {
+            $sth = $this->pdo->prepare($sql);
+            $sth->execute($values);
+            $result = $sth->rowCount();
+
+            list($em, $es) = explode(' ', microtime());
+            $benchmark = ($em + $es) - ($sm + $ss);
+            $this->benchmark+=$benchmark;
+            $this->sql[$benchmark] = $_sql;
+
+            return $result;
+        } catch (\PDOException $e) {
+            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
+            throw $e;
         }
-		$sth->execute($values);
-        $result = $sth->rowCount();
-
-        list($em, $es) = explode(' ', microtime());
-        $benchmark = ($em + $es) - ($sm + $ss);
-        $this->benchmark+=$benchmark;
-        $this->sql[$benchmark] = $_sql;
-
-        return $result;
 	}
 	
 	public function inserts($table,$fieldsArr)
@@ -312,20 +329,21 @@ abstract class AbstractPdoDialect
         $_sql = $this->log($sql,$values);
         list($sm, $ss) = explode(' ', microtime());
 
-		$sth = $this->pdo->prepare($sql);
-        if(!$sth){
-            Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-            throw new \PDOException("数据库执行异常",$this->pdo->errorCode());
+        try {
+            $sth = $this->pdo->prepare($sql);
+            $sth->execute($values);
+            $result = $sth->rowCount();
+
+            list($em, $es) = explode(' ', microtime());
+            $benchmark = ($em + $es) - ($sm + $ss);
+            $this->benchmark += $benchmark;
+            $this->sql[$benchmark] = $_sql;
+
+            return $result;
+        } catch (\PDOException $e) {
+            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
+            throw $e;
         }
-		$sth->execute($values);
-        $result = $sth->rowCount();
-
-        list($em, $es) = explode(' ', microtime());
-        $benchmark = ($em + $es) - ($sm + $ss);
-        $this->benchmark+=$benchmark;
-        $this->sql[$benchmark] = $_sql;
-
-        return $result;
 	}
 
 	public function beginTransaction($nested=false)
