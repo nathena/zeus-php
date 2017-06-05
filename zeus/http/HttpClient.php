@@ -1,5 +1,5 @@
 <?php
-namespace zeus\utils;
+namespace zeus\http;
 
 class HttpClient
 {
