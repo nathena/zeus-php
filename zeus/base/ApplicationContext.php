@@ -1,5 +1,5 @@
 <?php
-namespace zeus\base;
+namespace zeus\sandbox;
 use zeus\base\exception\ClassNotFoundException;
 use zeus\base\logger\Logger;
 
@@ -12,10 +12,12 @@ use zeus\base\logger\Logger;
 class ApplicationContext
 {
     private static $context;
+    private $loader;
     private $containers = [];
 
+
     /**
-     * @return \zeus\base\ApplicationContext
+     * @return \zeus\sandbox\ApplicationContext
      */
     public static function currentContext(){
         if(!isset(static::$context)){
@@ -84,8 +86,33 @@ class ApplicationContext
         return $this->containers[$clazz];
     }
 
+    public function start(){
+
+    }
+
     private function __construct()
     {
+        $this->loader = new Autoloader();
+        $this->loader->registerNamespaces('zeus', ZEUS_PATH);
+
+        ConfigManager::init();
+
+        $components = ConfigManager::config("app_ns");
+        foreach( $components as $ns => $path )
+        {
+            if( is_dir($path) )
+            {
+                $this->loader->registerNamespaces($ns, $path);
+                $components_url_ini = $path.DS."url.ini";
+                if(is_file($components_url_ini)){
+                    $url_ini = parse_ini_file($components_url_ini,false);
+                    ConfigManager::addRouter($url_ini);
+                }
+            }
+        }
+
+        //timezone
+        date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
     }
 
     private function getCgiIp(){

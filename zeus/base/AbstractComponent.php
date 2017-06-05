@@ -1,5 +1,7 @@
 <?php
 namespace zeus\base;
+use zeus\sandbox\ApplicationContext;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nathena

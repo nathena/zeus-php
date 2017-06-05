@@ -6,7 +6,7 @@
  */
 namespace zeus\base\logger;
 
-use zeus\base\ApplicationContext;
+use zeus\sandbox\ApplicationContext;
 use zeus\sandbox\ConfigManager;
 
 class Logger
