@@ -35,11 +35,9 @@ return [
     'log.level' => 0,
 
     //database
-    'database.pdo.dsn' => 'mysql:host=localhost;dbname=t_my;charset=utf8',
-    'database.pdo.user' => 'root',
-    'database.pdo.pass' => '123456',
-    'database.pdo.driver_options' => [
-        \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-    ],
+    'database.dsn' => 'mysql:host=localhost;dbname=t_my',
+    'database.user' => 'root',
+    'database.pass' => '123456',
+    'database.charset' => 'utf8',
+
 ];

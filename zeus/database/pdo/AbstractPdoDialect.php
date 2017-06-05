@@ -10,9 +10,7 @@ namespace zeus\database\pdo;
 abstract class AbstractPdoDialect
 {
 	protected $pdo;
-	
-	protected $sql = array();
-    protected $param = array();
+	protected $sql = [];
 
     private $insertSqlFormat = "INSERT INTO `%s` ( %s ) VALUES ( %s )";
     private $insertsSqlFormat = "INSERT INTO `%s` ( %s ) VALUES  %s ";
@@ -21,25 +19,35 @@ abstract class AbstractPdoDialect
 	
 	/**
 	 * @param $cfg
-	 *
 	 * mysql:host=localhost;port=3306;dbname=testdb
 	 * mysql:unix_socket=/tmp/mysql.sock;dbname=testdb
 	 * array(
 		 "dsn"=>"",
 		 "user"=>"",
 		 "pass"=>"",
-		 "driver_options"=>[]
 		)
 	 */
 	public function __construct( $cfg )
-	{
-		$dsn = $cfg["dsn"];
-		$user = isset($cfg["user"]) ? trim($cfg["user"]) : "";
-		$pass = isset($cfg["pass"]) ? trim($cfg["pass"]) : "";
-		//$charset = isset($cfg["charset"]) ? trim($cfg["charset"]) : "utf8";
-		
-		$driver_options = isset($cfg["driver_options"]) && is_array($cfg["driver_options"]) ? $cfg["driver_options"] : null;
-	
+    {
+        $dsn = $cfg["dsn"];
+        $user = isset($cfg["user"]) ? trim($cfg["user"]) : "";
+        $pass = isset($cfg["pass"]) ? trim($cfg["pass"]) : "";
+        $charset = isset($cfg["charset"]) ? trim($cfg["charset"]) : "utf8";
+
+        /**
+         * 'database.pdo.driver_options' => [
+         * \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+         * \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+         * ],
+         */
+        $driver_options = [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+        ];
+
+        if (strpos($dsn, 'mysql') !== FALSE){
+            $driver_options[\PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES {$charset}";
+        }
+
 		$this->pdo = new \PDO($dsn, $user, $pass, $driver_options);
 		//old php5.3
         //$this->pdo->exec("set names utf8");
@@ -58,8 +66,7 @@ abstract class AbstractPdoDialect
 		$sth = $this->pdo->prepare($prepare);
 		$sth->execute($params);
 	
-		$this->sql[] = $prepare;
-		$this->param[] = $params;
+		$this->log($prepare,$params);
 	
 		$result = $sth->fetch();
 	
@@ -70,9 +77,8 @@ abstract class AbstractPdoDialect
 	{
 		$sth = $this->pdo->prepare($prepare);
 		$sth->execute($params);
-	
-		$this->sql[] = $prepare;
-		$this->param[] = $params;
+
+        $this->log($prepare,$params);
 	
 		return $sth->fetch();
 	}
@@ -81,9 +87,8 @@ abstract class AbstractPdoDialect
 	{
 		$sth = $this->pdo->prepare($prepare);
 		$sth->execute($params);
-	
-		$this->sql[] = $prepare;
-		$this->param[] = $params;
+
+        $this->log($prepare,$params);
 	
 		return $sth->fetchAll();
 	}
@@ -92,9 +97,8 @@ abstract class AbstractPdoDialect
 	{
 		$sth = $this->pdo->prepare($prepare);
 		$sth->execute($params);
-	
-		$this->sql[] = $prepare;
-		$this->param[] = $params;
+
+        $this->log($prepare,$params);
 	}
 	
 	public function insert($table,$fields)
@@ -116,9 +120,8 @@ abstract class AbstractPdoDialect
 	
 		$sth = $this->pdo->prepare($sql);
 		$sth->execute($params);
-	
-		$this->sql[] = $sql;
-		$this->param[] = $params;
+
+        $this->log($sql,$params);
 	
 		return $this->pdo->lastInsertId();
 	}
@@ -161,9 +164,8 @@ abstract class AbstractPdoDialect
 	
 		$sth = $this->pdo->prepare($sql);
 		$sth->execute($values);
-	
-		$this->sql[] = $sql;
-		$this->param[] = $values;
+
+        $this->log($sql,$values);
 	
 		return $sth->rowCount();
 	}
@@ -197,9 +199,8 @@ abstract class AbstractPdoDialect
 	
 		$sth = $this->pdo->prepare($sql);
 		$sth->execute($values);
-	
-		$this->sql[] = $sql;
-		$this->param[] = $values;
+
+        $this->log($sql,$values);
 	
 		return $sth->rowCount();
 	}
@@ -238,18 +239,12 @@ abstract class AbstractPdoDialect
 	
 		$sth = $this->pdo->prepare($sql);
 		$sth->execute($values);
-	
-		$this->sql[] = $sql;
-		$this->param[] = $values;
+
+        $this->log($sql,$values);
 	
 		return $sth->rowCount();
 	}
-	
-	public function debug()
-	{
-		return [$this->sql,$this->param];
-	}
-	
+
 	public function beginTransaction($nested=false)
 	{
 		
@@ -264,4 +259,25 @@ abstract class AbstractPdoDialect
 	{
 		
 	}
+
+    public function debug()
+    {
+        return $this->sql;
+    }
+
+	private function log($sql,$param){
+        $indexed=$param==array_values($param);
+        foreach($param as $k=>$v) {
+            if(is_string($v)){
+                $v="'$v'";
+            }
+            if($indexed){
+                $sql=preg_replace('/\?/',$v,$sql,1);
+            }else {
+                $sql=str_replace(":$k",$v,$sql);
+            }
+        }
+
+        $this->sql[] = $sql;
+    }
 }

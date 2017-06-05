@@ -1,46 +1,21 @@
 <?php
-class a {
-    public function c(b $b){
-        $b->c();
+function parms($string,$data) {
+    $indexed=$data==array_values($data);
+    foreach($data as $k=>$v) {
+        if(is_string($v)) $v="'$v'";
+        if($indexed) $string=preg_replace('/\?/',$v,$string,1);
+        else $string=str_replace(":$k",$v,$string);
     }
-
-    public function __call($m,$data){
-        echo $m;
-        print_r($data);
-    }
-
+    return $string;
 }
 
-class b {
+//    Index Parameters
+$string='INSERT INTO stuff(name,value) VALUES (?,?)';
+$data=array('Fred',23);
+print parms($string,$data);
+echo "\r\n";
+//    Named Parameters
+$string='INSERT INTO stuff(name,value) VALUES (:name,:value)';
+$data=array('name'=>'Fred','value'=>23);
 
-    public function __construct($data)
-    {
-        echo get_class($this);
-    }
-
-    public function c(){
-        echo get_class($this);
-    }
-
-    public function __set($key,$val){
-        $this->data[$key] = $val;
-    }
-
-    public function setData($data){
-        foreach($data as $key => $val ){
-            $this->{$key} = $val;
-        }
-    }
-}
-
-class bb extends b{
-
-    public function __set($key,$val){
-        $this->data[$key] = $val;
-
-        echo "========>",1;
-    }
-}
-
-$a = new bb();
-$a->c();
+print parms($string,$data);

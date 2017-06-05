@@ -30,14 +30,14 @@ class DbManager
 		{
 			$config = ConfigManager::config($database);
             if(empty($config)){
-                throw new DbCofigNotFoundException("Pdo {$alias} 配置文件找不到.");
+                throw new DbCofigNotFoundException("Pdo {$database} 配置文件找不到.");
             }
 
             $cfg = [
                 "dsn" => $config["{$database}.pdo.dsn"],
                 "user" => $config["{$database}.pdo.user"],
                 "pass" => $config["{$database}.pdo.pass"],
-                "driver_options" => $config["{$database}.pdo.driver_options"],
+                "charset" => $config["{$database}.pdo.charset"],
             ];
 
 			self::$driver_instances[$database] = new Pdo($cfg);
@@ -64,7 +64,7 @@ class DbManager
                 "dsn" => $config["{$xa_database}.pdo.dsn"],
                 "user" => $config["{$xa_database}.pdo.user"],
                 "pass" => $config["{$xa_database}.pdo.pass"],
-                "driver_options" => $config["{$xa_database}.pdo.driver_options"],
+                "charset" => $config["{$xa_database}.pdo.charset"],
             ];
 
             self::$xa_driver_instances[$xa_database] = new XaPdo($cfg);
