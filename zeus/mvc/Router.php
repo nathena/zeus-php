@@ -2,6 +2,7 @@
 namespace zeus\mvc;
 
 use zeus\sandbox\ConfigManager;
+use zeus\utils\XssCleaner;
 
 class Router
 {
@@ -164,6 +165,7 @@ class Router
 
     private function merge_params(array $params)
     {
+        $params = XssCleaner::doClean($params);
         $this->params = array_merge($this->params,$params);
     }
 }
