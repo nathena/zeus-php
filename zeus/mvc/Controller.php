@@ -17,7 +17,7 @@ abstract class Controller
     }
 
     public function forward($url_path){
-        Application::getInstance()->forward($url_path);
+        Application::getInstance()->dispatch($url_path);
     }
 
 	public function errorHandler(\Exception $e)

@@ -4,7 +4,7 @@ namespace zeus\mvc;
 use zeus\http\Response;
 use zeus\http\XssWapperRequest;
 
-class Application 
+class Application
 {
     private static $instance;
 
@@ -21,7 +21,7 @@ class Application
         return static::$instance;
     }
 
-	public function forward($url_path)
+	public function dispatch($url_path)
 	{
 		$controller = null;
 		try
@@ -53,7 +53,6 @@ class Application
     public function getResponse(){
 	    return $this->response;
     }
-
 
     protected function __construct()
     {

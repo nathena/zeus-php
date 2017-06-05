@@ -4,7 +4,7 @@ $root = dirname(ZEUS_PATH);
 $application = $root.DS.'application';
 
 return [
-	
+
 	'debug' => true,
 	'default_timezone' => 'Asia/Shanghai',
 	//REQUEST_URI、QUERY_STRING、PATH_INFO

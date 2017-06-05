@@ -87,7 +87,8 @@ class ApplicationContext
     }
 
     public function start(){
-
+        //timezone
+        date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
     }
 
     private function __construct()
@@ -110,9 +111,6 @@ class ApplicationContext
                 }
             }
         }
-
-        //timezone
-        date_default_timezone_set(empty(ConfigManager::config('time_zone')) ? 'Asia/Shanghai' : ConfigManager::config('time_zone'));
     }
 
     private function getCgiIp(){
