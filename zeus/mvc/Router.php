@@ -51,10 +51,10 @@ class Router
             return;
         }
 
-        if( $this->routeUriPath() )
-        {
-            return;
-        }
+//        if( $this->routeUriPath() )
+//        {
+//            return;
+//        }
 
         if( $this->config['router.404_override'] )
         {
