@@ -1,12 +1,12 @@
 <?php
 namespace zeus\domain;
 
-abstract class LocalCacheRepository
+abstract class LocalCacheRepository extends SingletonRepository
 {
 	private static $cache = [];
 	private $_cache_key;
-	
-	public function __construct()
+
+	protected function __construct()
 	{
 		$this->_cache_key = get_class($this);
 		if(!isset(static::$cache[$this->_cache_key])){

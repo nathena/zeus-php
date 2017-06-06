@@ -8,13 +8,19 @@
 
 namespace zeus\domain;
 
+use zeus\database\DbManager;
+
 class DbRepository extends LocalCacheRepository
 {
+    /**
+     * @var \zeus\database\pdo\Pdo
+     */
     protected $db;
 
-    public function __construct()
+    protected function __construct()
     {
         parent::__construct();
         $this->db = DbManager::openSession();
     }
+
 }
