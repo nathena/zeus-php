@@ -16,7 +16,7 @@ class Router
 	public function __construct($uri_path)
 	{
 	    $this->config = ConfigManager::config("router");
-		$this->uri_path = trim(uri_path,"/");
+		$this->uri_path = trim($uri_path,"/");
 
 		$this->route();
 	}
@@ -38,14 +38,6 @@ class Router
 
     private function route()
     {
-        if( "/" == $this->uri || "" == $this->uri )
-        {
-            if( $this->routeDefaultController() )
-            {
-                return;
-            }
-        }
-
         if( $this->routerUriRewrite() )
         {
             return;
@@ -56,17 +48,18 @@ class Router
 //            return;
 //        }
 
-        if( $this->config['router.404_override'] )
+        if( $this->routeDefaultController())
         {
-            $this->routeDefaultController();
+            return;
         }
+
+        throw new \RuntimeException(" request not found");
     }
 
     private function routerUriRewrite()
     {
         $rewrite = $this->config['router.rewrite'];
-
-        if( !empty($rewrite) && is_array($rewrite))
+        if( !empty($rewrite) && is_array($rewrite) && !in_array($this->uri_path,["","/"]))
         {
             foreach ($rewrite as $pattern => $replacement )
             {
@@ -78,13 +71,15 @@ class Router
                     if( class_exists($rule[0]))//autoload
                     {
                         $this->controller = $rule[0];
-
-                        $rule = explode("#",$rule[1]);
-                        $this->action = $rule[0];
-
-                        if( count($rule)>1 )
-                        {
-                            $this->merge_params(explode(",", $rule[1]));
+                        if(count($rule)>1){
+                            $rule = explode("#",$rule[1]);
+                            $this->action = $rule[0];
+                            if( count($rule)>1 )
+                            {
+                                $this->merge_params(explode(",", $rule[1]));
+                            }
+                        }else{
+                            $this->action = ConfigManager::config("router.default_controller_action");
                         }
 
                         return true;
@@ -151,7 +146,7 @@ class Router
 
     private function routeDefaultController()
     {
-        $controller = $this->config['router.default_controller_ns'].'\\controller\\'.$this->config['router.default_controller'];
+        $controller = $this->config['router.default_controller'];
         if( class_exists($controller) )
         {
             $this->controller = $controller;
