@@ -65,6 +65,10 @@ class Request
         return new Cookie($this);
     }
 
+    public function getSession(){
+        return Session::getInstance();
+    }
+
     public function isAjax()
     {
         $value = $this->server('HTTP_X_REQUESTED_WITH');
