@@ -23,10 +23,17 @@ class Application
 
 	public function dispatch($url_path)
 	{
+	    $url_path_data = parse_url($url_path);
+	    $path = isset($url_path_data["path"]) ? $url_path_data['path'] : "/";
+	    if(isset($url_path_data['query'])){
+	        parse_str($url_path_data['query'],$data);
+	        $this->request->setData($data);
+        }
+
 		$controller = null;
 		try
 		{
-		    $router = new Router($url_path);
+		    $router = new Router($path);
 
 			$controllerClass = $router->getController();
 			$controller = new $controllerClass();
