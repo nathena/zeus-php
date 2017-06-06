@@ -1,5 +1,5 @@
 <?php
-namespace zeus\database;
+namespace zeus\database\exception;
 
 use zeus\base\exception\NestedException;
 

@@ -1,6 +1,7 @@
 <?php
 namespace zeus\database;
 
+use zeus\database\exception\DbCofigNotFoundException;
 use zeus\database\pdo\Pdo;
 use zeus\database\pdo\XaPdo;
 use zeus\sandbox\ConfigManager;
