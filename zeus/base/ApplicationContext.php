@@ -92,15 +92,14 @@ class ApplicationContext
         $components = ConfigManager::config("app_ns");
         foreach( $components as $ns => $path )
         {
-            if( is_dir($path) )
-            {
+            if( is_dir($path) ){
                 $this->loader->registerNamespaces($ns, $path);
-                $components_url_ini = $path.DS."url.ini";
-                if(is_file($components_url_ini)){
-                    $url_ini = parse_ini_file($components_url_ini,false);
-                    ConfigManager::addRouter($url_ini);
+                $url = $path.DS."url.php";
+                if(is_file($url)){
+                    $data = include_once $url;
+                    ConfigManager::addRouter($data);
                 }else{
-                    Logger::warn("{$components_url_ini} not found");
+                    Logger::warn("{$url} not found");
                 }
             }else{
                 Logger::warn("component => {$ns} {$path} not found");
@@ -140,7 +139,6 @@ class ApplicationContext
 
 //set_exception_handler&set_error_handler
 function __error_handler($errno, $errstr, $errfile='', $errline='', $errcontext=null){
-
     $message  = 'type   = PHP ERROR'."\n".
         'code    = '.$errno."\n".
         'message = '.$errstr."\n".
