@@ -1,6 +1,7 @@
 <?php
 namespace zeus\domain;
 use zeus\base\AbstractComponent;
+use zeus\base\logger\Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,9 +14,9 @@ abstract class AbstractEntity extends AbstractComponent
 {
     protected $data = [];
     protected $id;
-    protected $adpater;
 
-    private $idFiled;
+    private $idFiled;//uuid key
+    private $update_data = [];//更新未来提交的数据
 
 
     public function __construct($data,$idFiled='id'){
@@ -29,20 +30,9 @@ abstract class AbstractEntity extends AbstractComponent
         $this->idFiled = $idFiled;
     }
 
-    public function setAdpater($adpater){
-        $this->adpater = $adpater;
-    }
-    public function getAdpater(){
-        return $this->adpater;
-    }
 
     public function getId(){
         return $this->id;
-    }
-
-    public function setId($id){
-        $this->id = $id;
-        $this->data[$this->idFiled] = $id;
     }
 
     public function getData(){
@@ -54,9 +44,22 @@ abstract class AbstractEntity extends AbstractComponent
      * @param mixed|array $data
      */
     public function setData($data){
-        $this->data = array_merge($this->data,$data);
         //不允许更新id
-        $this->data[$this->idFiled] = $this->id;
+        if(isset($data[$this->idFiled])){
+            Logger::debug(self::class." {$this->id} setData unset {$data[$this->idFiled]} ");
+            unset($data[$this->idFiled]);
+
+        }
+
+        $this->data = array_merge($this->data,$data);
+        $this->update_data = array_merge($this->update_data,$data);
+    }
+
+    public function updateData(){
+        $data = $this->update_data;
+        $this->update_data = [];
+
+        return $data;
     }
 
     public function __get($key){
@@ -67,6 +70,11 @@ abstract class AbstractEntity extends AbstractComponent
     }
 
     public function __set($key,$val){
+        //不允许更新id
+        if($key == $this->idFiled){
+            return;
+        }
         $this->data[$key] = $val;
+        $this->update_data[$key] = $val;
     }
 }
