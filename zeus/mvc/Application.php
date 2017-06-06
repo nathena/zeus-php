@@ -3,6 +3,7 @@ namespace zeus\mvc;
 
 use zeus\http\Response;
 use zeus\http\XssWapperRequest;
+use zeus\mvc\exception\ControllerNotFoundException;
 
 class Application
 {

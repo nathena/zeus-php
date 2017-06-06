@@ -1,5 +1,5 @@
 <?php
-namespace zeus\mvc;
+namespace zeus\mvc\exception;
 
 use zeus\base\exception\NestedException;
 
