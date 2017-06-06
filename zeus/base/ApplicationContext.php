@@ -14,7 +14,6 @@ class ApplicationContext
     private $loader;
     private $containers = [];
 
-
     /**
      * @return \zeus\sandbox\ApplicationContext
      */
@@ -71,11 +70,11 @@ class ApplicationContext
         return $server_ip;
     }
 
-    public function registerComponent($obj){
+    public function register($obj){
         $this->containers[get_class($obj)] = $obj;
     }
 
-    public function getComponent($clazz,$prototype=false){
+    public function getInstance($clazz,$prototype=false){
         if(!$prototype){
             return new $clazz();
         }

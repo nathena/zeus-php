@@ -10,16 +10,11 @@ use zeus\sandbox\ApplicationContext;
  */
 abstract class AbstractComponent
 {
-
     /**
      * @param $event
      */
     public function publishMessage(AbstractEvent $event){
         $event->publish();
         $event->callback($this);
-    }
-
-    protected function registerComponent(){
-        ApplicationContext::currentContext()->registerComponent($this);
     }
 }
