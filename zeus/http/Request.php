@@ -61,11 +61,18 @@ class Request
         return $this->server;
     }
 
+    public function getCookie(){
+        return new Cookie($this);
+    }
 
     public function isAjax()
     {
         $value = $this->server('HTTP_X_REQUESTED_WITH');
         return (!is_null($value) && strtolower($value) == 'xmlhttprequest') ? true : false;
+    }
+
+    public function getHost(){
+        return $this->server["HTTP_HOST"];
     }
 
     public function getMethod()
