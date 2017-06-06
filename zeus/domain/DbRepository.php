@@ -6,10 +6,7 @@
  * Time: 22:34
  */
 
-namespace zeus\database;
-
-
-use zeus\base\LocalCacheRepository;
+namespace zeus\domain;
 
 class DbRepository extends LocalCacheRepository
 {
@@ -18,8 +15,6 @@ class DbRepository extends LocalCacheRepository
     public function __construct()
     {
         parent::__construct();
-
         $this->db = DbManager::openSession();
-
     }
 }
