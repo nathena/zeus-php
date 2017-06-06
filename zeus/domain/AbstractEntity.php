@@ -13,8 +13,10 @@ abstract class AbstractEntity extends AbstractComponent
 {
     protected $data = [];
     protected $id;
+    protected $adpater;
 
     private $idFiled;
+
 
     public function __construct($data,$idFiled='id'){
 
@@ -25,6 +27,13 @@ abstract class AbstractEntity extends AbstractComponent
             }
         }
         $this->idFiled = $idFiled;
+    }
+
+    public function setAdpater($adpater){
+        $this->adpater = $adpater;
+    }
+    public function getAdpater(){
+        return $this->adpater;
     }
 
     public function getId(){
