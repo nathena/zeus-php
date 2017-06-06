@@ -4,12 +4,10 @@ $root = dirname(ZEUS_PATH);
 $application = $root.DS.'application';
 
 return [
-
 	'debug' => true,
 	'default_timezone' => 'Asia/Shanghai',
 	//REQUEST_URI、QUERY_STRING、PATH_INFO
 	'uri_protocol' => 'REQUEST_URI',
-	'xss_clean' => true,
 
     //application namespace
     'app_ns' => [
@@ -17,13 +15,9 @@ return [
     ],
 
     //router
-    'router.default_controller_ns' => 'app',
-    'router.404_override' => true,
-    'router.default_controller' => 'Index',
+    'router.default_controller' => 'app\\IndexController',
     'router.default_controller_action' => 'Index',
-    'router.rewrite' => [
-        //'test/afadf/([\\w\\/]+)' => 'app\\controller\\Index@index#$1',
-    ],
+    'router.rewrite' => [],
 
     //view
     'view.template_path' => $application.DS.'views',

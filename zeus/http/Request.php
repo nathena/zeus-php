@@ -4,9 +4,9 @@ namespace zeus\http;
 
 class Request
 {
-    private $data = [];
-    private $headers = [];
-    private $server;
+    protected $data = [];
+    protected $headers = [];
+    protected $server;
 
 
     public function __construct()

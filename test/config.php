@@ -1,7 +1,7 @@
 <?php
 
-$root = dirname(dirname(__FILE__));
-$application = $root.DS.'application';
+$current_dir = dirname(__FILE__);
+$root = dirname($current_dir);
 
 return [
 
@@ -11,7 +11,8 @@ return [
 
     //application namespace
     'app_ns' => [
-        'app' => $application,
+        'test_router' => $current_dir.DS."test_router",
+        'app' => $current_dir.DS."app",
     ],
 
     //log
