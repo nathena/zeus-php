@@ -11,7 +11,6 @@ class QuerySpecification extends AbstractSpecification
     private $table;
     private $select_data = [];
     private $join_data = [];
-    private $codition_data = [];
     private $having_data = [];
     private $groupby_data = [];
     private $orderby_data = [];
