@@ -18,13 +18,21 @@ class DeleteSpecification extends AbstractWhereSpecification
 
     public function __construct($table)
     {
-        parent::__construct(DmlType::DML_DELETE);
+        parent::__construct();
 
         $this->table = $table;
+        $this->dml = DmlType::DML_DELETE;
     }
 
-    public function delete()
+    public function getSql()
     {
-        $this->sql = sprintf($this->deleteSqlFormat,$this->table,$this->getWhereFragment());
+        $this->init();
+
+        return parent::getSql();
+    }
+
+    protected function init()
+    {
+        $this->sql = sprintf($this->deleteSqlFormat, $this->table, $this->getWhereFragment());
     }
 }

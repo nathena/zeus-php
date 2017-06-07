@@ -9,53 +9,71 @@
 namespace zeus\database\specification;
 
 
+use zeus\database\DmlType;
+
 abstract class AbstractSpecification
 {
     protected $params = [];
     protected $sql = "";
 
-    private $dml;
+    protected $dml;
 
-    public function __construct($dml)
+    public function getSql()
     {
-        $this->dml = trim($dml);
-    }
-
-    public function getSql(){
         return $this->sql;
     }
 
-    public function setSql($sql){
+    public function setSql($sql)
+    {
         $this->sql = $sql;
     }
 
-    public function getParams(){
+    public function getParams()
+    {
         return $this->params;
     }
 
-    public function setParams(array $params){
-        $this->params = array_merge($this->params,$params);
+    public function setParams(array $params)
+    {
+        $this->params = array_merge($this->params, $params);
     }
 
-    public function getDml(){
+    public function getDml()
+    {
         return $this->dml;
     }
 
-    public function test(){
+    public function log()
+    {
+        $sql_s = [];
         $sql = $this->getSql();
         $param = $this->getParams();
-        $indexed=$param==array_values($param);
 
-        foreach($param as $k=>$v) {
-            if(is_string($v)){
-                $v="'$v'";
+        if (DmlType::DML_INSERT_BATCH == $this->dml) {
+            foreach ($param as $item) {
+                $sql_s[] = $this->_real_sql($sql, $item);
             }
-            if($indexed){
-                $sql=preg_replace('/\?/',$v,$sql,1);
-            }else {
-                $sql=preg_replace("/$k/",$v,$sql,1);
+        } else {
+            $sql_s[] = $this->_real_sql($sql, $param);
+        }
+
+        echo "\r\n" . implode(",", $sql_s) . "\r\n";
+    }
+
+    private function _real_sql($sql, $param)
+    {
+        $indexed = $param == array_values($param);
+
+        foreach ($param as $k => $v) {
+            if (is_string($v)) {
+                $v = "'$v'";
+            }
+            if ($indexed) {
+                $sql = preg_replace('/\?/', $v, $sql, 1);
+            } else {
+                $sql = preg_replace("/$k/", $v, $sql, 1);
             }
         }
-        echo "\r\n". $sql."\r\n";
+        return $sql;
     }
 }

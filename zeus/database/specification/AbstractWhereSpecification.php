@@ -17,9 +17,8 @@ class AbstractWhereSpecification extends AbstractSpecification
     private $pre_named;
     private $pre_name_index = 0;
 
-    public function __construct($dml)
+    public function __construct()
     {
-        parent::__construct($dml);
         $this->pre_named = ":_".UUIDGenerator::randChar(4)."_";
     }
 
@@ -67,9 +66,8 @@ class AbstractWhereSpecification extends AbstractSpecification
         {
             $where[$type] = "( {$key->_getWhereFragment()} )";
             $_params = $key->getParams();
-            foreach($_params as $k => $v){
-                $this->params[$k] = $v;
-            }
+
+            $this->params = array_merge($this->params,$_params);
         }
         else if(is_string($key))
         {

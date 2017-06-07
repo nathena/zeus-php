@@ -1,33 +1,47 @@
 <?php
 namespace test;
+
+use zeus\database\specification\DeleteSpecification;
+use zeus\database\specification\InsertBatchSpecification;
 use zeus\database\specification\InsertSpecification;
+use zeus\database\specification\QueryRowSpecification;
 use zeus\database\specification\QuerySpecification;
+use zeus\database\specification\UpdateSpecification;
 
 $current_dir = dirname(__FILE__);
 $root = dirname($current_dir);
 
 define("APP_ENV_PATH",$current_dir.DIRECTORY_SEPARATOR."config.php");
 $zeus_path = $root.DIRECTORY_SEPARATOR."zeus".DIRECTORY_SEPARATOR."bootstrap.php";
+
 include_once $zeus_path;
 
+$q = new QuerySpecification();
+$q->select("*")->from("t_test")->where("id",1);
+$c = new QuerySpecification();
+$c->where("b > ",2);
+$c->where("d < ",3);
+$q->or_where($c);
+$q->log();
+echo $q->getDml();
 
-//$spec = new QuerySpecification();
-//$spec->select("a1,a2,a3")->from("test a")->join("test_b b","a.id = b.id")
-//       ->where("a.id",1);
-//$spec->where_in("a.c",[1,2,3.1,2,3,1,2,3,1]);
-//
-//
-//$other = new QuerySpecification();
-//$other->where_in("a.d",["a"]);
-//$other->where("aaa > ",1);
-//$spec->or_where($other);
-//
-////$spec->like("a.c not","aaa");
-////echo $spec->getSql();
-////print_r($spec->getParams());
-//echo $spec->test();
-echo "\r\n===>";
+$q = new InsertSpecification("t_est",["a"=>1,"b"=>2,"c"=>3]);
+$q->log();
+echo $q->getDml();
 
-$spec = new InsertSpecification("caadfa");
-$spec->insert(["a"=>'b',"c"=>1]);
-echo $spec->test();
+$data = [];
+$params = ["a"=>11,"b"=>22,"c"=>33];
+$data[] = $params;
+$params = ["a"=>"aa","b"=>"bb","c"=>"cc"];
+$data[] = $params;
+$q = new InsertBatchSpecification("t_est",$data);
+$q->log();
+echo $q->getDml();
+
+$q = new UpdateSpecification("t_test",["a"=>1,"b"=>2]);
+$q->where("id",1)->log();
+echo $q->getDml();
+
+$q = new DeleteSpecification("t_tese");
+$q->where("id",2)->log();
+echo $q->getDml();
