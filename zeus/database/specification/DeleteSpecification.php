@@ -11,5 +11,8 @@ namespace zeus\database\specification;
 
 class DeleteSpecification extends AbstractSpecification
 {
-
+    public function __construct()
+    {
+        parent::__construct("delete");
+    }
 }

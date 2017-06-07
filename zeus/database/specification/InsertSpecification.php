@@ -12,4 +12,8 @@ namespace zeus\database\specification;
 class InsertSpecification extends AbstractSpecification
 {
 
+    public function __construct()
+    {
+        parent::__construct("insert");
+    }
 }

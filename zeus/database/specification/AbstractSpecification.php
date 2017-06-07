@@ -14,9 +14,10 @@ abstract class AbstractSpecification
     protected $codition_data = [];
     protected $having_data = [];
 
-    protected $dml = "select";
     protected $params = [];
     protected $sql = "";
+
+    private $dml;
 
     public function __construct($dml)
     {

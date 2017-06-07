@@ -18,9 +18,15 @@ class QuerySpecification extends AbstractSpecification
     private $limit_data;
     private $offset_data;
 
-    public function __construct($table='')
+    public function __construct($is_list=true)
     {
-        $this->table = trim($table);
+        if($is_list){
+            $dml="select-list";
+        }else{
+            $dml="select-one";
+        }
+        parent::__construct($dml);
+
     }
 
     public function select($fields){
@@ -63,6 +69,10 @@ class QuerySpecification extends AbstractSpecification
         return $this;
     }
 
+    public function from($table){
+        $this->table = trim($table);
+    }
+
     public function join($table,$codition,$type="left join"){
         //TODO
         //return $this;
@@ -89,16 +99,6 @@ class QuerySpecification extends AbstractSpecification
         return $this;
     }
 
-    //-------- build
-    public function fectch($params=null){
-        $this->dml = "one";
-        //TODO
-    }
-
-    public function fectchAll($params=null){
-        //TODO
-    }
-    //--------------
     protected function _create_alias_from_item($item)
     {
         if (strpos($item, '.') !== FALSE)
