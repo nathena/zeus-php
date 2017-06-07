@@ -25,8 +25,16 @@ abstract class AbstractSpecification
         return $this->sql;
     }
 
+    public function setSql($sql){
+        $this->sql = $sql;
+    }
+
     public function getParams(){
         return $this->params;
+    }
+
+    public function setParams(array $params){
+        $this->params = array_merge($this->params,$params);
     }
 
     public function getDml(){
@@ -48,6 +56,6 @@ abstract class AbstractSpecification
                 $sql=preg_replace("/$k/",$v,$sql,1);
             }
         }
-        return $sql;
+        echo "\r\n". $sql."\r\n";
     }
 }
