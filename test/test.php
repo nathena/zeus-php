@@ -16,7 +16,7 @@ $zeus_path = $root.DIRECTORY_SEPARATOR."zeus".DIRECTORY_SEPARATOR."bootstrap.php
 
 include_once $zeus_path;
 
-$q = new QuerySpecification();
+$q = new QueryRowSpecification();
 $q->select("*")->from("t_test")->where("id",1);
 $c = new QuerySpecification();
 $c->where("b > ",2);
