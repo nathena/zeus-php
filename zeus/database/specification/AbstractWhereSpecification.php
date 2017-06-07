@@ -53,16 +53,6 @@ class AbstractWhereSpecification extends AbstractSpecification
         return $this;
     }
 
-    public function having($key,$value){
-        $this->_having($key,$value);
-        return $this;
-    }
-
-    public function or_having($key,$value){
-        $this->_having($key,$value," or ");
-        return $this;
-    }
-
     public function getWhereFragment(){
         $where  = [];
         $where_data = $this->where_data;
@@ -74,7 +64,10 @@ class AbstractWhereSpecification extends AbstractSpecification
                 $where[] = $key ." ".$val;
             }
         }
-        return implode(" ",$where);
+        if(!empty($where)){
+            return " where ".implode(" ",$where);
+        }
+        return "";
     }
 
     private function _where($key,$value=null,$type = 'AND ')
@@ -147,25 +140,7 @@ class AbstractWhereSpecification extends AbstractSpecification
         }
     }
 
-    private function _having($key,$value,$type = " and "){
-        if(!empty($key) ){
-            $where = [];
-            $key = " having {$key} ";
-            if(!$this->_has_operator($key)){
-                $key .= " = ";
-            }
-            if( !is_null($value)){
-                $named = $this->_named();
-                $key .= $named;
-                $this->params[$named] = $value;
-            }
-            $where[$type] = $key;
-
-            $this->where_data[] = $where;
-        }
-    }
-
-    private function _has_operator($str)
+    protected function _has_operator($str)
     {
         $str = trim($str);
         if ( ! preg_match("/(\s|<|>|!|=|is null|is not null)/i", $str))
@@ -176,7 +151,7 @@ class AbstractWhereSpecification extends AbstractSpecification
         return TRUE;
     }
 
-    private function _named(){
+    protected function _named(){
         return $named = $this->pre_named.$this->pre_name_index++;
     }
 }

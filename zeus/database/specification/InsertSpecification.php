@@ -22,7 +22,7 @@ class InsertSpecification extends AbstractSpecification
         $this->table = trim($table);
     }
 
-    public function prepare(array $params){
+    public function insert(array $params){
         if( empty($params)){
             return;
         }
@@ -40,7 +40,7 @@ class InsertSpecification extends AbstractSpecification
         $this->sql = sprintf($this->insertSqlFormat,$this->table,$insert_key,$insert_value);
     }
 
-    public function prepareBatch(array $params){
+    public function batchInsert(array $params){
         if (count($params) < 1){
             return;
         }

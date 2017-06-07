@@ -21,7 +21,7 @@ class UpdateSpecification extends AbstractWhereSpecification
         $this->table = $table;
     }
 
-    public function prepare(array $params){
+    public function update(array $params){
         if( empty($params)){
             return;
         }

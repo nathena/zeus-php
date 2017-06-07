@@ -23,7 +23,7 @@ class DeleteSpecification extends AbstractWhereSpecification
         $this->table = $table;
     }
 
-    public function getSql()
+    public function delete()
     {
         $this->sql = sprintf($this->deleteSqlFormat,$this->table,$this->getWhereFragment());
     }
