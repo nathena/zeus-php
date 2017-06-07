@@ -11,12 +11,16 @@ namespace zeus\database\specification;
 
 class AbstractWhereSpecification extends AbstractSpecification
 {
-    protected $codition_data = [];
-    protected $having_data = [];
+    protected $where_data=[];
+
+    private $pre_named;
+    private $pre_name_index = 0;
 
     public function __construct($dml)
     {
         parent::__construct($dml);
+
+        $this->pre_named = ":_".time()."_";
     }
 
     public function where($key, $value = NULL){
@@ -29,23 +33,23 @@ class AbstractWhereSpecification extends AbstractSpecification
         return $this;
     }
 
-    public function where_in($key,$values,$not = false){
-        $this->_where_in($key,$values,$not);
+    public function where_in($key,$values){
+        $this->_where_in($key,$values);
         return $this;
     }
 
-    public function or_where_in($key,$values,$not = false){
-        $this->_where_in($key,$values,$not," or ");
+    public function or_where_in($key,$values){
+        $this->_where_in($key,$values," or ");
         return $this;
     }
 
-    public function like($key,$match,$site="both",$not=false){
-        $this->_like($key,$match,$site,$not);
+    public function like($key,$match,$site="both"){
+        $this->_like($key,$match,$site);
         return $this;
     }
 
-    public function or_like($key,$match,$site="both",$not=false){
-        $this->_like($key,$match,$site,$not," or ");
+    public function or_like($key,$match,$site="both"){
+        $this->_like($key,$match,$site," or ");
         return $this;
     }
 
@@ -60,22 +64,119 @@ class AbstractWhereSpecification extends AbstractSpecification
     }
 
     public function getWhereFragment(){
+        $where  = [];
+        $where_data = $this->where_data;
+        foreach($where_data as $index => $data){
+            list($key,$val) = each($data);
+            if(0 == $index){
+                $where[] = $val;
+            }else{
+                $where[] = $key ." ".$val;
+            }
+        }
+        return implode(" ",$where);
+    }
+
+    private function _where($key,$value=null,$type = 'AND ')
+    {
+        $where = [];
+        if($key instanceof AbstractWhereSpecification )
+        {
+            $where[$type] = "({$key->getWhereFragment()})";
+            $this->params = array_merge($this->params,$key->getParams());
+        }
+        else if(is_string($key))
+        {
+            if(!$this->_has_operator($key)){
+                $key .= " = ";
+            }
+            if( !is_null($value)){
+                $named = $this->_named();
+                $key .= $named;
+                $this->params[$named] = $value;
+            }
+            $where[$type] = $key;
+
+            $this->where_data[] = $where;
+        }
 
     }
 
-    private function _where($key,$value=null,$type = 'AND '){
-        //TODO
+    private function _where_in($key,$values,$type = " and "){
+        if(!empty($key) && !empty($values) && is_string($key) && is_array($values) )
+        {
+            $key.=" in ";
+            $in = [];
+            foreach($values as $value){
+                $named = $this->_named();
+                $in[] = $named;
+                $this->params[$named] = $value;
+            }
+            if(!empty($in)){
+                $where = [];
+                $in = implode(",".$in);
+                $where[$type] = " $key ($in)";
+
+                $this->where_data[] = $where;
+            }
+        }
     }
 
-    private function _where_in($key,$values,$not= false, $type = " and "){
-        //TODO
-    }
+    private function _like($key,$match,$side="both",$type = 'AND '){
+        if(!empty($key) && !empty($values) && is_string($key) && is_string($match) && in_array($side,["both","left","right"]))
+        {
+            $where = [];
+            $named = $this->_named();
+            $key.=" like {$named}";
+            switch ($side)
+            {
+                case 'left':
+                    $match = "%{$match}";
+                    break;
+                case 'right':
+                    $match = "{$match}%";
+                    break;
+                default:
+                    $match = "%{$match}%";
+                    break;
+            }
+            $this->params[$named] = $match;
+            $where[$type] = " $key ";
 
-    private function _like($key,$match,$side="both",$not= false, $type = 'AND '){
-        //TODO
+            $this->where_data[] = $where;
+        }
     }
 
     private function _having($key,$value,$type = " and "){
-        //TODO
+        if(!empty($key) ){
+            $where = [];
+            $key = " having {$key} ";
+            if(!$this->_has_operator($key)){
+                $key .= " = ";
+            }
+            if( !is_null($value)){
+                $named = $this->_named();
+                $key .= $named;
+                $this->params[$named] = $value;
+            }
+            $where[$type] = $key;
+
+            $this->where_data[] = $where;
+        }
+    }
+
+    private function _has_operator($str)
+    {
+        $str = trim($str);
+        if ( ! preg_match("/(\s|<|>|!|=|is null|is not null)/i", $str))
+        {
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    private function _named(){
+        return $named = $this->pre_named.$this->pre_name_index++;
     }
 }
