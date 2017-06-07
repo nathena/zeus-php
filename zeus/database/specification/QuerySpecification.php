@@ -13,9 +13,9 @@ class QuerySpecification extends AbstractWhereSpecification
     private $table;
     private $select_data = [];
     private $join_data = [];
-    private $groupby_data = [];
+    private $group_by_data = [];
     private $having_data = [];
-    private $orderby_data = [];
+    private $order_by_data = [];
     private $limit_data;
     private $offset_data;
 
@@ -26,45 +26,49 @@ class QuerySpecification extends AbstractWhereSpecification
 
     public function getSql()
     {
-        $sql = [];
-        $sql[] = implode(",",$this->select_data);
-        $sql[] = $this->table;
-        if(!empty($this->join_data)){
-            $sql[] = implode(" ",$this->join_data);
-        }
-        $sql[] = $this->getWhereFragment();
-        if(!empty($this->groupby_data)){
-            $sql[] = "group by ".implode(",",$this->groupby_data);
-        }
-        if(!empty($this->having_data)){
-            $having  = [];
-            $having_data = $this->having_data;
-            foreach($having_data as $index => $data){
-                list($key,$val) = each($data);
-                if(0 == $index){
-                    $having[] = $val;
-                }else{
-                    $having[] = $key ." ".$val;
+        if(empty($this->sql)){
+            $sql = [];
+            $sql[] = "select ";
+            $sql[] = implode(",",$this->select_data);
+            $sql[] = "from ".$this->table;
+            if(!empty($this->join_data)){
+                $sql[] = implode(" ",$this->join_data);
+            }
+            $sql[] = $this->getWhereFragment();
+            if(!empty($this->group_by_data)){
+                $sql[] = "group by ".implode(",",$this->group_by_data);
+            }
+            if(!empty($this->having_data)){
+                $having  = [];
+                $having_data = $this->having_data;
+                foreach($having_data as $index => $data){
+                    list($key,$val) = each($data);
+                    if(0 == $index){
+                        $having[] = $val;
+                    }else{
+                        $having[] = $key ." ".$val;
+                    }
+                }
+                if(!empty($having)){
+                    $sql[] = " having ".implode(",",$having);
                 }
             }
-            if(!empty($having)){
-                $sql[] = " having ".implode(",",$having);
+            if(!empty($this->order_by_data)){
+                $sql[] = " having ".implode(",",$this->order_by_data);
             }
-        }
-        if(!empty($this->orderby_data)){
-            $sql[] = " having ".implode(",",$this->orderby_data);
-        }
 
-        if( $this->offset_data>0){
-            $sql[] = " limit ";
-            if( $this->limit_data>0 ){
-                $sql[] = "{$this->limit_data},{$this->offset_data}";
-            }else{
-                $sql[] = "{$this->offset_data}";
+            if( $this->offset_data>0){
+                $sql[] = " limit ";
+                if( $this->limit_data>0 ){
+                    $sql[] = "{$this->limit_data},{$this->offset_data}";
+                }else{
+                    $sql[] = "{$this->offset_data}";
+                }
             }
-        }
 
-        return implode(" ",$sql);
+            $this->sql = implode(" ",$sql);
+        }
+        return $this->sql;
     }
 
     public function select($fields){
@@ -125,7 +129,7 @@ class QuerySpecification extends AbstractWhereSpecification
             foreach($fields as $val){
                 $val = trim($val);
                 if(!empty($val)){
-                    $this->groupby_data[] = $val;
+                    $this->group_by_data[] = $val;
                 }
             }
         }
@@ -144,7 +148,7 @@ class QuerySpecification extends AbstractWhereSpecification
 
     public function order_by($by,$direction=''){
         if(!empty($by)){
-            $this->orderby_data[] = "{$by} {$direction}";
+            $this->order_by_data[] = "{$by} {$direction}";
         }
         return $this;
     }

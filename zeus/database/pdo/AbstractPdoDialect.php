@@ -75,10 +75,6 @@ abstract class AbstractPdoDialect
         try {
             $sth = $this->pdo->prepare($prepare);
             $sth->execute($params);
-            if( DmlType::DML_SELECT_ONE == $dml){
-                $result = $sth->fetch();
-            }
-
             switch ($dml){
                 case DmlType::DML_SELECT_ONE:
                     $result = $sth->fetch();
@@ -123,27 +119,20 @@ abstract class AbstractPdoDialect
         if(empty($_params)){
             return;
         }
-
+        $_sql = $this->log($prepare,$_params);
         list($sm, $ss) = explode(' ', microtime());
+
         try {
             $sth = $this->pdo->prepare($prepare);
             foreach($params as $_params){
-                $_sql = $this->log($prepare,$_params);
-                list($sm, $ss) = explode(' ', microtime());
-
                 $sth->execute($_params);
-
-                list($em, $es) = explode(' ', microtime());
-                $benchmark = ($em + $es) - ($sm + $ss);
-                $this->benchmark+=$benchmark;
-                $this->sql[$benchmark] = $_sql;
             }
             $result = $sth->rowCount();
 
             list($em, $es) = explode(' ', microtime());
             $benchmark = ($em + $es) - ($sm + $ss);
             $this->benchmark+=$benchmark;
-            $this->sql[$benchmark] = $prepare;
+            $this->sql[$benchmark] = $_sql;
 
             return $result;
         } catch (\PDOException $e) {
@@ -186,9 +175,9 @@ abstract class AbstractPdoDialect
                 $v="'$v'";
             }
             if($indexed){
-                $sql=preg_replace('/\?/',$v,$sql,1);
+                $sql=preg_replace('/\?/',$this->pdo->quote($v),$sql,1);
             }else {
-                $sql=str_replace("$k",$v,$sql);
+                $sql=preg_replace("/$k/",$this->pdo->quote($v),$sql,1);
             }
         }
         return $sql;

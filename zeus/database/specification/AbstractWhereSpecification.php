@@ -8,6 +8,7 @@
 
 namespace zeus\database\specification;
 
+use zeus\utils\UUIDGenerator;
 
 class AbstractWhereSpecification extends AbstractSpecification
 {
@@ -19,8 +20,7 @@ class AbstractWhereSpecification extends AbstractSpecification
     public function __construct($dml)
     {
         parent::__construct($dml);
-
-        $this->pre_named = ":_".time()."_";
+        $this->pre_named = ":_".UUIDGenerator::randChar(4)."_";
     }
 
     public function where($key, $value = NULL){
@@ -54,29 +54,22 @@ class AbstractWhereSpecification extends AbstractSpecification
     }
 
     public function getWhereFragment(){
-        $where  = [];
-        $where_data = $this->where_data;
-        foreach($where_data as $index => $data){
-            list($key,$val) = each($data);
-            if(0 == $index){
-                $where[] = $val;
-            }else{
-                $where[] = $key ." ".$val;
-            }
-        }
-        if(!empty($where)){
-            return " where ".implode(" ",$where);
-        }
-        return "";
+        $where  = $this->_getWhereFragment();
+        return !empty($where) ? " where {$where}" : "";
     }
+
+
 
     private function _where($key,$value=null,$type = 'AND ')
     {
         $where = [];
         if($key instanceof AbstractWhereSpecification )
         {
-            $where[$type] = "({$key->getWhereFragment()})";
-            $this->params = array_merge($this->params,$key->getParams());
+            $where[$type] = "( {$key->_getWhereFragment()} )";
+            $_params = $key->getParams();
+            foreach($_params as $k => $v){
+                $this->params[$k] = $v;
+            }
         }
         else if(is_string($key))
         {
@@ -89,10 +82,8 @@ class AbstractWhereSpecification extends AbstractSpecification
                 $this->params[$named] = $value;
             }
             $where[$type] = $key;
-
-            $this->where_data[] = $where;
         }
-
+        $this->where_data[] = $where;
     }
 
     private function _where_in($key,$values,$type = " and "){
@@ -107,8 +98,8 @@ class AbstractWhereSpecification extends AbstractSpecification
             }
             if(!empty($in)){
                 $where = [];
-                $in = implode(",".$in);
-                $where[$type] = " $key ($in)";
+                $in = implode(", ",$in);
+                $where[$type] = " $key ( $in )";
 
                 $this->where_data[] = $where;
             }
@@ -116,7 +107,7 @@ class AbstractWhereSpecification extends AbstractSpecification
     }
 
     private function _like($key,$match,$side="both",$type = 'AND '){
-        if(!empty($key) && !empty($values) && is_string($key) && is_string($match) && in_array($side,["both","left","right"]))
+        if(!empty($key) && !empty($match) && is_string($key) && is_string($match) && in_array($side,["both","left","right"]))
         {
             $where = [];
             $named = $this->_named();
@@ -153,5 +144,22 @@ class AbstractWhereSpecification extends AbstractSpecification
 
     protected function _named(){
         return $named = $this->pre_named.$this->pre_name_index++;
+    }
+
+    protected function _getWhereFragment(){
+        $where  = [];
+        $where_data = $this->where_data;
+        foreach($where_data as $index => $data){
+            if(empty($data)){
+                continue;
+            }
+            list($key,$val) = each($data);
+            if(0 == $index){
+                $where[] = $val;
+            }else{
+                $where[] = $key ." ".$val;
+            }
+        }
+        return !empty($where) ? implode(" ",$where) : "";
     }
 }

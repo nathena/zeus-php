@@ -33,5 +33,21 @@ abstract class AbstractSpecification
         return $this->dml;
     }
 
+    public function test(){
+        $sql = $this->getSql();
+        $param = $this->getParams();
+        $indexed=$param==array_values($param);
 
+        foreach($param as $k=>$v) {
+            if(is_string($v)){
+                $v="'$v'";
+            }
+            if($indexed){
+                $sql=preg_replace('/\?/',$v,$sql,1);
+            }else {
+                $sql=preg_replace("/$k/",$v,$sql,1);
+            }
+        }
+        return $sql;
+    }
 }
