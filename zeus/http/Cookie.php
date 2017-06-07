@@ -24,41 +24,48 @@ class Cookie
     public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->domain = !in_array($this->request->getHost(),["127.0.0.1","localhost"]) ? $this->request->getHost() : "";
+        $this->domain = !in_array($this->request->getHost(), ["127.0.0.1", "localhost"]) ? $this->request->getHost() : "";
     }
 
-    public function setDomain($domain){
+    public function setDomain($domain)
+    {
         $this->domain = $domain;
         return $this;
     }
 
-    public function setExpire($expire){
+    public function setExpire($expire)
+    {
         $this->expire = $expire;
         return $this;
     }
 
-    public function setPath($path){
+    public function setPath($path)
+    {
         $this->path = $path;
         return $this;
     }
 
-    public function setSecure($secure){
+    public function setSecure($secure)
+    {
         $this->secure = $secure;
         return $this;
     }
 
-    public function setHttponly($httponly){
+    public function setHttponly($httponly)
+    {
         $this->httponly = $httponly;
         return $this;
     }
 
-    public function clear(){
+    public function clear()
+    {
         foreach ($_COOKIE as $name => $value) {
             $this->delete($name);
         }
     }
 
-    public function __get($name){
+    public function __get($name)
+    {
         $value = null;
         if (isset($_COOKIE[$name])) {
             $value = (substr($_COOKIE[$name], 0, 1) == '{') ? json_decode($_COOKIE[$name]) : $_COOKIE[$name];
@@ -81,16 +88,18 @@ class Cookie
         $this->delete($name);
     }
 
-    protected function set($name,$value){
+    protected function set($name, $value)
+    {
         if (!is_string($value) && !is_numeric($value)) {
             $value = json_encode($value);
         }
         setcookie($name, $value, $this->expire, $this->path, $this->domain, $this->secure, $this->httponly);
     }
 
-    protected function delete($name){
-        if(isset($_COOKIE[$name])){
-            setcookie($name, '', - 3600, $this->path, $this->domain, $this->secure, $this->httponly);
+    protected function delete($name)
+    {
+        if (isset($_COOKIE[$name])) {
+            setcookie($name, '', -3600, $this->path, $this->domain, $this->secure, $this->httponly);
             unset($_COOKIE[$name]);
         }
     }
