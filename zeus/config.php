@@ -9,6 +9,12 @@ return [
 	//REQUEST_URI、QUERY_STRING、PATH_INFO
 	'uri_protocol' => 'REQUEST_URI',
 
+    //session
+    'session.save_handler' => '',
+    'session.var_session_id'=>'',
+    'session.session_name'=>'zeus',
+    'session.session_save_path'=>'',
+
     //application namespace
     'app_ns' => [
         'app' => $application,
