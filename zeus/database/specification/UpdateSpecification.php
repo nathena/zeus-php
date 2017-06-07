@@ -8,11 +8,33 @@
 
 namespace zeus\database\specification;
 
+use zeus\database\DmlType;
 
-class UpdateSpecification extends AbstractSpecification
+class UpdateSpecification extends AbstractWhereSpecification
 {
-    public function __construct()
+    private $table;
+    private $updateSqlFormat = "UPDATE `%s` set %s %s ";
+
+    public function __construct($table)
     {
-        parent::__construct("update");
+        parent::__construct(DmlType::DML_UPDATE);
+        $this->table = $table;
+    }
+
+    public function prepare(array $params){
+        if( empty($params)){
+            return;
+        }
+
+        $set_sql = $comma = "";
+        foreach($params as $fields => $val )
+        {
+            $set_sql .= "{$comma} `{$fields}` = :{$fields}";
+            $comma = ",";
+
+            $this->params[":{$fields}"] = $val;
+        }
+
+        $this->sql = sprintf($this->updateSqlFormat,$this->table,$set_sql,$this->getWhereFragment());
     }
 }

@@ -1,5 +1,7 @@
 <?php
 namespace zeus\database\specification;
+use zeus\database\DmlType;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nathena
@@ -19,13 +21,7 @@ class QuerySpecification extends AbstractSpecification
 
     public function __construct($is_list=true)
     {
-        if($is_list){
-            $dml="select-list";
-        }else{
-            $dml="select-one";
-        }
-        parent::__construct($dml);
-
+        parent::__construct($is_list ? DmlType::DML_SELECT_LIST : DmlType::DML_SELECT_ONE);
     }
 
     public function select($fields){

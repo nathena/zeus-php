@@ -59,6 +59,10 @@ class AbstractWhereSpecification extends AbstractSpecification
         return $this;
     }
 
+    public function getWhereFragment(){
+
+    }
+
     private function _where($key,$value=null,$type = 'AND '){
         //TODO
     }

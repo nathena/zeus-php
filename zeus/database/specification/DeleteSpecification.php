@@ -9,10 +9,22 @@
 namespace zeus\database\specification;
 
 
-class DeleteSpecification extends AbstractSpecification
+use zeus\database\DmlType;
+
+class DeleteSpecification extends AbstractWhereSpecification
 {
-    public function __construct()
+    private $table;
+    private $deleteSqlFormat = "DELETE FROM `%s` %s ";
+
+    public function __construct($table)
     {
-        parent::__construct("delete");
+        parent::__construct(DmlType::DML_DELETE);
+
+        $this->table = $table;
+    }
+
+    public function getSql()
+    {
+        $this->sql = sprintf($this->deleteSqlFormat,$this->table,$this->getWhereFragment());
     }
 }

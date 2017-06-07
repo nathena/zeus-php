@@ -1,6 +1,8 @@
 <?php
 namespace zeus\database\pdo;
 use zeus\base\logger\Logger;
+use zeus\database\DmlType;
+use zeus\database\specification\AbstractSpecification;
 
 /**
  * 
@@ -14,9 +16,6 @@ abstract class AbstractPdoDialect
 	protected $benchmark = 0;
 	protected $sql = [];
 
-    private $insertSqlFormat = "INSERT INTO `%s` ( %s ) VALUES ( %s )";
-    private $insertsSqlFormat = "INSERT INTO `%s` ( %s ) VALUES  %s ";
-    private $updateSqlFormat = "UPDATE `%s` set %s %s ";
     private $deleteSqlFormat = "DELETE FROM `%s` %s ";
 	
 	/**
@@ -64,63 +63,42 @@ abstract class AbstractPdoDialect
 		$this->pdo = null;
 	}
 	
-	public function queryForValue($prepare,$params=null,$index=0)
+	public function execute(AbstractSpecification $specification)
 	{
+        $prepare = $specification->getSql();
+        $params = $specification->getParams();
+        $dml = $specification->getDml();
+
         $_sql = $this->log($prepare,$params);
         list($sm, $ss) = explode(' ', microtime());
 
         try {
             $sth = $this->pdo->prepare($prepare);
             $sth->execute($params);
-            $result = $sth->fetch();
-
-            list($em, $es) = explode(' ', microtime());
-            $benchmark = ($em + $es) - ($sm + $ss);
-            $this->benchmark += $benchmark;
-            $this->sql[$benchmark] = $_sql;
-
-            return (!empty($result) && is_array($result)) ? $result[$index] : null;
-        } catch (\PDOException $e) {
-            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
-            throw $e;
-        }
-	}
-	
-	public function query($prepare,$params=null)
-	{
-        $_sql = $this->log($prepare,$params);
-        list($sm, $ss) = explode(' ', microtime());
-
-        try {
-            $sth = $this->pdo->prepare($prepare);
-            $sth->execute($params);
-            $result = $sth->fetch();
-
-            list($em, $es) = explode(' ', microtime());
-            $benchmark = ($em + $es) - ($sm + $ss);
-            $this->benchmark+=$benchmark;
-            $this->sql[$benchmark] = $_sql;
-
-            return $result;
-        } catch (\PDOException $e) {
-            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
-            throw $e;
-        }
-	}
-	
-	public function queryForList($prepare,$params=null)
-	{
-        $_sql = $this->log($prepare,$params);
-        list($sm, $ss) = explode(' ', microtime());
-
-	    try{
-            $sth = $this->pdo->prepare($prepare);
-            if(!$sth){
-                Logger::error(">> Query Error: ".$this->pdo->errorCode().",".implode(",",array_values($this->pdo->errorInfo()))." - {$_sql}");
-                throw new \PDOException("数据库查询异常",$this->pdo->errorCode());
+            if( DmlType::DML_SELECT_ONE == $dml){
+                $result = $sth->fetch();
             }
-            $sth->execute($params);
-            $result = $sth->fetchAll();
+
+            switch ($dml){
+                case DmlType::DML_SELECT_ONE:
+                    $result = $sth->fetch();
+                    break;
+                case DmlType::DML_SELECT_LIST:
+                    $result = $sth->fetchAll();
+                    break;
+                case DmlType::DML_INSERT:
+                    $result = $this->pdo->lastInsertId();
+                    break;
+                case DmlType::DML_UPDATE:
+                    $result = $sth->rowCount();
+                    break;
+                case DmlType::DML_DELETE:
+                    $result = $sth->rowCount();
+                    break;
+                default:
+                    $result = $sth->rowCount();
+                    break;
+            }
 
             list($em, $es) = explode(' ', microtime());
             $benchmark = ($em + $es) - ($sm + $ss);
@@ -133,219 +111,47 @@ abstract class AbstractPdoDialect
             throw $e;
         }
 	}
-	
-	public function exec($prepare,$params=null)
-	{
-        $_sql = $this->log($prepare,$params);
-        list($sm, $ss) = explode(' ', microtime());
 
+    public function batchInsert(AbstractSpecification $specification)
+    {
+        $prepare = $specification->getSql();
+        $params = $specification->getParams();
+        if (count($params) < 1){
+            return;
+        }
+        $_params = $params[0];
+        if(empty($_params)){
+            return;
+        }
+
+        list($sm, $ss) = explode(' ', microtime());
         try {
             $sth = $this->pdo->prepare($prepare);
-            $sth->execute($params);
+            foreach($params as $_params){
+                $_sql = $this->log($prepare,$_params);
+                list($sm, $ss) = explode(' ', microtime());
 
-            list($em, $es) = explode(' ', microtime());
-            $benchmark = ($em + $es) - ($sm + $ss);
-            $this->benchmark+=$benchmark;
-            $this->sql[$benchmark] = $_sql;
-        } catch (\PDOException $e) {
-            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
-            throw $e;
-        }
+                $sth->execute($_params);
 
-	}
-	
-	public function insert($table,$fields)
-	{
-		$insertkeysql = $insertvaluesql = $comma = "";
-		$params = array();
-	
-		foreach($fields as $field => $val )
-		{
-			$insertkeysql .= $comma . '`' .$field . '`';
-			$insertvaluesql .= $comma.":".$field;
-	
-			$comma = ",";
-	
-			$params[":".$field] = $val;
-		}
-	
-		$sql = sprintf($this->insertSqlFormat,$table,$insertkeysql,$insertvaluesql);
-
-        $_sql = $this->log($sql,$params);
-        list($sm, $ss) = explode(' ', microtime());
-
-        try {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute($params);
-            $result = $this->pdo->lastInsertId();
-
-            list($em, $es) = explode(' ', microtime());
-            $benchmark = ($em + $es) - ($sm + $ss);
-            $this->benchmark+=$benchmark;
-            $this->sql[$benchmark] = $_sql;
-
-            return $result;
-        } catch (\PDOException $e) {
-            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
-            throw $e;
-        }
-	}
-	
-	public function update($table,$fields,$wheresql)
-	{
-		$values = array();
-		$setsql = $comma = "";
-	
-		foreach($fields as $fields => $val )
-		{
-			$setsql .= $comma . '`' .$fields. '` = ? ';
-			$comma = ",";
-	
-			$values[] = $val;
-		}
-	
-		$_where = $comma = '';
-		if( is_array($wheresql) )
-		{
-			foreach($wheresql as $key => $val )
-			{
-				$_where .= $comma . '`' .$key. '` = ? ';
-				$comma = " and ";
-	
-				$values[] = $val;
-			}
-		}
-		else
-		{
-			$_where = $wheresql;
-		}
-	
-		if( $_where )
-		{
-			$_where = " where ".$_where;
-		}
-	
-		$sql = sprintf($this->updateSqlFormat,$table,$setsql,$_where);
-
-        $_sql = $this->log($sql,$values);
-        list($sm, $ss) = explode(' ', microtime());
-
-        try {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute($values);
+                list($em, $es) = explode(' ', microtime());
+                $benchmark = ($em + $es) - ($sm + $ss);
+                $this->benchmark+=$benchmark;
+                $this->sql[$benchmark] = $_sql;
+            }
             $result = $sth->rowCount();
 
             list($em, $es) = explode(' ', microtime());
             $benchmark = ($em + $es) - ($sm + $ss);
             $this->benchmark+=$benchmark;
-            $this->sql[$benchmark] = $_sql;
+            $this->sql[$benchmark] = $prepare;
 
             return $result;
         } catch (\PDOException $e) {
             Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
             throw $e;
         }
-	}
+    }
 	
-	public function delete($table,$wheresql)
-	{
-		$values = array();
-		$_where = $comma = '';
-	
-		if( is_array($wheresql) )
-		{
-			foreach($wheresql as $key => $val )
-			{
-				$_where .= $comma . '`' .$key. '` = ? ';
-				$comma = " and ";
-	
-				$values[] = $val;
-			}
-		}
-		else
-		{
-			$_where = $wheresql;
-		}
-	
-		if( $_where )
-		{
-			$_where = " where ".$_where;
-		}
-	
-		$sql = sprintf($this->deleteSqlFormat,$table,$_where);
-
-        $_sql = $this->log($sql,$values);
-        list($sm, $ss) = explode(' ', microtime());
-
-        try {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute($values);
-            $result = $sth->rowCount();
-
-            list($em, $es) = explode(' ', microtime());
-            $benchmark = ($em + $es) - ($sm + $ss);
-            $this->benchmark+=$benchmark;
-            $this->sql[$benchmark] = $_sql;
-
-            return $result;
-        } catch (\PDOException $e) {
-            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
-            throw $e;
-        }
-	}
-	
-	public function inserts($table,$fieldsArr)
-	{
-		if (count($fieldsArr) < 1)
-		{
-			return 0;
-		}
-	
-		$values = array();
-		$insertkeysql = $insertvaluesql = $comma = $out = $in = '';
-	
-		$keys = array_keys(current($fieldsArr));
-		foreach ($keys as $insert_key) {
-			$insertkeysql .= $comma . '`' . $insert_key . '`';
-			$comma = ', ';
-		}
-	
-		foreach ($fieldsArr as $fields) {
-			$in = '';
-			$insertvaluesql.=$out . '(';
-			foreach ($fields as $insert_value) {
-	
-				$insertvaluesql .= $in."?";
-				$in = ',';
-	
-				$values[] = $insert_value;
-			}
-			$insertvaluesql.=')';
-			$out = ',';
-		}
-	
-		$sql = sprintf($this->insertsSqlFormat,$table,$insertkeysql,$insertvaluesql);
-
-        $_sql = $this->log($sql,$values);
-        list($sm, $ss) = explode(' ', microtime());
-
-        try {
-            $sth = $this->pdo->prepare($sql);
-            $sth->execute($values);
-            $result = $sth->rowCount();
-
-            list($em, $es) = explode(' ', microtime());
-            $benchmark = ($em + $es) - ($sm + $ss);
-            $this->benchmark += $benchmark;
-            $this->sql[$benchmark] = $_sql;
-
-            return $result;
-        } catch (\PDOException $e) {
-            Logger::error(">> Query Error: " . $e->getCode() . "," . implode(",", array_values($e->errorInfo)) . " - {$_sql}");
-            throw $e;
-        }
-	}
-
 	public function beginTransaction($nested=false)
 	{
 		
@@ -382,7 +188,7 @@ abstract class AbstractPdoDialect
             if($indexed){
                 $sql=preg_replace('/\?/',$v,$sql,1);
             }else {
-                $sql=str_replace(":$k",$v,$sql);
+                $sql=str_replace("$k",$v,$sql);
             }
         }
         return $sql;
