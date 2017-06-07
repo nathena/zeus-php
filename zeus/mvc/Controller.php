@@ -13,7 +13,7 @@ abstract class Controller
     }
 
     public function getView($tpl_path){
-        return new View($tpl_path);
+        return new View($this->getRequest(),$this->getResponse(),$tpl_path);
     }
 
     public function forward($url_path){

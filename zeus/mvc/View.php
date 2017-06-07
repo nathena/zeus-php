@@ -1,12 +1,20 @@
 <?php
 namespace zeus\mvc;
 
+use zeus\http\Request;
+use zeus\http\Response;
 use zeus\sandbox\ConfigManager;
 
 class View
 {
 	private static $hook = [];
     private static $config;
+
+    private $tpl_path;
+    private $tpl_args = [];
+
+    private $request;
+    private $response;
 
     /**
      * Hook 方法注入
@@ -28,16 +36,14 @@ class View
     }
 
 
-
-    private $tpl_path;
-	private $tpl_args = [];
-
-
-    public function __construct($tpl_path)
+    public function __construct(Request $request,Response $response,$tpl_path)
     {
         if(!isset(self::$config)){
             self::$config = ConfigManager::config("view");
         }
+
+        $this->request = $request;
+        $this->response = $response;
 
         $this->template($tpl_path);
     }
@@ -76,14 +82,11 @@ class View
     }
 
     public function display($content_type ="text/html",$code = 200){
-
-        $response = Application::getInstance()->getResponse();
-
-        $response->setCode($code)->setBody($this->fetch())->setHeader("Content-Typt",$content_type)->send();
+        $this->response->setCode($code)->setBody($this->fetch())->setHeader("Content-Typt",$content_type)->send();
     }
 
     //模板内部include
-    private function template($template)
+    protected function template($template)
     {
         $this->tpl_path = realpath(self::$config['view.template_path'].DS.self::$config['view.template_lang_dir'].DS.$template.self::$config['view.template_extension']);
     }
