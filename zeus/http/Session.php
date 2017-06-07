@@ -30,28 +30,27 @@ class Session
     protected function __construct()
     {
         $handler = ConfigManager::config("session.save_handler");
-        if (!empty($handler) && !class_exists($handler) || !session_set_save_handler(new $handler()))
-        {
+        if (!empty($handler) && (!class_exists($handler) || !session_set_save_handler(new $handler()))) {
             throw new InitSessionSaveHandlerException('error session handler:' . $handler);
         }
 
         $var_session_id = ConfigManager::config("session.var_session_id");
-        if(!empty($var_session_id)){
+        if (!empty($var_session_id)) {
             session_id($var_session_id);
         }
 
         $session_name = ConfigManager::config("session.session_name");
-        if(!empty($session_name)){
+        if (!empty($session_name)) {
             session_name($session_name);
         }
 
         $session_save_path = ConfigManager::config("session.session_save_path");
-        if(!empty($session_save_path) && is_dir($session_save_path) && is_writable($session_save_path)){
+        if (!empty($session_save_path) && is_dir($session_save_path) && is_writable($session_save_path)) {
             session_save_path($session_save_path);
         }
 
-        ini_set('session.use_trans_sid',0);//关闭透明session
-        ini_set('session.cookie_httponly',1);//开启httponnly
+        ini_set('session.use_trans_sid', 0);//关闭透明session
+        ini_set('session.cookie_httponly', 1);//开启httponnly
 
         session_start();
         $this->sessionId = session_id();
