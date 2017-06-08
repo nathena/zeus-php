@@ -1,5 +1,7 @@
 <?php
+
 namespace zeus\sandbox;
+
 use zeus\base\logger\Logger;
 
 /**
@@ -17,8 +19,9 @@ class ApplicationContext
     /**
      * @return \zeus\sandbox\ApplicationContext
      */
-    public static function currentContext(){
-        if(!isset(static::$context)){
+    public static function currentContext()
+    {
+        if (!isset(static::$context)) {
             static::$context = new static();
         }
         return static::$context;
@@ -37,70 +40,72 @@ class ApplicationContext
     public static function debug()
     {
         echo '<hr>';
-        echo '<br>',microtime(true)-ZEUS_START_TIME;
-        echo '<br>',memory_get_usage()-ZEUS_START_MEM;
+        echo '<br>', microtime(true) - ZEUS_START_TIME;
+        echo '<br>', memory_get_usage() - ZEUS_START_MEM;
         echo '<br>';
         print_r(get_included_files());
     }
 
     public function ip()
     {
-        if( static::isCgi()){
+        if (static::isCgi()) {
             return $this->getCgiIp();
         }
 
-        if(static::isCli()){
+        if (static::isCli()) {
             return $this->getCliIp();
         }
 
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $arr = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
             $pos = array_search('unknown', $arr);
-            if (false !== $pos){
+            if (false !== $pos) {
                 unset($arr[$pos]);
             }
             $server_ip = trim($arr[0]);
-        }elseif (isset($_SERVER['HTTP_CLIENT_IP'])){
+        } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $server_ip = $_SERVER['HTTP_CLIENT_IP'];
-        }elseif (isset($_SERVER['REMOTE_ADDR'])){
+        } elseif (isset($_SERVER['REMOTE_ADDR'])) {
             $server_ip = $_SERVER['REMOTE_ADDR'];
-        }else {
+        } else {
             $server_ip = getenv('SERVER_ADDR');
         }
         return $server_ip;
     }
 
-    public function register($obj){
+    public function register($obj)
+    {
         $this->containers[get_class($obj)] = $obj;
     }
 
-    public function getInstance($clazz,$prototype=false){
-        if(!$prototype){
+    public function getInstance($clazz, $prototype = false)
+    {
+        if (!$prototype) {
             return new $clazz();
         }
-        if(!isset($this->containers[$clazz])){
+        if (!isset($this->containers[$clazz])) {
             $this->containers[$clazz] = new $clazz();
         }
         return $this->containers[$clazz];
     }
 
-    public function start(){
+    public function start()
+    {
         //config init
         ConfigManager::init();
         //register components
         $components = ConfigManager::config("app_ns");
-        foreach( $components as $ns => $path )
-        {
-            if( is_dir($path) ){
+        foreach ($components as $ns => $path) {
+            if (is_dir($path)) {
                 $this->loader->registerNamespaces($ns, $path);
-                $url = $path.DS."url.php";
-                if(is_file($url)){
+                $url = $path . DS . "url.php";
+                if (is_file($url)) {
                     $data = include_once $url;
                     ConfigManager::addRouter($data);
-                }else{
+                } else {
                     Logger::warn("{$url} not found");
                 }
-            }else{
+            } else {
                 Logger::warn("component => {$ns} {$path} not found");
             }
         }
@@ -108,12 +113,12 @@ class ApplicationContext
         date_default_timezone_set(empty(ConfigManager::config('default_timezone')) ? 'Asia/Shanghai' : ConfigManager::config('default_timezone'));
         //upload
         $upload_tmp_dir = ConfigManager::config("upload_tmp_dir");
-        if(!empty($upload_tmp_dir)){
-            ini_set("upload_tmp_dir",$upload_tmp_dir);
+        if (!empty($upload_tmp_dir)) {
+            ini_set("upload_tmp_dir", $upload_tmp_dir);
         }
         $upload_max_filesize = ConfigManager::config("upload_max_filesize");
-        if(!empty($upload_max_filesize)){
-            ini_set("upload_max_filesize",$upload_max_filesize);
+        if (!empty($upload_max_filesize)) {
+            ini_set("upload_max_filesize", $upload_max_filesize);
         }
     }
 
@@ -126,12 +131,13 @@ class ApplicationContext
         $this->loader->registerNamespaces('zeus', ZEUS_PATH);
     }
 
-    private function getCgiIp(){
-        if(getenv('HTTP_CLIENT_IP')){
+    private function getCgiIp()
+    {
+        if (getenv('HTTP_CLIENT_IP')) {
             $client_ip = getenv('HTTP_CLIENT_IP');
-        } elseif(getenv('HTTP_X_FORWARDED_FOR')) {
+        } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
             $client_ip = getenv('HTTP_X_FORWARDED_FOR');
-        } elseif(getenv('REMOTE_ADDR')) {
+        } elseif (getenv('REMOTE_ADDR')) {
             $client_ip = getenv('REMOTE_ADDR');
         } else {
             $client_ip = $_SERVER['REMOTE_ADDR'];
@@ -139,43 +145,45 @@ class ApplicationContext
         return $client_ip;
     }
 
-    private function getCliIp(){
+    private function getCliIp()
+    {
         //TODO
         return "0.0.0.0";
     }
 }
 
 //set_exception_handler&set_error_handler
-function __error_handler($errno, $errstr, $errfile='', $errline='', $errcontext=null){
-    $message  = 'type   = PHP ERROR'."\n".
-        'code    = '.$errno."\n".
-        'message = '.$errstr."\n".
-        'file    = '.$errfile."\n".
-        'line    = '.$errline."\n";
+function __error_handler($errno, $errstr, $errfile = '', $errline = '', $errcontext = null)
+{
+    $message = 'type   = PHP ERROR' . "\n" .
+        'code    = ' . $errno . "\n" .
+        'message = ' . $errstr . "\n" .
+        'file    = ' . $errfile . "\n" .
+        'line    = ' . $errline . "\n";
 
-    __errorMsgHandler($errno,$message);
+    __errorMsgHandler($errno, $message);
 }
 
-function __exception_handler($exception){
-    $type     = get_class($exception);
-    $code     = $exception->getCode();
-    $message  = $exception->getMessage()."\n".$exception->getTraceAsString();
-    $file     = $exception->getFile();
-    $line     = $exception->getLine();
+function __exception_handler($exception)
+{
+    $type = get_class($exception);
+    $code = $exception->getCode();
+    $message = $exception->getMessage() . "\n" . $exception->getTraceAsString();
+    $file = $exception->getFile();
+    $line = $exception->getLine();
 
-    $message  = 'type   = '.$type."\n".
-        'code    = '.$code."\n".
-        'message = '.$message."\n".
-        'file    = '.$file."\n".
-        'line    = '.$line."\n";
+    $message = 'type   = ' . $type . "\n" .
+        'code    = ' . $code . "\n" .
+        'message = ' . $message . "\n" .
+        'file    = ' . $file . "\n" .
+        'line    = ' . $line . "\n";
 
-    __errorMsgHandler($code,$message);
+    __errorMsgHandler($code, $message);
 }
 
-function __errorMsgHandler($code,$message){
-
+function __errorMsgHandler($code, $message)
+{
     Logger::error($message);
-
     //应用没有处理错误
     $str = '<style>body {font-size:12px;}</style>';
     $str .= '<h1>操作失败！</h1><br />';
@@ -186,5 +194,5 @@ function __errorMsgHandler($code,$message){
 }
 
 //异常处理
-set_error_handler(__NAMESPACE__.'\__error_handler');
-set_exception_handler(__NAMESPACE__.'\__exception_handler');
+set_error_handler(__NAMESPACE__ . '\__error_handler');
+set_exception_handler(__NAMESPACE__ . '\__exception_handler');
