@@ -113,7 +113,7 @@ class Uploader
 
     private static function _get_file_header($file)
     {
-        if(!is_file($file)){
+        if (!is_file($file)) {
             throw new \RuntimeException("获取文件头失败");
         }
         $fh = fopen($file, "rb");
@@ -144,8 +144,8 @@ class Uploader
             4 => '没有文件被上传',
             6 => '找不到临时路径',
             7 => '文件写入失败',
-            8  => 'A PHP extension stopped the file upload.',
-            9  => 'The uploaded file exceeds the user-defined max file size.',
+            8 => 'A PHP extension stopped the file upload.',
+            9 => 'The uploaded file exceeds the user-defined max file size.',
             10 => 'The uploaded file is not allowed.',
             11 => 'The specified upload directory does not exist.',
             12 => 'The specified upload directory is not writable.',
@@ -188,18 +188,18 @@ class Uploader
 
     public function addAllowdMimeType($mime_types)
     {
-        if(is_array($mime_types)){
+        if (is_array($mime_types)) {
             $this->mime_arr = array_merge($this->mime_arr, $mime_types);
-        }else{
+        } else {
             $this->mime_arr[] = trim($mime_types);
         }
     }
 
     public function addDisallowedTypes($disallowed_types)
     {
-        if(is_array($disallowed_types)){
-            $this->disallowedTypes = array_merge($this->disallowedTypes,$disallowed_types);
-        }else{
+        if (is_array($disallowed_types)) {
+            $this->disallowedTypes = array_merge($this->disallowedTypes, $disallowed_types);
+        } else {
             $this->disallowedTypes[] = $disallowed_types;
         }
     }
@@ -249,33 +249,33 @@ class Uploader
             $tmp_name = $_file['name'];
             $tmp_path = $_file['tmp_name'];
 
-            $tmp_name_ext = explode(".",$tmp_name);
-            $this->check_file(end($tmp_name_ext),self::_get_file_header($tmp_path));
+            $tmp_name_ext = explode(".", $tmp_name);
+            $this->check_file(end($tmp_name_ext), self::_get_file_header($tmp_path));
 
             $this->tmp_name = $tmp_name;
             $this->tmp_path = $tmp_path;
         }
     }
 
-    protected function check_file($ext,$bin)
+    protected function check_file($ext, $bin)
     {
         $ext = strtolower($ext);
         $bin = strtoupper($bin);
 
-        if(in_array($ext,$this->disallowedTypes)){
-            throw new \RuntimeException($this->msg . '不允许上传'.$ext.'文件');
+        if (in_array($ext, $this->disallowedTypes)) {
+            throw new \RuntimeException($this->msg . '不允许上传' . $ext . '文件');
         }
 
-        if(!isset(self::$file_hex_headers[$ext])){
+        if (!isset(self::$file_hex_headers[$ext])) {
             throw new \RuntimeException($this->msg . '文件格式不允许');
         }
 
         $headers = self::$file_hex_headers[$ext];
-        if(is_string($headers)){
+        if (is_string($headers)) {
             $headers = [$headers];
         }
-        foreach($headers as $header){
-            if($header == $bin){
+        foreach ($headers as $header) {
+            if ($header == $bin) {
                 return;
             }
         }
