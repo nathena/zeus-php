@@ -78,7 +78,7 @@ class Downloader
     protected function check_file()
     {
         $file = $this->download_file;
-        if (stripos($file, ".") === false || stripos($file, "..") >= 0) {
+        if (stripos($file, ".") === false || stripos($file, "..") !==false ) {
             return false;
         }
         return true;
