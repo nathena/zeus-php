@@ -9,13 +9,13 @@ use zeus\sandbox\ConfigManager;
 class DbManager
 {
 	/**
-	 * \zeus\persistent\pdo\Pdo
+	 * \zeus\database\pdo\Pdo
 	 * @var array
 	 */
 	protected static $driver_instances = [];
 	
 	/**
-	 * \zeus\persistent\pdo\Pdo
+	 * \zeus\database\pdo\XaPdo
 	 * @var array
 	 */
 	protected static $xa_driver_instances = [];
@@ -50,7 +50,7 @@ class DbManager
 	/**
 	 * 
 	 * @param string $xa_database
-	 * @return \zeus\database\pdo\Pdo
+	 * @return \zeus\database\pdo\XaPdo
 	 */
 	public static function openXaSession($xa_database)
 	{
