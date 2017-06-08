@@ -14,5 +14,4 @@ $zeus_path = $root.DIRECTORY_SEPARATOR."zeus".DIRECTORY_SEPARATOR."bootstrap.php
 
 include_once $zeus_path;
 
-print_r(\zeus\sandbox\ConfigManager::config());
 \zeus\mvc\Application::getInstance()->dispatch("/test?a='''12&b=2");

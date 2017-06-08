@@ -2,12 +2,13 @@
 
 namespace zeus\http;
 
+use zeus\sandbox\ApplicationContext;
+
 class Request
 {
     protected $data = [];
     protected $headers = [];
     protected $server;
-
 
     public function __construct()
     {
@@ -61,27 +62,34 @@ class Request
         return $this->server;
     }
 
-    public function getCookie(){
+    public function getCookie()
+    {
         return new Cookie($this);
     }
 
-    public function getSession(){
+    public function getSession()
+    {
         return Session::getInstance();
     }
 
     public function isAjax()
     {
+        if (ApplicationContext::isCli()) {
+            return false;
+        }
+
         $value = $this->server('HTTP_X_REQUESTED_WITH');
         return (!is_null($value) && strtolower($value) == 'xmlhttprequest') ? true : false;
     }
 
-    public function getHost(){
-        return $this->server["HTTP_HOST"];
+    public function getHost()
+    {
+        return ApplicationContext::isCli() ? "localhost" : $this->server["HTTP_HOST"];
     }
 
     public function getMethod()
     {
-        return $this->server['REQUEST_METHOD'];
+        return ApplicationContext::isCli() ? "" : $this->server['REQUEST_METHOD'];
     }
 
     /**
@@ -91,7 +99,7 @@ class Request
      */
     public function isGet()
     {
-        return ($this->server['REQUEST_METHOD'] == 'GET');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'GET');
     }
 
     /**
@@ -101,7 +109,7 @@ class Request
      */
     public function isHead()
     {
-        return ($this->server['REQUEST_METHOD'] == 'HEAD');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'HEAD');
     }
 
     /**
@@ -111,7 +119,7 @@ class Request
      */
     public function isPost()
     {
-        return ($this->server['REQUEST_METHOD'] == 'POST');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'POST');
     }
 
     /**
@@ -121,7 +129,7 @@ class Request
      */
     public function isPut()
     {
-        return ($this->server['REQUEST_METHOD'] == 'PUT');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'PUT');
     }
 
     /**
@@ -131,7 +139,7 @@ class Request
      */
     public function isDelete()
     {
-        return ($this->server['REQUEST_METHOD'] == 'DELETE');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'DELETE');
     }
 
     /**
@@ -141,7 +149,7 @@ class Request
      */
     public function isTrace()
     {
-        return ($this->server['REQUEST_METHOD'] == 'TRACE');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'TRACE');
     }
 
     /**
@@ -151,7 +159,7 @@ class Request
      */
     public function isOptions()
     {
-        return ($this->server['REQUEST_METHOD'] == 'OPTIONS');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'OPTIONS');
     }
 
     /**
@@ -161,7 +169,7 @@ class Request
      */
     public function isConnect()
     {
-        return ($this->server['REQUEST_METHOD'] == 'CONNECT');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'CONNECT');
     }
 
     /**
@@ -171,7 +179,7 @@ class Request
      */
     public function isPatch()
     {
-        return ($this->server['REQUEST_METHOD'] == 'PATCH');
+        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'PATCH');
     }
 
     protected function parseData()

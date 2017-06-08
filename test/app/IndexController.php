@@ -15,7 +15,7 @@ class IndexController extends Controller
 {
     public function index($data=null){
         echo __CLASS__,"=>",__METHOD__;
-        print_r($this->getRequest()->getData());
+        print_r($this->request->getData());
         print_r($data);
     }
 }
