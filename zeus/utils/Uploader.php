@@ -86,7 +86,7 @@ class Uploader
         'mp4' => '00000020667479706d70',
     ];
 
-    public static function add_file_hex_header($ext, $bin)
+    public static function add_file_header($ext, $bin)
     {
         $ext = strtolower($ext);
         if (!isset(self::$file_hex_headers[$ext])) {
@@ -96,22 +96,29 @@ class Uploader
             $old_bin = self::$file_hex_headers[$ext];
             $new_bin = is_array($old_bin) ? array_merge($new_bin, $old_bin) : [$old_bin];
             $new_bin[] = $bin;
-
             self::$file_hex_headers[$ext] = $new_bin;
         }
     }
 
     public static function get_file_header($file)
     {
+        $file_info = explode(".", $file);
+        $ext = end($file_info);
+        $bin = self::_get_file_header($file);
+
+        return [$ext, $bin];
+    }
+
+    private static function _get_file_header($file)
+    {
+        if(!is_file($file)){
+            throw new \RuntimeException("获取文件头失败");
+        }
         $fh = fopen($file, "rb");
         $head = fread($fh, 4);
         fclose($fh);
 
-        $file_info = explode(".", $file);
-        $ext = end($file_info);
-        $bin = strtoupper(bin2hex($head));
-
-        return [$ext, $bin];
+        return strtoupper(bin2hex($head));
     }
 
     //上传错误
@@ -188,10 +195,9 @@ class Uploader
         if ($this->processed) {
             return;
         }
-
         $this->processed = true;
-        $filedata = $this->filedata;
 
+        $filedata = $this->filedata;
         if (!empty($_FILES[$filedata])) {
             $_file = $_FILES[$filedata];
             if (4 == $_file['error']) {
@@ -214,8 +220,35 @@ class Uploader
                 throw new \RuntimeException($this->msg . '上传出错，请稍后再试');
             }
 
-            $this->tmp_name = $_file['name'];
-            $this->tmp_path = $_file['tmp_name'];
+            $tmp_name = $_file['name'];
+            $tmp_path = $_file['tmp_name'];
+
+            $tmp_name_ext = explode(".",$tmp_name);
+            $this->check_file_header(end($tmp_name_ext),self::_get_file_header($tmp_path));
+
+            $this->tmp_name = $tmp_name;
+            $this->tmp_path = $tmp_path;
         }
+    }
+
+    private function check_file_header($ext,$bin)
+    {
+        $ext = strtolower($ext);
+        $bin = strtoupper($bin);
+
+        if(!isset(self::$file_hex_headers[$ext])){
+            throw new \RuntimeException($this->msg . '文件后缀不允许');
+        }
+
+        $headers = self::$file_hex_headers[$ext];
+        if(is_string($headers)){
+            $headers = [$headers];
+        }
+        foreach($headers as $header){
+            if($header == $bin){
+                return;
+            }
+        }
+        throw new \RuntimeException($this->msg . '文件格式异常');
     }
 }
