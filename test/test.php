@@ -8,13 +8,7 @@ use zeus\database\specification\QueryRowSpecification;
 use zeus\database\specification\QuerySpecification;
 use zeus\database\specification\UpdateSpecification;
 
-$current_dir = dirname(__FILE__);
-$root = dirname($current_dir);
-
-define("APP_ENV_PATH",$current_dir.DIRECTORY_SEPARATOR."config.php");
-$zeus_path = $root.DIRECTORY_SEPARATOR."zeus".DIRECTORY_SEPARATOR."bootstrap.php";
-
-include_once $zeus_path;
+include_once 'bootstrap.php';
 
 $q = new QueryRowSpecification();
 $q->select("*")->from("t_test")->where("id",1);
