@@ -18,7 +18,7 @@ class Downloader
         $this->data = $data;
     }
 
-    public function send()
+    public function send($ngx_send=false)
     {
         ob_clean();
 
@@ -53,26 +53,12 @@ class Downloader
 
         if (!empty($this->data)) {
             echo $this->data;
+        }else if($ngx_send){
+            //让Xsendfile发送文件
+            header('X-Accel-Redirect: ' . $this->download_file);
         }else{
             readfile($this->download_file);
         }
-    }
-
-    public function ngx_send()
-    {
-        ob_clean();
-
-        if (!empty($this->data)) {
-            return;
-        }
-        if (!$this->check_file()) {
-            return;
-        }
-
-        header('Content-type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($this->download_file) . '"');
-        //让Xsendfile发送文件
-        header('X-Accel-Redirect: ' . $this->download_file);
     }
 
     protected function check_file()
