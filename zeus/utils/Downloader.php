@@ -22,6 +22,17 @@ class Downloader
     {
         ob_clean();
 
+        if (!empty($this->data)) {
+            $filename = $this->download_file;
+        }else if ($this->check_file()) {
+            $filename = basename($this->download_file);
+        }else{
+            return;
+        }
+
+        $encoded_filename = urlencode($filename);
+        $encoded_filename = str_replace("+", "%20", $encoded_filename);
+
         //通用头
         header('Content-type: application/octet-stream');
         header("Pragma: public");
@@ -31,17 +42,20 @@ class Downloader
         header("Content-Description: File Transfer");
         header("Content-Transfer-Encoding: binary");
 
-        if (!empty($this->data)) {
-            header('Content-Disposition: attachment; filename="' . $this->download_file . '"');
-            echo $this->data;
-            return;
-        }
-        if (!$this->check_file()) {
-            return;
+        $ua = $_SERVER["HTTP_USER_AGENT"];
+        if (preg_match("/MSIE/", $ua)) {
+            header('Content-Disposition: attachment; filename="' . $encoded_filename . '"');
+        } else if (preg_match("/Firefox/", $ua)) {
+            header('Content-Disposition: attachment; filename*="utf8\'\'' . $filename . '"');
+        } else {
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
         }
 
-        header('Content-Disposition: attachment; filename="' . basename($this->download_file) . '"');
-        echo file_get_contents($this->download_file);
+        if (!empty($this->data)) {
+            echo $this->data;
+        }else{
+            readfile($this->download_file);
+        }
     }
 
     public function ngx_send()
