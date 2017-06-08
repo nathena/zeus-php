@@ -216,7 +216,7 @@ class Uploader
         return $this->tmp_path;
     }
 
-    public function process()
+    protected function process()
     {
         if ($this->processed) {
             return;
@@ -233,8 +233,8 @@ class Uploader
                 throw new \RuntimeException($this->msg . '上传失败：' . $this->err_arr[$_file['error']]);
             }
 
-            if ($_file['size'] > $this->size) {
-                throw new \RuntimeException($this->msg . '上传文件过大, 不能超过：' . intval($this->size / 1024 / 1024) . 'M');
+            if ($_file['size'] > $this->max_size) {
+                throw new \RuntimeException($this->msg . '上传文件过大, 不能超过：' . intval($this->max_size / 1024 / 1024) . 'M');
             }
             //判断MIME类型
             if (!in_array($_file['type'], $this->mime_arr)) {
@@ -257,7 +257,7 @@ class Uploader
         }
     }
 
-    private function check_file($ext,$bin)
+    protected function check_file($ext,$bin)
     {
         $ext = strtolower($ext);
         $bin = strtoupper($bin);
