@@ -141,6 +141,12 @@ class Uploader
             4 => '没有文件被上传',
             6 => '找不到临时路径',
             7 => '文件写入失败',
+            8  => 'A PHP extension stopped the file upload.',
+            9  => 'The uploaded file exceeds the user-defined max file size.',
+            10 => 'The uploaded file is not allowed.',
+            11 => 'The specified upload directory does not exist.',
+            12 => 'The specified upload directory is not writable.',
+            13 => 'Unexpected error.'
         ];
         //判断文件大小
         $this->max_size = 1024 * 1024 * 10;
