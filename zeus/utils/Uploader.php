@@ -1,5 +1,7 @@
 <?php
 /**
+ * file_uploads，upload_max_filesize，upload_tmp_dirpost_max_size 以及 max_input_time
+ *
  * User: nathena
  * Date: 2017/6/8 0008
  * Time: 14:08
@@ -56,11 +58,11 @@ class Uploader
         'bmp' => '424D',
         'dwg' => '41433130',
         'psd' => '38425053',
-        'rtf' => '7B5C727466',
-        'xml' => '3C3F786D6C',
-        'htm' => '68746D6C3E',
-        'html' => '68746D6C3E',
-        'html5' => '68746D6C3E',
+        //'rtf' => '7B5C727466',
+        //'xml' => '3C3F786D6C',
+        //'htm' => '68746D6C3E',
+        //'html' => '68746D6C3E',
+        //'html5' => '68746D6C3E',
         'eml' => '44656C69766572792D646174653A',
         'dbx' => 'CFAD12FEC5FD746F',
         'pst' => '2142444E',
@@ -125,6 +127,7 @@ class Uploader
     private $err_arr;
     private $max_size;
     private $mime_arr;
+    private $disallowedTypes;
     private $filedata;
     private $msg;
     private $processed = false;
@@ -170,6 +173,10 @@ class Uploader
             'application/octet-stream',
         ];
 
+        $this->disallowedTypes = [
+            'css', 'htm', 'html', 'js', 'json', 'pgsql', 'php', 'php3', 'php4', 'php5', 'sql', 'sqlite', 'yaml', 'yml'
+        ];
+
         $this->filedata = trim($filedata);
         $this->msg = trim($msg);
     }
@@ -181,7 +188,20 @@ class Uploader
 
     public function addAllowdMimeType($mime_types)
     {
-        $this->mime_arr = array_merge($this->mime_arr, $mime_types);
+        if(is_array($mime_types)){
+            $this->mime_arr = array_merge($this->mime_arr, $mime_types);
+        }else{
+            $this->mime_arr[] = trim($mime_types);
+        }
+    }
+
+    public function addDisallowedTypes($disallowd_types)
+    {
+        if(is_array($disallowd_types)){
+            $this->disallowedTypes = array_merge($this->disallowedTypes,$disallowd_types);
+        }else{
+            $this->disallowedTypes[] = $disallowd_types;
+        }
     }
 
     public function getName()
@@ -230,20 +250,24 @@ class Uploader
             $tmp_path = $_file['tmp_name'];
 
             $tmp_name_ext = explode(".",$tmp_name);
-            $this->check_file_header(end($tmp_name_ext),self::_get_file_header($tmp_path));
+            $this->check_file(end($tmp_name_ext),self::_get_file_header($tmp_path));
 
             $this->tmp_name = $tmp_name;
             $this->tmp_path = $tmp_path;
         }
     }
 
-    private function check_file_header($ext,$bin)
+    private function check_file($ext,$bin)
     {
         $ext = strtolower($ext);
         $bin = strtoupper($bin);
 
+        if(in_array($ext,$this->disallowedTypes)){
+            throw new \RuntimeException($this->msg . '不允许上传'.$ext.'文件');
+        }
+
         if(!isset(self::$file_hex_headers[$ext])){
-            throw new \RuntimeException($this->msg . '文件后缀不允许');
+            throw new \RuntimeException($this->msg . '文件格式不允许');
         }
 
         $headers = self::$file_hex_headers[$ext];

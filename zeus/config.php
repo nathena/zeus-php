@@ -9,6 +9,10 @@ return [
 	//REQUEST_URI、QUERY_STRING、PATH_INFO
 	'uri_protocol' => 'REQUEST_URI',
 
+    //upload
+    'upload_tmp_dir'=>'',
+    'upload_max_filesize'=>'10M',
+
     //session
     'session.save_handler' => '',
     'session.var_session_id'=>'',

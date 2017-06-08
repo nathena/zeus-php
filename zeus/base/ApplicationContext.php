@@ -106,6 +106,15 @@ class ApplicationContext
         }
         //timezone
         date_default_timezone_set(empty(ConfigManager::config('default_timezone')) ? 'Asia/Shanghai' : ConfigManager::config('default_timezone'));
+        //upload
+        $upload_tmp_dir = ConfigManager::config("upload_tmp_dir");
+        if(!empty($upload_tmp_dir)){
+            ini_set("upload_tmp_dir",$upload_tmp_dir);
+        }
+        $upload_max_filesize = ConfigManager::config("upload_max_filesize");
+        if(!empty($upload_max_filesize)){
+            ini_set("upload_max_filesize",$upload_max_filesize);
+        }
     }
 
     private function __construct()
