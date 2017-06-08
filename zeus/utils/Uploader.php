@@ -195,12 +195,12 @@ class Uploader
         }
     }
 
-    public function addDisallowedTypes($disallowd_types)
+    public function addDisallowedTypes($disallowed_types)
     {
-        if(is_array($disallowd_types)){
-            $this->disallowedTypes = array_merge($this->disallowedTypes,$disallowd_types);
+        if(is_array($disallowed_types)){
+            $this->disallowedTypes = array_merge($this->disallowedTypes,$disallowed_types);
         }else{
-            $this->disallowedTypes[] = $disallowd_types;
+            $this->disallowedTypes[] = $disallowed_types;
         }
     }
 
