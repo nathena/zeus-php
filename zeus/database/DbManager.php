@@ -1,4 +1,5 @@
 <?php
+
 namespace zeus\database;
 
 use zeus\database\exception\DbCofigNotFoundException;
@@ -8,29 +9,28 @@ use zeus\sandbox\ConfigManager;
 
 class DbManager
 {
-	/**
-	 * \zeus\database\pdo\Pdo
-	 * @var array
-	 */
-	protected static $driver_instances = [];
-	
-	/**
-	 * \zeus\database\pdo\XaPdo
-	 * @var array
-	 */
-	protected static $xa_driver_instances = [];
-	
-	/**
-	 * 
-	 * @param string $database
-	 * @return \zeus\database\pdo\Pdo
-	 */
-	public static function openSession($database = "database")
-	{
-		if( !isset(self::$driver_instances[$database]) )
-		{
-			$config = ConfigManager::config($database);
-            if(empty($config)){
+    /**
+     * \zeus\database\pdo\Pdo
+     * @var array
+     */
+    protected static $driver_instances = [];
+
+    /**
+     * \zeus\database\pdo\XaPdo
+     * @var array
+     */
+    protected static $xa_driver_instances = [];
+
+    /**
+     *
+     * @param string $database
+     * @return \zeus\database\pdo\Pdo
+     */
+    public static function openSession($database = "database")
+    {
+        if (!isset(self::$driver_instances[$database])) {
+            $config = ConfigManager::config($database);
+            if (empty($config)) {
                 throw new DbCofigNotFoundException("Pdo {$database} 配置文件找不到.");
             }
 
@@ -41,23 +41,22 @@ class DbManager
                 "charset" => $config["{$database}.pdo.charset"],
             ];
 
-			self::$driver_instances[$database] = new Pdo($cfg);
-		}
-		
-		return self::$driver_instances[$database];
-	}
-	
-	/**
-	 * 
-	 * @param string $xa_database
-	 * @return \zeus\database\pdo\XaPdo
-	 */
-	public static function openXaSession($xa_database)
-	{
-        if( !isset(self::$xa_driver_instances[$xa_database]) )
-        {
+            self::$driver_instances[$database] = new Pdo($cfg);
+        }
+
+        return self::$driver_instances[$database];
+    }
+
+    /**
+     *
+     * @param string $xa_database
+     * @return \zeus\database\pdo\XaPdo
+     */
+    public static function openXaSession($xa_database)
+    {
+        if (!isset(self::$xa_driver_instances[$xa_database])) {
             $config = ConfigManager::config($xa_database);
-            if(empty($config)){
+            if (empty($config)) {
                 throw new DbCofigNotFoundException("Pdo {$xa_database} 配置文件找不到.");
             }
 
@@ -71,16 +70,16 @@ class DbManager
             self::$xa_driver_instances[$xa_database] = new XaPdo($cfg);
         }
 
-		return self::$driver_instances[$xa_database];
-	}
-	
-	public static function getAllSessions()
-	{
-		return self::$driver_instances;
-	}
-	
-	public static function getAllXaSessions()
-	{
-		return self::$xa_driver_instances;
-	}
+        return self::$driver_instances[$xa_database];
+    }
+
+    public static function getAllSessions()
+    {
+        return self::$driver_instances;
+    }
+
+    public static function getAllXaSessions()
+    {
+        return self::$xa_driver_instances;
+    }
 }
