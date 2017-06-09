@@ -1,27 +1,41 @@
-﻿#zeus-php
+﻿# zeus-php
 
-# 图例
+## 图例
+![alt 架构](https://github.com/nathena/zeus-php/blob/master/resource/1.jpg "架构")
 
-![alt 架构][id]
+## 写在前面的话
+- 好的架构并非数据库优先，而是业务模型优先；数据库的职责是存储数据，业务不应该过度的依赖数据库。
+- MVC的M不是数据源，而是业务模型。
+- 框架的用意不是功能库，而是约定与约束。
+- 领域驱动是目前较好的抽象业务的方式。
+- 模块化垂直架构 or 功能性水平分层架构的选择，zeus选择前者。
+- 聚合根：业务抽象入口。注意：不使用集合管理聚合下的实体。
+- 实体：实体保留聚合根引用。
+- 值对象：无状态的数据值。
+- 领域服务：业务可确定的聚合间协作。
+- 领域事件：业务完成后广播的事件，通常用户消息通知，日志记录等行为。
+- 事件源：目前框架暂未启用mq队列实现事件源。
+- 命令：事件触发的上下文，事件的开始。
+- 存储库：一个聚合根一个存储库，存储聚合内所有实体数据。
+- 上下文：业务行为的生命周期。
+- 单一职责，依赖倒置，接口隔离。
+- 代码即注解。
 
-[id]: https://github.com/nathena/zeus-php/blob/master/resource/1.jpg "架构"
+## 文档
+zeus以模块化来设计架构，使用领域驱动来组织代码。关注约定与约束，不造功能性轮子，各种功能性轮子可以使用autoload方式，以模块形式加入到“上下文”中。
+使用MVC为业务行为驱动的基础模型，并约定了行为的路由规则（详见：zeus\mvc\Router）。
 
-# 写在前面的话
+### config
+提供默认的配置文件“config.php”,应用层可使用APP_ENV_PATH来定义应用自身的配置文件（test\bootstrap.php ）,
+配置文件的管理方式详见[zeus\sandbox\ConfigManager] (# ConfigManager)
 
-为什么创建了zeus-php这个项目，并逐步衍生成一个框架（小型？）？其原因其实是一直以来在考虑，如何在php项目中运用clean或ddd架构（接触过很多项目，新的或旧的，很多组员都考虑如何设计数据库）。从而有了zeus这个代码仓库。
+### bootstap
+顾名思义框架启动入口，初始化上下文。见[zeus\sandbox\ApplicationContext] (# ApplicationContext)
 
-实际上个人觉得，好的架构并非数据库优先，而是业务模型优先——即优先确定业务模型关系，而后基于内存实现业务逻辑，再按需异步持久化到硬盘（数据库），如此这般在扩展与性能间找到一个好的临界点。因此，稀稀落落地着手写了zeus-php的代码。
-
-其中关隘，有空再文字化。。。
-
-# 文档
-
-## etc
-
-etc以约定约束项目默认配置文件，实际项目可使用APP_ENV_DIR（见webroot/index.php）常量重载。关于APP_ENV_DIR，详见[zeus\sandbox\ConfigManager] (#ConfigManager)
-- config.php 默认项目环境配置文件
-- database.php 默认的数据库配置文件
-- mimes.php 目前用处不大，文件mime头
-- router.php 推荐使用路由配置，而不使用框架默认的路由判断
-
-先写到这里，待续......
+### 基本模块
+- base：定义上下文管理方式、组件、事件。
+- domain：聚合、实体、可以发生事件源的聚合
+- http：request、response、cookie、session
+- mvc：mvc 分发上下文、路由等。
+- database：pdo抽象层，定义了xa事务、active record等基础组件，使用规约提供统一的执行入口（zeus\database\specification\AbstractSpecification）。
+- utils：cryto、uploader、download等，可根据模块分类。
