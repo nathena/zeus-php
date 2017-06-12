@@ -14,7 +14,7 @@
 - 实体：实体保留聚合根引用。
 - 值对象：无状态的数据值。
 - 领域服务：业务可确定的聚合间协作。
-- 领域事件：业务完成后广播的事件，通常用户消息通知，日志记录等行为。
+- 领域事件：业务完成后广播的事件，通常用于消息通知，日志记录等行为。
 - 事件源：目前框架暂未启用mq队列实现事件源。
 - 命令：事件触发的上下文，事件的开始。
 - 存储库：一个聚合根一个存储库，存储聚合内所有实体数据。
@@ -28,7 +28,7 @@ zeus以模块化来设计架构，使用领域驱动来组织代码。关注约�
 
 ### config
 提供默认的配置文件“config.php”,应用层可使用APP_ENV_PATH来定义应用自身的配置文件（test\bootstrap.php ）,
-配置文件的管理方式详见[zeus\sandbox\ConfigManager] (# ConfigManager)
+配置文件的管理方式详见[zeus\sandbox\ConfigManager]。
 
 ### bootstap
 顾名思义框架启动入口，初始化上下文。见[zeus\sandbox\ApplicationContext] (# ApplicationContext)
