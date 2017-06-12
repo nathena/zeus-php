@@ -8,13 +8,17 @@
 namespace test;
 
 
-use zeus\base\AbstractComponent;
+use zeus\base\event\EventListenerInterface;
+use zeus\base\event\EventMessage;
 
-class EchoedEventHandler extends AbstractComponent
+class EchoedEventHandler implements EventListenerInterface
 {
-    public function onEchoedEvent(EchoedEvent $event)
+    public function handler(EventMessage $eventMessage)
     {
-        echo get_class($this),"\r\n";
-        print_r($event->getResult());
+        $sender = $eventMessage->getSender();
+        $event  = $eventMessage->getEvent();
+
+        echo "sender : ".get_class($sender)."=>\r\n";
+        print_r($event->getData());
     }
 }

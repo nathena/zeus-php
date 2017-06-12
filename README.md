@@ -75,51 +75,92 @@ class IndexController extends Controller
 ```
 #### Command&Event
 ```
+//test
+use test\EchoCommand;
+
+include_once 'bootstrap.php';
+
+$command = new EchoCommand();
+$command->execute();//or ApplicationContext::currentContext()->getCommandBus()->execute($command);
+
+//command
+use zeus\base\command\AbstractCommand;
+use zeus\sandbox\ApplicationContext;
+
 class EchoCommand extends AbstractCommand
 {
     public function __construct()
     {
         parent::__construct();
 
-        $this->subscribe(EchoCommandHandler::class);
-
-        $this->msg = "hello";
+        $this->setData([1,2,3]);
     }
 
-    protected function start(){
+    public function start(){
         echo "{$this->commandType} => starting \r\n";
     }
 
-    protected function finished(){
+    public function finished(){
         echo "{$this->commandType} => finished \r\n";
     }
-}
-$command = new EchoCommand();
-$command->publish();
 
-class EchoCommandHandler extends AbstractComponent
-{
-    public function handlerEchoCommand(EchoCommand $command)
-    {
-        $data = $command->getData();
-        print_r($data);
-
-        $this->publishMessage(new EchoedEvent($data));
-    }
-
-    public function onEchoedEvent(EchoedEvent $event)
-    {
-        echo get_class($this),"\r\n";
-        print_r($event->getResult());
-    }
 }
 
-class EchoedEventHandler extends AbstractComponent
+ApplicationContext::currentContext()->getCommandBus()->register(EchoCommand::class,EchoCommandHandler::class);
+
+//commandhandler
+use zeus\base\AbstractComponent;
+use zeus\base\command\AbstractCommand;
+use zeus\base\command\CommandHandlerInterface;
+
+class EchoCommandHandler extends AbstractComponent implements CommandHandlerInterface
 {
-    public function onEchoedEvent(EchoedEvent $event)
+    public function execute(AbstractCommand $command)
     {
-        echo get_class($this),"\r\n";
-        print_r($event->getResult());
+        print_r($command->getData());
+
+        $this->raise(new EchoedEvent());
+        
+        //$event = new new EchoedEvent();
+        //$msg   = new EventMessage($this,$event);
+        //ApplicationContext::currentContext()->getEventBus()->publish($msg);
+    }
+}
+
+//event
+class EchoedEvent extends AbstractEvent
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->setData(["a","b","c"]);
+    }
+
+    public function start(){
+        echo "{$this->eventType} => starting \r\n";
+    }
+
+    public function finished(){
+        echo "{$this->eventType} => finished \r\n";
+    }
+}
+
+ApplicationContext::currentContext()->getEventBus()->subscribe(EchoedEvent::class,EchoedEventHandler::class);
+
+//listener
+use zeus\base\event\EventListenerInterface;
+use zeus\base\event\EventMessage;
+
+class EchoedEventHandler implements EventListenerInterface
+{
+    public function handler(EventMessage $eventMessage)
+    {
+        $sender = $eventMessage->getSender();
+        $event  = $eventMessage->getEvent();
+
+        echo "sender : ".get_class($sender)."=>\r\n";
+        print_r($event->getData());
     }
 }
 ```

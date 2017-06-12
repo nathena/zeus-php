@@ -1,6 +1,8 @@
 <?php
 namespace test;
-use zeus\base\AbstractEvent;
+
+use zeus\base\event\AbstractEvent;
+use zeus\sandbox\ApplicationContext;
 
 /**
  * User: nathena
@@ -9,10 +11,20 @@ use zeus\base\AbstractEvent;
  */
 class EchoedEvent extends AbstractEvent
 {
-    public function __construct($data)
+    public function __construct()
     {
-        parent::__construct($data);
+        parent::__construct();
 
-        $this->subscribe();
+        $this->setData(["a","b","c"]);
+    }
+
+    public function start(){
+        echo "{$this->eventType} => starting \r\n";
+    }
+
+    public function finished(){
+        echo "{$this->eventType} => finished \r\n";
     }
 }
+
+ApplicationContext::currentContext()->getEventBus()->subscribe(EchoedEvent::class,EchoedEventHandler::class);
