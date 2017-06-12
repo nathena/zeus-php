@@ -22,7 +22,7 @@ abstract class AbstractEvent extends AbstractMessage
 
     public function callback($component){
         if(is_object($component) && method_exists($component, $this->method)){
-            $component->{$this->method}($this->getResult());
+            $component->{$this->method}($this);
         }
     }
 }
