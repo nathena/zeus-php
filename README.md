@@ -40,3 +40,90 @@ zeus以模块化来设计架构，使用领域驱动来组织代码。关注约�
 - mvc：mvc 分发上下文、路由等。
 - database：pdo抽象层，定义了xa事务、active record等基础组件，使用规约提供统一的执行入口（zeus\database\specification\AbstractSpecification）。
 - utils：cryto、uploader、download等，可根据模块分类。
+
+### Roadmap
+- plugin机制
+- EventSouring事件源
+
+### Usage
+#### 加载框架
+```
+define("CURRENT_DIR",dirname(__FILE__));//项目根目录，非必选
+define("APP_ENV_PATH",CURRENT_DIR.DIRECTORY_SEPARATOR."config.php");//项目配置文件路径
+
+define("ROOT",dirname(CURRENT_DIR));//项目目录与框架目录所在的根目录，非必须
+include_once ROOT.DIRECTORY_SEPARATOR."zeus".DIRECTORY_SEPARATOR."bootstrap.php";//加载框架
+```
+#### 路由
+每个模块根目录，都可以通过“url.php”定义路由映射规则。规则为正则表达式。
+```
+<?php
+return [
+    'test' => \test_router\IndexController::class,
+    'test/(\d+)' => \test_router\IndexController::class."@test2#$1",//其中$1，将来作为controller action的参数
+];
+```
+controller
+```
+class IndexController extends Controller
+{
+    public function test2($a){
+        print_r($this->request->getData());
+        echo $a;
+    }
+}
+```
+#### Command&Event
+```
+class EchoCommand extends AbstractCommand
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->subscribe(EchoCommandHandler::class);
+
+        $this->msg = "hello";
+    }
+
+    protected function start(){
+        echo "{$this->commandType} => starting \r\n";
+    }
+
+    protected function finished(){
+        echo "{$this->commandType} => finished \r\n";
+    }
+}
+$command = new EchoCommand();
+$command->publish();
+
+class EchoCommandHandler extends AbstractComponent
+{
+    public function handlerEchoCommand(EchoCommand $command)
+    {
+        $data = $command->getData();
+        print_r($data);
+
+        $this->publishMessage(new EchoedEvent($data));
+    }
+
+    public function onEchoedEvent(EchoedEvent $event)
+    {
+        echo get_class($this),"\r\n";
+        print_r($event->getResult());
+    }
+}
+
+class EchoedEventHandler extends AbstractComponent
+{
+    public function onEchoedEvent(EchoedEvent $event)
+    {
+        echo get_class($this),"\r\n";
+        print_r($event->getResult());
+    }
+}
+```
+
+
+### License
+- All code in this repository is covered by the terms of the Apache2.0 License.
