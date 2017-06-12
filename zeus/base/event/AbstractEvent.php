@@ -43,7 +43,9 @@ abstract class AbstractEvent
 
     public function setData($data)
     {
-        $this->data = array_merge($this->data, $data);
+        if(is_array($data)){
+            $this->data = array_merge($this->data, $data);
+        }
     }
 
     public function getData()
