@@ -15,7 +15,12 @@ abstract class AbstractComponent
     /**
      * @param AbstractEvent $event
      */
-    public function raise(AbstractEvent $event){
+    protected function raise(AbstractEvent $event){
         ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this,$event));
+    }
+
+    public function handle(AbstractEvent $event)
+    {
+
     }
 }

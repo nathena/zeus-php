@@ -57,7 +57,7 @@ abstract class AbstractEntity extends AbstractComponent
         $this->update_data = array_merge($this->update_data, $data);
     }
 
-    public function updateData()
+    public function getUpdatedData()
     {
         $data = $this->update_data;
         $this->update_data = [];

@@ -4,7 +4,10 @@
  */
 namespace zeus\domain;
 
-use zeus\base\AbstractEvent;
+
+use zeus\base\event\AbstractEvent;
+use zeus\base\event\EventMessage;
+use zeus\sandbox\ApplicationContext;
 
 abstract class EventSouringAggregateRoot extends AggregateRoot
 {
@@ -28,7 +31,7 @@ abstract class EventSouringAggregateRoot extends AggregateRoot
 	    //TODO
         $events = $this->getEvents();
         foreach ($events as $event){
-            $this->publishMessage($event);
+            ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this,$event));
         }
     }
 

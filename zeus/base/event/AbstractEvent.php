@@ -24,12 +24,12 @@ abstract class AbstractEvent
         $this->data = $data;
     }
 
-    public function start(EventMessage $eventMessage)
+    public function start()
     {
 
     }
 
-    public function finished(EventMessage $eventMessage)
+    public function finished()
     {
     }
 
