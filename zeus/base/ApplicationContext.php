@@ -2,6 +2,8 @@
 
 namespace zeus\sandbox;
 
+use zeus\base\bus\CommandBus;
+use zeus\base\bus\EventBus;
 use zeus\base\logger\Logger;
 
 /**
@@ -44,6 +46,22 @@ class ApplicationContext
         echo '<br>', memory_get_usage() - ZEUS_START_MEM;
         echo '<br>';
         print_r(get_included_files());
+    }
+
+    /**
+     * @return EventBus
+     */
+    public function getEventBus()
+    {
+        return EventBus::getInstance();
+    }
+
+    /**
+     * @return CommandBus
+     */
+    public function getCommandBus()
+    {
+        return CommandBus::getInstance();
     }
 
     public function ip()
