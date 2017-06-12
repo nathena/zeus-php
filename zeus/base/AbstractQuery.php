@@ -14,4 +14,5 @@ abstract class AbstractQuery
         $this->db = DbManager::openSession();
     }
 
+    public abstract function execute();
 }
