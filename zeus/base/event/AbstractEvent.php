@@ -3,6 +3,7 @@
  * Class AbstractEvent
  * @package zeus\base\event
  */
+
 namespace zeus\base\event;
 
 abstract class AbstractEvent
@@ -18,16 +19,18 @@ abstract class AbstractEvent
         $class = get_class($this);
 
         $this->eventType = $class;
-        $this->eventId = $this->eventType.time();
+        $this->eventId = $this->eventType . time();
 
         $this->data = $data;
     }
 
-    public function start(){
+    public function start(EventMessage $eventMessage)
+    {
 
     }
 
-    public function finished(){
+    public function finished(EventMessage $eventMessage)
+    {
     }
 
     public function getEventType()
@@ -45,21 +48,26 @@ abstract class AbstractEvent
         return $this->data;
     }
 
-    public function setResult($result){
+    public function setResult($result)
+    {
         $this->result = $result;
     }
 
-    public function getResult(){
+    public function getResult()
+    {
         return $this->result;
     }
 
-    public function __get($key){
-        if(isset($this->data[$key])){
+    public function __get($key)
+    {
+        if (isset($this->data[$key])) {
             return $this->data[$key];
         }
         return null;
     }
-    public function __set($key,$val){
+
+    public function __set($key, $val)
+    {
         $this->data[$key] = $val;
     }
 
