@@ -26,9 +26,7 @@ abstract class EventSouringAggregateRoot extends AggregateRoot
         return $domainEvents;
     }
 
-
     public function commit(){
-	    //TODO
         $events = $this->getEvents();
         foreach ($events as $event){
             ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this,$event));
@@ -38,7 +36,12 @@ abstract class EventSouringAggregateRoot extends AggregateRoot
     protected function raise(AbstractEvent $domainEvent)
     {
         $this->domainEvents[] = $domainEvent;
+        $this->handle($domainEvent);
     }
 
+    protected function handle(AbstractEvent $domainEvent)
+    {
+
+    }
 
 }

@@ -1,5 +1,7 @@
 <?php
+
 namespace zeus\base;
+
 use zeus\base\event\AbstractEvent;
 use zeus\base\event\EventMessage;
 use zeus\sandbox\ApplicationContext;
@@ -15,12 +17,8 @@ abstract class AbstractComponent
     /**
      * @param AbstractEvent $event
      */
-    protected function raise(AbstractEvent $event){
-        ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this,$event));
-    }
-
-    public function handle(AbstractEvent $event)
+    protected function raise(AbstractEvent $event)
     {
-
+        ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this, $event));
     }
 }
