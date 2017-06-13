@@ -39,9 +39,9 @@ return [
     'log.level' => 0,
 
     //database
-    'database.dsn' => 'mysql:host=localhost;dbname=t_my',
-    'database.user' => 'root',
-    'database.pass' => '123456',
-    'database.charset' => 'utf8',
+    'database.pdo.dsn' => 'mysql:host=localhost;dbname=t_my',
+    'database.pdo.user' => 'root',
+    'database.pdo.pass' => '123456',
+    'database.pdo.charset' => 'utf8',
 
 ];
