@@ -2,12 +2,14 @@
 
 namespace zeus\base\command;
 
+use zeus\sandbox\ApplicationContext;
+
 abstract class AbstractCommand
 {
     protected $commandId;
     protected $commandType;
 
-    protected $data = [];
+    private $data = [];
 
     public function __construct()
     {
@@ -25,6 +27,11 @@ abstract class AbstractCommand
     {
     }
 
+    public function execute()
+    {
+        ApplicationContext::currentContext()->getCommandBus()->execute($this);
+    }
+
     public function getCommandType()
     {
         return $this->commandType;
@@ -37,7 +44,9 @@ abstract class AbstractCommand
 
     public function setData($data)
     {
-        $this->data = array_merge($this->data,$data);
+        if(is_array($data)){
+            $this->data = array_merge($this->data, $data);
+        }
     }
 
     public function getData()

@@ -13,6 +13,7 @@ return [
     'app_ns' => [
         'test_router' => $current_dir.DS."test_router",
         'app' => $current_dir.DS."app",
+        'test'=>$current_dir,
     ],
 
     //log

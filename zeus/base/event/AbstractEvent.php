@@ -11,17 +11,15 @@ abstract class AbstractEvent
     protected $eventId;
     protected $eventType;
 
-    protected $data;
-    protected $result;
+    private $result = [];
+    private $data = [];
 
-    public function __construct($data)
+    public function __construct()
     {
         $class = get_class($this);
 
         $this->eventType = $class;
         $this->eventId = $this->eventType . time();
-
-        $this->data = $data;
     }
 
     public function start()
@@ -43,6 +41,13 @@ abstract class AbstractEvent
         return $this->eventId;
     }
 
+    public function setData($data)
+    {
+        if(is_array($data)){
+            $this->data = array_merge($this->data, $data);
+        }
+    }
+
     public function getData()
     {
         return $this->data;
@@ -50,7 +55,10 @@ abstract class AbstractEvent
 
     public function setResult($result)
     {
-        $this->result = $result;
+        if(!is_array($result)){
+            $result = [$result];
+        }
+        $this->result = array_merge($this->result,$result);
     }
 
     public function getResult()

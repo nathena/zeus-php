@@ -14,7 +14,7 @@
 - 实体：实体保留聚合根引用。
 - 值对象：无状态的数据值。
 - 领域服务：业务可确定的聚合间协作。
-- 领域事件：业务完成后广播的事件，通常用户消息通知，日志记录等行为。
+- 领域事件：业务完成后广播的事件，通常用于消息通知，日志记录等行为。
 - 事件源：目前框架暂未启用mq队列实现事件源。
 - 命令：事件触发的上下文，事件的开始。
 - 存储库：一个聚合根一个存储库，存储聚合内所有实体数据。
@@ -28,7 +28,7 @@ zeus以模块化来设计架构，使用领域驱动来组织代码。关注约�
 
 ### config
 提供默认的配置文件“config.php”,应用层可使用APP_ENV_PATH来定义应用自身的配置文件（test\bootstrap.php ）,
-配置文件的管理方式详见[zeus\sandbox\ConfigManager] (# ConfigManager)
+配置文件的管理方式详见[zeus\sandbox\ConfigManager]。
 
 ### bootstap
 顾名思义框架启动入口，初始化上下文。见[zeus\sandbox\ApplicationContext] (# ApplicationContext)
@@ -75,51 +75,92 @@ class IndexController extends Controller
 ```
 #### Command&Event
 ```
+//test
+use test\EchoCommand;
+
+include_once 'bootstrap.php';
+
+$command = new EchoCommand();
+$command->execute();//or ApplicationContext::currentContext()->getCommandBus()->execute($command);
+
+//command
+use zeus\base\command\AbstractCommand;
+use zeus\sandbox\ApplicationContext;
+
 class EchoCommand extends AbstractCommand
 {
     public function __construct()
     {
         parent::__construct();
 
-        $this->subscribe(EchoCommandHandler::class);
-
-        $this->msg = "hello";
+        $this->setData([1,2,3]);
     }
 
-    protected function start(){
+    public function start(){
         echo "{$this->commandType} => starting \r\n";
     }
 
-    protected function finished(){
+    public function finished(){
         echo "{$this->commandType} => finished \r\n";
     }
-}
-$command = new EchoCommand();
-$command->publish();
 
-class EchoCommandHandler extends AbstractComponent
-{
-    public function handlerEchoCommand(EchoCommand $command)
-    {
-        $data = $command->getData();
-        print_r($data);
-
-        $this->publishMessage(new EchoedEvent($data));
-    }
-
-    public function onEchoedEvent(EchoedEvent $event)
-    {
-        echo get_class($this),"\r\n";
-        print_r($event->getResult());
-    }
 }
 
-class EchoedEventHandler extends AbstractComponent
+ApplicationContext::currentContext()->getCommandBus()->register(EchoCommand::class,EchoCommandHandler::class);
+
+//commandhandler
+use zeus\base\AbstractComponent;
+use zeus\base\command\AbstractCommand;
+use zeus\base\command\CommandHandlerInterface;
+
+class EchoCommandHandler extends AbstractComponent implements CommandHandlerInterface
 {
-    public function onEchoedEvent(EchoedEvent $event)
+    public function execute(AbstractCommand $command)
     {
-        echo get_class($this),"\r\n";
-        print_r($event->getResult());
+        print_r($command->getData());
+
+        $this->raise(new EchoedEvent());
+        
+        //$event = new new EchoedEvent();
+        //$msg   = new EventMessage($this,$event);
+        //ApplicationContext::currentContext()->getEventBus()->publish($msg);
+    }
+}
+
+//event
+class EchoedEvent extends AbstractEvent
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->setData(["a","b","c"]);
+    }
+
+    public function start(){
+        echo "{$this->eventType} => starting \r\n";
+    }
+
+    public function finished(){
+        echo "{$this->eventType} => finished \r\n";
+    }
+}
+
+ApplicationContext::currentContext()->getEventBus()->subscribe(EchoedEvent::class,EchoedEventHandler::class);
+
+//listener
+use zeus\base\event\EventListenerInterface;
+use zeus\base\event\EventMessage;
+
+class EchoedEventHandler implements EventListenerInterface
+{
+    public function handler(EventMessage $eventMessage)
+    {
+        $sender = $eventMessage->getSender();
+        $event  = $eventMessage->getEvent();
+
+        echo "sender : ".get_class($sender)."=>\r\n";
+        print_r($event->getData());
     }
 }
 ```

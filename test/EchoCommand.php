@@ -7,8 +7,8 @@
 
 namespace test;
 
-
-use zeus\base\AbstractCommand;
+use zeus\base\command\AbstractCommand;
+use zeus\sandbox\ApplicationContext;
 
 class EchoCommand extends AbstractCommand
 {
@@ -16,16 +16,17 @@ class EchoCommand extends AbstractCommand
     {
         parent::__construct();
 
-        $this->subscribe(EchoCommandHandler::class);
-
-        $this->msg = "hello";
+        $this->setData([1,2,3]);
     }
 
-    protected function start(){
+    public function start(){
         echo "{$this->commandType} => starting \r\n";
     }
 
-    protected function finished(){
+    public function finished(){
         echo "{$this->commandType} => finished \r\n";
     }
+
 }
+
+ApplicationContext::currentContext()->getCommandBus()->register(EchoCommand::class,EchoCommandHandler::class);

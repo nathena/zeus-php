@@ -9,20 +9,15 @@ namespace test;
 
 
 use zeus\base\AbstractComponent;
+use zeus\base\command\AbstractCommand;
+use zeus\base\command\CommandHandlerInterface;
 
-class EchoCommandHandler extends AbstractComponent
+class EchoCommandHandler extends AbstractComponent implements CommandHandlerInterface
 {
-    public function handlerEchoCommand(EchoCommand $command)
+    public function execute(AbstractCommand $command)
     {
-        $data = $command->getData();
-        print_r($data);
+        print_r($command->getData());
 
-        $this->publishMessage(new EchoedEvent($data));
-    }
-
-    public function onEchoedEvent(EchoedEvent $event)
-    {
-        echo get_class($this),"\r\n";
-        print_r($event->getResult());
+        $this->raise(new EchoedEvent());
     }
 }
