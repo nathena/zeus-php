@@ -53,11 +53,19 @@ class View
         }
     }
 
+    public function __get($key)
+    {
+        if (isset($this->tpl_args[$key])) {
+            return $this->tpl_args[$key];
+        }
+        return null;
+    }
 
-    public function assign($key, $val)
+    public function __set($key, $val)
     {
         $this->tpl_args[$key] = $val;
     }
+
 
     /**
      * @param $template

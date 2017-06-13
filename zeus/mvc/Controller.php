@@ -15,6 +15,10 @@ abstract class Controller
         $this->response = Application::getInstance()->getResponse();
     }
 
+    /**
+     * @param $tpl_path
+     * @return View
+     */
     public function getView($tpl_path)
     {
         $csrf_token = UUIDGenerator::randChar(5);
@@ -24,6 +28,8 @@ abstract class Controller
 
         $view = new View($this->getRequest(), $this->getResponse(), $tpl_path);
         $view->assign("csrf_token", $csrf_token);
+
+        return $view;
     }
 
     public function errorHandler(\Exception $e)
