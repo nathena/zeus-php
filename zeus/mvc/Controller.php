@@ -26,19 +26,23 @@ abstract class Controller
         $session = $this->request->getSession();
         $session->csrf_token = $csrf_token;
 
-        $view = new View($this->getRequest(), $this->getResponse(), $tpl_path);
-        $view->assign("csrf_token", $csrf_token);
+        $view = new View($this->request, $this->response, $tpl_path);
+        $view->csrf_token = $csrf_token;
 
         return $view;
     }
 
     public function errorHandler(\Exception $e)
     {
-        $str = '<style>body {font-size:12px;}</style>';
-        $str .= '<h1>操作失败！</h1><br />';
-        $str .= '<strong>错误信息：<strong><font color="red">' . $e->getMessage() . '</font><br />';
+        if($this->request->isAjax()){
+            $this->response->setBody($e->getMessage())->send("json");
+        }else{
+            $str = '<style>body {font-size:12px;}</style>';
+            $str .= '<h1>操作失败！</h1><br />';
+            $str .= '<strong>错误信息：<strong><font color="red">' . $e->getMessage() . '</font><br />';
 
-        $this->response->setBody($str)->send();
+            $this->response->setBody($str)->send();
+        }
     }
 
     protected function forward($url_path)
