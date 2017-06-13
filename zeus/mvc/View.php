@@ -78,12 +78,14 @@ class View
 
             include $this->tpl_path;
         }
-        return ob_get_contents();
+        $content = ob_get_contents();
+        ob_clean();
+        return $content;
     }
 
     public function display($content_type = "text/html", $code = 200)
     {
-        $this->response->setCode($code)->setBody($this->fetch())->setHeader("Content-Typt", $content_type)->send();
+        $this->response->setCode($code)->setBody($this->fetch())->setHeader("Content-Type", $content_type)->send();
     }
 
     //模板内部include
