@@ -20,6 +20,11 @@ return [
     'log.path' => $root.DS.'logs',
     'log.level' => 0,
 
+    //view
+    'view.template_path' => $current_dir.DS.'views',
+    'view.template_extension' => ".htm",
+    'view.template_lang_dir' => "",
+
     //database
     'database.pdo.dsn' => 'mysql:host=localhost;dbname=t_my',
     'database.pdo.user' => 'root',

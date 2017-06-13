@@ -1,0 +1,12 @@
+<?=$test?>
+<?php if(empty($test)):?>
+<font color="red">空的</font>
+<?php else:?>
+<font color="red">不是空的</font>
+<?php endif;?>
+
+<?php foreach($data as $key => $item):?>
+<font color="red"><?=$key,$item;?></font>
+<?php endforeach;?>
+
+<?=$csrf_token?>

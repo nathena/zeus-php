@@ -20,6 +20,7 @@ class IndexController extends Controller
 
         echo intval($this->check_csrf_token());
 
+        $this->response->setBody("12321")->send("json");
         //throw new \RuntimeException("异常测试");
     }
 
@@ -30,5 +31,17 @@ class IndexController extends Controller
     public function test2($a){
         print_r($this->request->getData());
         echo $a;
+    }
+
+    public function test_view()
+    {
+        echo 1;
+        $view = $this->getView("test_view");
+        $view->test = "2222";
+        $view->abc = "2";
+        $view->data = [1,2.3];
+
+        //$view->display("application/json");
+        $view->display();
     }
 }
