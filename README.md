@@ -44,6 +44,7 @@ zeus以模块化来设计架构，使用领域驱动来组织代码。关注约�
 ### Roadmap
 - plugin机制
 - EventSouring事件源
+- Snapshot 事件源归档快照
 
 ### Usage
 #### 加载框架
