@@ -16,13 +16,13 @@ $pdo->beginTransaction();
 try
 {
     $fields = [
-      'c_a'=>'1',
+      'c_a'=>'2',
         'c_b'=>'2',
     ];
     $in = new InsertSpecification("t_test",$fields);
     $id = $pdo->execute($in);
     echo $id;
-
+    //throw new \RuntimeException("业务异常");
     $pdo->commit();
 }
 catch (\Exception $e)
