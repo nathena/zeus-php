@@ -152,17 +152,16 @@ class Response
     }
 
 
-    public function send()
+    public function send($type_name="html")
     {
         if (headers_sent()) {
             throw new \RuntimeException('The headers have already been sent.');
         }
-
-        switch ($this->headers['Content-Type']) {
-            case "application/json":
+        switch ($type_name) {
+            case "json":
                 $this->sendJson();
                 break;
-            case "application/xml":
+            case "xml":
                 $this->sendXml();
                 break;
             default:
@@ -170,10 +169,31 @@ class Response
         }
     }
 
+    public function sendJson()
+    {
+        $this->headers["Content-Type"] = "application/json";
+        $this->sendHeaders();
+        $data = [
+            'code' => $this->code,
+            'message' => $this->message,
+            'body' => $this->body,
+        ];
+        echo json_encode($data);
+    }
+
+    public function sendXml()
+    {
+        $this->headers["Content-Type"] = "application/xml";
+        $this->sendHeaders();
+        $xml = "<xml><code>{$this->code}</code><message><![CDATA[{$this->message}]]></message><body><![CDATA[{$this->body}]]></body></xml>";
+
+        echo $xml;
+    }
+
     protected function sendBody()
     {
         if (!isset($this->headers["Content-Type"])) {
-            $this->headers["Content-Type"] = "text/plain";
+            $this->headers["Content-Type"] = "text/html";
         }
         if (array_key_exists('Content-Encoding', $this->headers)) {
             $body = $this->encodeBody($this->body, $this->headers['Content-Encoding']);
@@ -185,26 +205,7 @@ class Response
         echo $body;
     }
 
-    protected function sendJson()
-    {
-        $this->sendHeaders();
-        $data = [
-            'code' => $this->code,
-            'message' => $this->message,
-            'body' => $this->body,
-        ];
-        echo json_encode($data);
-    }
-
-    protected function sendXml()
-    {
-        $this->sendHeaders();
-        $xml = "<xml><code>{$this->code}</code><message><![CDATA[{$this->message}]]></message><body><![CDATA[{$this->body}]]></body></xml>";
-
-        echo $xml;
-    }
-
-    private function encodeBody($body, $encode = 'gzip')
+    protected function encodeBody($body, $encode = 'gzip')
     {
         switch ($encode) {
             // GZIP compression
