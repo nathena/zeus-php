@@ -14,6 +14,7 @@ use zeus\database\DbManager;
 use zeus\database\DmlType;
 use zeus\database\specification\AbstractSpecification;
 use zeus\database\specification\DeleteSpecification;
+use zeus\database\specification\InsertBatchSpecification;
 use zeus\database\specification\InsertSpecification;
 use zeus\database\specification\UpdateSpecification;
 
@@ -105,6 +106,17 @@ class DbRepository
         return $list;
     }
 
+    /**
+     *
+     * UpdateBatch extends AbstractSpecification {
+     *      //TDOO;; setSql,setParams,dml
+     * }
+     *
+     * RemoveBach the same as UpdateBatch
+     *
+     * @see InsertBatchSpecification
+     * @param AbstractSpecification $specification
+     */
     public function updateBatch(AbstractSpecification $specification)
     {
         if( null == $specification ){
