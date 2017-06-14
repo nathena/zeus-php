@@ -15,10 +15,10 @@ class EchoedEventHandler implements EventListenerInterface
 {
     public function handler(EventMessage $eventMessage)
     {
-        $sender = $eventMessage->getSender();
         $event  = $eventMessage->getEvent();
 
-        echo "sender : ".get_class($sender)."=>\r\n";
         print_r($event->getData());
+
+        $eventMessage->trigger("ok");
     }
 }

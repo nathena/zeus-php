@@ -20,4 +20,11 @@ class EchoCommandHandler extends AbstractComponent implements CommandHandlerInte
 
         $this->raise(new EchoedEvent());
     }
+
+    public function onEchoedEvent(EchoedEvent $event,$msg)
+    {
+        print_r($event->getData());
+
+        var_dump($msg);
+    }
 }

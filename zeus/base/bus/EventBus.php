@@ -40,7 +40,7 @@ class EventBus
 
     public function publish(EventMessage $eventMessage){
         $event = $eventMessage->getEvent();
-        $event->start($eventMessage);
+        $event->start();
         $eventType = $event->getEventType();
         $_listeners = self::$_listeners[$eventType];
         foreach($_listeners as $_listener){
@@ -51,6 +51,6 @@ class EventBus
                 }
             }
         }
-        $event->finished($eventMessage);
+        $event->finished();
     }
 }

@@ -11,7 +11,6 @@ abstract class AbstractEvent
     protected $eventId;
     protected $eventType;
 
-    private $result = [];
     private $data = [];
 
     public function __construct()
@@ -53,18 +52,6 @@ abstract class AbstractEvent
         return $this->data;
     }
 
-    public function setResult($result)
-    {
-        if(!is_array($result)){
-            $result = [$result];
-        }
-        $this->result = array_merge($this->result,$result);
-    }
-
-    public function getResult()
-    {
-        return $this->result;
-    }
 
     public function __get($key)
     {
