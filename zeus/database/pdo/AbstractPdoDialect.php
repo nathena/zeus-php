@@ -98,7 +98,7 @@ abstract class AbstractPdoDialect
         $params = $specification->getParams();
         $dml = $specification->getDml();
 
-        if (DmlType::DML_INSERT_BATCH == $dml) {
+        if (DmlType::DML_BATCH == $dml) {
             return $this->_execute_batch($prepare, $params);
         } else {
             return $this->_execute($prepare, $params, $dml);

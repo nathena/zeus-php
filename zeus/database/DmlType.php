@@ -13,7 +13,7 @@ class DmlType
     const DML_SELECT_LIST   = "select_list";
     const DML_SELECT_ONE    = "select_one";
     const DML_INSERT        = "INSERT";
-    const DML_INSERT_BATCH  = "INSERT_BATCH";
     const DML_UPDATE        = "UPDATE";
     const DML_DELETE        = "DELETE";
+    const DML_BATCH         = "UPDATE_BATCH";
 }

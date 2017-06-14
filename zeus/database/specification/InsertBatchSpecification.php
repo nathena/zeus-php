@@ -20,7 +20,7 @@ class InsertBatchSpecification extends AbstractSpecification
     public function __construct($table, $fields)
     {
         $this->table = trim($table);
-        $this->dml = DmlType::DML_INSERT_BATCH;
+        $this->dml = DmlType::DML_BATCH;
         $this->fields = array_merge($this->fields, $fields);
     }
 
