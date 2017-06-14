@@ -12,6 +12,7 @@ abstract class AbstractEvent
     protected $eventType;
 
     private $data = [];
+    private $method;
 
     public function __construct()
     {
@@ -19,6 +20,12 @@ abstract class AbstractEvent
 
         $this->eventType = $class;
         $this->eventId = $this->eventType . time();
+
+        $class = get_class($this);
+        $class_fragments = explode("\\", $class);
+        $simple_class_name = end($class_fragments);
+
+        $this->method = "on{$simple_class_name}";
     }
 
     public function start()
@@ -40,9 +47,14 @@ abstract class AbstractEvent
         return $this->eventId;
     }
 
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
     public function setData($data)
     {
-        if(is_array($data)){
+        if (is_array($data)) {
             $this->data = array_merge($this->data, $data);
         }
     }

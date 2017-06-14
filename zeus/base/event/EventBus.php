@@ -5,11 +5,8 @@
  * Time: 11:18
  */
 
-namespace zeus\base\bus;
+namespace zeus\base\event;
 
-
-use zeus\base\event\EventListenerInterface;
-use zeus\base\event\EventMessage;
 
 class EventBus
 {
@@ -21,7 +18,7 @@ class EventBus
      */
     public static function getInstance()
     {
-        if(!isset(self::$_instance)){
+        if (!isset(self::$_instance)) {
             self::$_instance = new self();
         }
         return self::$_instance;
@@ -31,23 +28,30 @@ class EventBus
     {
     }
 
-    public function subscribe($eventType,$eventListner){
-        if(!isset(self::$_listeners[$eventType])){
+    public function subscribe($eventType, $eventListner)
+    {
+        if (!isset(self::$_listeners[$eventType])) {
             self::$_listeners[$eventType] = [];
         }
         self::$_listeners[$eventType][] = $eventListner;
     }
 
-    public function publish(EventMessage $eventMessage){
+    public function publish(EventMessage $eventMessage)
+    {
         $event = $eventMessage->getEvent();
         $event->start();
         $eventType = $event->getEventType();
+        $eventMethod = $event->getMethod();
         $_listeners = self::$_listeners[$eventType];
-        foreach($_listeners as $_listener){
-            if(!empty($_listener) && class_exists($_listener)){
+        foreach ($_listeners as $_listener) {
+            if (!empty($_listener) && class_exists($_listener)) {
                 $_listener = new $_listener();
-                if(is_object($_listener) && $_listener instanceof EventListenerInterface){
-                    $_listener->handler($eventMessage);
+                if (is_object($_listener)) {
+                    if ($_listener instanceof EventListenerInterface) {
+                        $_listener->handler($eventMessage);
+                    } else if (method_exists($_listener, $eventMethod)) {
+                        $_listener->{$eventMethod}($eventMessage);
+                    }
                 }
             }
         }

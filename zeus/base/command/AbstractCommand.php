@@ -10,6 +10,7 @@ abstract class AbstractCommand
     protected $commandType;
 
     private $data = [];
+    private $method;
 
     public function __construct()
     {
@@ -17,6 +18,12 @@ abstract class AbstractCommand
 
         $this->commandType = $class;
         $this->commandId = $this->commandType . time();
+
+        $class = get_class($this);
+        $class_fragments = explode("\\", $class);
+        $simple_class_name = end($class_fragments);
+
+        $this->method = "handler{$simple_class_name}";
     }
 
     public function start()
@@ -25,6 +32,11 @@ abstract class AbstractCommand
 
     public function finished()
     {
+    }
+
+    public function getMethod()
+    {
+        return $this->method;
     }
 
     public function execute()

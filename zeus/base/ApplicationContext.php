@@ -2,8 +2,8 @@
 
 namespace zeus\sandbox;
 
-use zeus\base\bus\CommandBus;
-use zeus\base\bus\EventBus;
+use zeus\base\command\CommandBus;
+use zeus\base\event\EventBus;
 use zeus\base\logger\Logger;
 
 /**

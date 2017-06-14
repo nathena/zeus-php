@@ -13,18 +13,10 @@ class EventMessage
     protected $event;
     protected $sender;
 
-    private $callback_method;
-
-    public function __construct($sender,AbstractEvent $event)
+    public function __construct($sender, AbstractEvent $event)
     {
         $this->sender = $sender;
-        $this->event  = $event;
-
-        $eventClass = get_class($event);
-        $eventClass_fragments = explode("\\",$eventClass);
-        $simple_class_name = end($eventClass_fragments);
-
-        $this->callback_method = "on{$simple_class_name}";
+        $this->event = $event;
     }
 
     public function getEvent()
@@ -34,10 +26,9 @@ class EventMessage
 
     public function trigger($msg)
     {
-        if(is_object($this->sender) && method_exists($this->sender,$this->callback_method))
-        {
-            $this->sender->{$this->callback_method}($this->event,$msg);
+        $method = $this->event->getMethod();
+        if (is_object($this->sender) && method_exists($this->sender, $method)) {
+            $this->sender->{$method}($this->event, $msg);
         }
-
     }
 }
