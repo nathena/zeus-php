@@ -12,6 +12,8 @@ abstract class AbstractCommand
     private $data = [];
     private $method;
 
+    private $idempotent = 0;
+
     public function __construct()
     {
         $class = get_class($this);
@@ -24,6 +26,14 @@ abstract class AbstractCommand
         $simple_class_name = end($class_fragments);
 
         $this->method = "handler{$simple_class_name}";
+    }
+
+    public function idempotent()
+    {
+        $idempotent = $this->idempotent;
+        $this->idempotent = $this->idempotent+1;
+
+        return 0 === $idempotent;
     }
 
     public function start()

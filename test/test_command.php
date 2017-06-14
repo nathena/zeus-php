@@ -13,3 +13,4 @@ include_once 'bootstrap.php';
 $command = new EchoCommand();
 $command->execute();
 
+$command->execute();

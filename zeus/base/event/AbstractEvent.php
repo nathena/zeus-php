@@ -14,6 +14,8 @@ abstract class AbstractEvent
     private $data = [];
     private $method;
 
+    private $idempotent = 0;
+
     public function __construct()
     {
         $class = get_class($this);
@@ -26,6 +28,14 @@ abstract class AbstractEvent
         $simple_class_name = end($class_fragments);
 
         $this->method = "on{$simple_class_name}";
+    }
+
+    public function idempotent()
+    {
+        $idempotent = $this->idempotent;
+        $this->idempotent = $this->idempotent+1;
+
+        return 0 === $idempotent;
     }
 
     public function start()

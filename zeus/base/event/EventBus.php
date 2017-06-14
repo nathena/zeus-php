@@ -39,6 +39,11 @@ class EventBus
     public function publish(EventMessage $eventMessage)
     {
         $event = $eventMessage->getEvent();
+
+        if(!$event->idempotent()){
+            return;
+        }
+
         $event->start();
         $eventType = $event->getEventType();
         $eventMethod = $event->getMethod();

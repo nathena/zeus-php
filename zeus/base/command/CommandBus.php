@@ -38,6 +38,10 @@ class CommandBus
 
     public function execute(AbstractCommand $command)
     {
+        if(!$command->idempotent()){
+            return;
+        }
+
         $command->start();
         $commandType = $command->getCommandType();
         $commandMethod = $command->getMethod();
