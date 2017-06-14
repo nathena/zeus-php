@@ -11,6 +11,7 @@ namespace zeus\domain;
 
 use zeus\base\exception\IllegalArgumentException;
 use zeus\database\DbManager;
+use zeus\database\DmlType;
 use zeus\database\specification\AbstractSpecification;
 use zeus\database\specification\DeleteSpecification;
 use zeus\database\specification\InsertSpecification;
@@ -80,13 +81,40 @@ class DbRepository
         return $this->pdo->execute($sepc);
     }
 
-    public function load(AbstractSpecification $specification)
+    public function load($class,AbstractSpecification $specification)
     {
         if( null == $specification){
             throw new IllegalArgumentException("DbRepository load : specification");
         }
 
-        return $this->pdo->execute($specification);
+        if(!class_exists($class)){
+            throw new IllegalArgumentException("DbRepository class {$class} not found");
+        }
+
+        $list = [];
+        $data = $this->pdo->execute($specification);
+        if(!empty($data)){
+            if(DmlType::DML_SELECT_ONE){
+                $data = [$data];
+            }
+            foreach($data as $item)
+            {
+                $list[] = new $class($item);
+            }
+        }
+        return $list;
     }
 
+    public function updateBatch(AbstractSpecification $specification)
+    {
+        if( null == $specification ){
+            throw new IllegalArgumentException("DbRepository updateBatch : specification");
+        }
+
+        if( DmlType::DML_BATCH != $specification->getDml()){
+            throw new IllegalArgumentException("DbRepository updateBatch : {$specification->getDml()} not support");
+        }
+
+        $this->pdo->execute($specification);
+    }
 }
