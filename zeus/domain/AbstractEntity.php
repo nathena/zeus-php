@@ -13,20 +13,14 @@ use zeus\base\logger\Logger;
  */
 abstract class AbstractEntity extends AbstractComponent
 {
-    protected $data = [];
-    protected $update_data = [];//更新未来提交的数据
-
+    private $data = [];
+    private $update_data = [];//更新未来提交的数据
     private $idFiled;//uuid key
 
     public function __construct($data, $idFiled = 'id')
     {
         $this->idFiled = $idFiled;
-        if (is_array($data)) {
-            if(isset($data[$idFiled])){
-                $this->setId($data[$idFiled]);
-            }
-            $this->setData($data);
-        }
+        $this->setProperties($data);
     }
 
     public function getIdFiled()
@@ -44,9 +38,24 @@ abstract class AbstractEntity extends AbstractComponent
         $this->data[$this->idFiled] = trim($id);
     }
 
-    public function getData()
+    public function getProperties()
     {
         return $this->data;
+    }
+
+    public function update_properties()
+    {
+        if(!empty($this->update_data)){
+            $this->data = array_merge($this->data,$this->update_data);
+            $this->update_data = [];
+        }
+
+        return $this->data;
+    }
+
+    public function getData()
+    {
+        return $this->update_data;
     }
 
     /**
@@ -56,7 +65,7 @@ abstract class AbstractEntity extends AbstractComponent
      */
     public function setData($data)
     {
-        if(is_array($data))
+        if(!empty($data) && is_array($data))
         {
             foreach($data as $key => $val)
             {
@@ -65,22 +74,10 @@ abstract class AbstractEntity extends AbstractComponent
         }
     }
 
-    /**
-     * 获取未更新信息
-     * @return array
-     */
-    public function getUpdatedData()
-    {
-        $data = $this->update_data;
-        $this->update_data = [];
-
-        return $data;
-    }
-
     public function __get($key)
     {
-        if (isset($this->data[$key])) {
-            return $this->data[$key];
+        if (isset($this->update_data[$key])) {
+            return $this->update_data[$key];
         }
         return '';
     }
@@ -88,11 +85,9 @@ abstract class AbstractEntity extends AbstractComponent
     public function __set($key, $val)
     {
         //不允许更新id
-        if ($key == $this->idFiled) {
+        if ($key == $this->idFiled || !isset($this->data[$key])) {
             return;
         }
-
-        $this->data[$key] = $val;
         $this->update_data[$key] = $val;
     }
 
@@ -124,5 +119,16 @@ abstract class AbstractEntity extends AbstractComponent
     public function offsetUnset($offset)
     {
         unset($this->{$offset});
+    }
+
+    protected function setProperties($data)
+    {
+        if(!empty($data) && is_array($data)){
+            $this->data = array_merge($this->data,$data);
+        }
+    }
+    protected function setProperty($key,$val)
+    {
+        $this->data[$key] = $val;
     }
 }

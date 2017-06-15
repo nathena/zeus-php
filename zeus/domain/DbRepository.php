@@ -28,8 +28,7 @@ class DbRepository
     public static function getSchema($schema)
     {
         $schema = strtolower(trim($schema));
-        if(!isset(self::$_instances[$schema]))
-        {
+        if (!isset(self::$_instances[$schema])) {
             self::$_instances[$schema] = new static($schema);
         }
         return self::$_instances[$schema];
@@ -43,25 +42,31 @@ class DbRepository
 
     public function save(AbstractEntity $entity)
     {
-        if( null == $entity ){
+        if (null == $entity) {
             throw new IllegalArgumentException("DbRepository save not found entity");
         }
 
         $id = $entity->getId();
 
-        if(!empty($id)) {
+        if (!empty($id)) {
             //update
             $fields = $entity->getUpdatedData();
 
-            $sepc = new UpdateSpecification($this->entity_schema,$fields);
-            $sepc->where($entity->getIdFiled(),$id);
+            $sepc = new UpdateSpecification($this->entity_schema, $fields);
+            $sepc->where($entity->getIdFiled(), $id);
+
+            //cas并发
+            $old_fields = $entity->getProperties();
+            foreach ($old_fields as $key => $val) {
+                $sepc->where($key, $val);
+            }
 
             return $this->pdo->execute($sepc);
         }
 
-        $fields = $entity->getData();
+        $fields = $entity->getProperties();
 
-        $sepc = new InsertSpecification($this->entity_schema,$fields);
+        $sepc = new InsertSpecification($this->entity_schema, $fields);
 
         $id = $this->pdo->execute($sepc);
 
@@ -72,34 +77,33 @@ class DbRepository
 
     public function remove(AbstractEntity $entity)
     {
-        if( null == $entity || empty($entity->getId())){
+        if (null == $entity || empty($entity->getId())) {
             throw new IllegalArgumentException("DbRepository remove not found entity");
         }
 
         $sepc = new DeleteSpecification($this->entity_schema);
-        $sepc->where($entity->getIdFiled(),$entity->getId());
+        $sepc->where($entity->getIdFiled(), $entity->getId());
 
         return $this->pdo->execute($sepc);
     }
 
-    public function load($class,AbstractSpecification $specification)
+    public function load($class, AbstractSpecification $specification)
     {
-        if( null == $specification){
+        if (null == $specification) {
             throw new IllegalArgumentException("DbRepository load : specification");
         }
 
-        if(!class_exists($class)){
+        if (!class_exists($class)) {
             throw new IllegalArgumentException("DbRepository class {$class} not found");
         }
 
         $list = [];
         $data = $this->pdo->execute($specification);
-        if(!empty($data)){
-            if(DmlType::DML_SELECT_ONE){
+        if (!empty($data)) {
+            if (DmlType::DML_SELECT_ONE) {
                 $data = [$data];
             }
-            foreach($data as $item)
-            {
+            foreach ($data as $item) {
                 $list[] = new $class($item);
             }
         }
@@ -119,11 +123,11 @@ class DbRepository
      */
     public function updateBatch(AbstractSpecification $specification)
     {
-        if( null == $specification ){
+        if (null == $specification) {
             throw new IllegalArgumentException("DbRepository updateBatch : specification");
         }
 
-        if( DmlType::DML_BATCH != $specification->getDml()){
+        if (DmlType::DML_BATCH != $specification->getDml()) {
             throw new IllegalArgumentException("DbRepository updateBatch : {$specification->getDml()} not support");
         }
 
