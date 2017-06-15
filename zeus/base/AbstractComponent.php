@@ -16,9 +16,10 @@ abstract class AbstractComponent
 {
     /**
      * @param AbstractEvent $event
+     * @param callable|null $callable
      */
-    protected function raise(AbstractEvent $event)
+    protected function raise(AbstractEvent $event, callable $callable = null)
     {
-        ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this, $event));
+        ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this, $event,$callable));
     }
 }

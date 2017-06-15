@@ -13,10 +13,14 @@ class EventMessage
     protected $event;
     protected $sender;
 
-    public function __construct($sender, AbstractEvent $event)
+    private $callable;
+    private $msg;
+
+    public function __construct($sender, AbstractEvent $event, callable $callable)
     {
         $this->sender = $sender;
         $this->event = $event;
+        $this->callable = $callable;
     }
 
     public function getEvent()
@@ -24,11 +28,21 @@ class EventMessage
         return $this->event;
     }
 
+    public function getMsg()
+    {
+        return $this->msg;
+    }
+
     public function trigger($msg)
     {
-        $method = $this->event->getMethod();
-        if (is_object($this->sender) && method_exists($this->sender, $method)) {
-            $this->sender->{$method}($this->event, $msg);
+        $this->msg = $msg;
+        if(is_callable($this->callable)){
+            call_user_func_array($this->callable,[$this]);
+        }else{
+            $method = $this->event->getMethod();
+            if (is_object($this->sender) && method_exists($this->sender, $method)) {
+                call_user_func_array(array($this->sender,$method),[$this]);
+            }
         }
     }
 }
