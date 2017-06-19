@@ -18,28 +18,8 @@ use zeus\database\specification\InsertBatchSpecification;
 use zeus\database\specification\InsertSpecification;
 use zeus\database\specification\UpdateSpecification;
 
-class DbRepository
+class GeneralDbRepository
 {
-    private static $_instances;
-    protected $pdo;
-
-    /**
-     * @param $schema
-     * @return DbRepository
-     */
-    public static function getInstance()
-    {
-        if (!isset(self::$_instances)) {
-            self::$_instances = new static();
-        }
-        return self::$_instances;
-    }
-
-    protected function __construct()
-    {
-        $this->pdo = DbManager::openSession();
-    }
-
     public function save(AbstractEntity $entity)
     {
         if (null == $entity) {
@@ -49,6 +29,7 @@ class DbRepository
         $id = $entity->getId();
         $schema = $entity->getSchema();
 
+        $pdo = $this->openSession();
         if (!empty($id)) {
             //update
             $fields = $entity->getData();
@@ -60,12 +41,12 @@ class DbRepository
                 $sepc->where($key, $val);
             }
 
-            return $this->pdo->execute($sepc);
+            return $pdo->execute($sepc);
         }
 
         $fields = $entity->getProperties();
         $sepc = new InsertSpecification($this->entity_schema, $fields);
-        $id = $this->pdo->execute($sepc);
+        $id = $pdo->execute($sepc);
         $entity->setId($id);
 
         return $id;
@@ -77,10 +58,10 @@ class DbRepository
             throw new IllegalArgumentException("DbRepository remove not found entity");
         }
 
-        $sepc = new DeleteSpecification($schema = $entity->getSchema());
+        $sepc = new DeleteSpecification($entity->getSchema());
         $sepc->where($entity->getIdFiled(), $entity->getId());
 
-        return $this->pdo->execute($sepc);
+        return $this->openSession()->execute($sepc);
     }
 
     public function load($class, AbstractSpecification $specification)
@@ -94,7 +75,7 @@ class DbRepository
         }
 
         $result = [];
-        $data = $this->pdo->execute($specification);
+        $data = $this->openSession()->execute($specification);
         if (!empty($data)) {
             if (DmlType::DML_SELECT_ONE) {
                 $data = [$data];
@@ -129,6 +110,11 @@ class DbRepository
             throw new IllegalArgumentException("DbRepository updateBatch : {$specification->getDml()} not support");
         }
 
-        $this->pdo->execute($specification);
+        $this->openSession()->execute($specification);
+    }
+
+    protected function openSession()
+    {
+        return DbManager::openSession();
     }
 }

@@ -11,7 +11,7 @@ namespace account_auth;
 use account\domain\Account;
 use base\BaseAppController;
 use zeus\database\specification\QueryRowSpecification;
-use zeus\domain\DbRepository;
+use zeus\domain\GeneralDbRepository;
 use zeus\http\Response;
 
 class AuthController extends BaseAppController
@@ -50,7 +50,8 @@ class AuthController extends BaseAppController
         $spect = new QueryRowSpecification();
         $spect->from("t_account")->where("user_name",trim($account));
 
-        $account = DbRepository::getSchema("t_account")->load(Account::class,$spect);
+        $rep = new GeneralDbRepository();
+        $account = $rep->load(Account::class,$spect);
 
         if(empty($account)){
             throw new \RuntimeException("登录账户不存在");
