@@ -118,8 +118,7 @@ class ApplicationContext
                 $this->loader->registerNamespaces($ns, $path);
                 $url = $path . DS . "__init__.php";
                 if (is_file($url)) {
-                    $data = include_once $url;
-                    ConfigManager::addRouter($data);
+                    ConfigManager::addRouter(include_once $url);
                 }
             }
         }

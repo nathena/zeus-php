@@ -24,15 +24,17 @@ class ConfigManager
 
     public static function addRouter($config)
     {
-        $routers = static::$config["router.rewrite"];
-        foreach ($config as $r => $w) {
-            if (isset($routers[$r])) {
-                throw new \RuntimeException(" {$r} url has already existed!");
-            }
+        if(!empty($config) && is_array($config)){
+            $routers = static::$config["router.rewrite"];
+            foreach ($config as $r => $w) {
+                if (isset($routers[$r])) {
+                    throw new \RuntimeException(" {$r} url has already existed!");
+                }
 
-            $routers[$r] = $w;
+                $routers[$r] = $w;
+            }
+            static::$config["router.rewrite"] = $routers;
         }
-        static::$config["router.rewrite"] = $routers;
     }
 
     public static function init()
