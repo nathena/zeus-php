@@ -116,15 +116,11 @@ class ApplicationContext
         foreach ($components as $ns => $path) {
             if (is_dir($path)) {
                 $this->loader->registerNamespaces($ns, $path);
-                $url = $path . DS . "url.php";
+                $url = $path . DS . "init.php";
                 if (is_file($url)) {
                     $data = include_once $url;
                     ConfigManager::addRouter($data);
-                } else {
-                    Logger::warn("{$url} not found");
                 }
-            } else {
-                Logger::warn("component => {$ns} {$path} not found");
             }
         }
         //timezone
