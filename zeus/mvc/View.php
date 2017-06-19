@@ -6,7 +6,7 @@ use zeus\http\Request;
 use zeus\http\Response;
 use zeus\sandbox\ConfigManager;
 
-class View
+class View implements \ArrayAccess
 {
     private static $hook = [];
     private static $config;
@@ -64,6 +64,26 @@ class View
     public function __set($key, $val)
     {
         $this->tpl_args[$key] = $val;
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->{$offset});
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->{$offset};
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->{$offset} = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->{$offset});
     }
 
 
