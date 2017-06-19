@@ -5,11 +5,10 @@
  * Time: 10:38
  */
 
-namespace account\domain;
+namespace account;
 
 
 use zeus\domain\AggregateRoot;
-use zeus\domain\GeneralDbRepository;
 
 class Account extends AggregateRoot
 {

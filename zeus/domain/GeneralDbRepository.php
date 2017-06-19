@@ -8,9 +8,7 @@
 
 namespace zeus\domain;
 
-
 use zeus\base\exception\IllegalArgumentException;
-use zeus\database\DbManager;
 use zeus\database\DmlType;
 use zeus\database\pdo\Pdo;
 use zeus\database\specification\AbstractSpecification;
@@ -65,29 +63,13 @@ abstract class GeneralDbRepository
         return $this->openSession()->execute($sepc);
     }
 
-    public function load($class, AbstractSpecification $specification)
+    public function load(AbstractSpecification $specification)
     {
         if (null == $specification) {
             throw new IllegalArgumentException("DbRepository load : specification");
         }
 
-        if (!class_exists($class)) {
-            throw new IllegalArgumentException("DbRepository class {$class} not found");
-        }
-
-        $result = [];
-        $data = $this->openSession()->execute($specification);
-        if (!empty($data)) {
-            if (DmlType::DML_SELECT_ONE) {
-                $data = [$data];
-                foreach ($data as $item) {
-                    $result[] = new $class($item);
-                }
-            } else {
-                $result = new $class($data);
-            }
-        }
-        return $result;
+        return $this->openSession()->execute($specification);
     }
 
     /**
