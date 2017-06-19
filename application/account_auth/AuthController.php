@@ -33,6 +33,10 @@ class AuthController extends BaseAppController
     {
         $account = $this->request['account'];
         $passwd  = $this->request['passwd'];
+        $follow  = $this->request['follow'];
+        if(empty($follow)){
+            $follow = "/";
+        }
 
         if(empty($account)){
             throw new \RuntimeException("登录账户不能为空");
@@ -45,9 +49,7 @@ class AuthController extends BaseAppController
         //TODO
         $spect = new QueryRowSpecification();
         $spect->from("t_account")->where("user_name",trim($account));
-        /**
-         * @var Account
-         */
+
         $account = DbRepository::getSchema("t_account")->load(Account::class,$spect);
 
         if(empty($account)){
@@ -61,6 +63,8 @@ class AuthController extends BaseAppController
 
         $session = $this->request->getSession();
         $session['token'] = $account['id'];
+
+        Response::redirect($follow);
     }
 
     public function logout()
