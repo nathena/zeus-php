@@ -17,8 +17,6 @@ abstract class AbstractPdoDialect
     protected $benchmark = 0;
     protected $sql = [];
 
-    private $deleteSqlFormat = "DELETE FROM `%s` %s ";
-
     /**
      * @param $cfg
      * mysql:host=localhost;port=3306;dbname=testdb

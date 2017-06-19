@@ -20,28 +20,24 @@ use zeus\database\specification\UpdateSpecification;
 
 class DbRepository
 {
-    private static $_instances = [];
-
+    private static $_instances;
     protected $pdo;
-    protected $entity_schema;
 
     /**
      * @param $schema
      * @return DbRepository
      */
-    public static function getSchema($schema)
+    public static function getInstance()
     {
-        $schema = strtolower(trim($schema));
-        if (!isset(self::$_instances[$schema])) {
-            self::$_instances[$schema] = new static($schema);
+        if (!isset(self::$_instances)) {
+            self::$_instances = new static();
         }
-        return self::$_instances[$schema];
+        return self::$_instances;
     }
 
     protected function __construct($schema)
     {
         $this->pdo = DbManager::openSession();
-        $this->entity_schema = $schema;
     }
 
     public function save(AbstractEntity $entity)
@@ -51,14 +47,13 @@ class DbRepository
         }
 
         $id = $entity->getId();
+        $schema = $entity->getSchema();
 
         if (!empty($id)) {
             //update
-            $fields = $entity->getUpdatedData();
-
-            $sepc = new UpdateSpecification($this->entity_schema, $fields);
+            $fields = $entity->getData();
+            $sepc = new UpdateSpecification($schema, $fields);
             $sepc->where($entity->getIdFiled(), $id);
-
             //cas并发
             $old_fields = $entity->getProperties();
             foreach ($old_fields as $key => $val) {
@@ -69,11 +64,8 @@ class DbRepository
         }
 
         $fields = $entity->getProperties();
-
         $sepc = new InsertSpecification($this->entity_schema, $fields);
-
         $id = $this->pdo->execute($sepc);
-
         $entity->setId($id);
 
         return $id;
@@ -85,7 +77,7 @@ class DbRepository
             throw new IllegalArgumentException("DbRepository remove not found entity");
         }
 
-        $sepc = new DeleteSpecification($this->entity_schema);
+        $sepc = new DeleteSpecification($schema = $entity->getSchema());
         $sepc->where($entity->getIdFiled(), $entity->getId());
 
         return $this->pdo->execute($sepc);
@@ -109,7 +101,7 @@ class DbRepository
                 foreach ($data as $item) {
                     $result[] = new $class($item);
                 }
-            }else{
+            } else {
                 $result = $data;
             }
         }

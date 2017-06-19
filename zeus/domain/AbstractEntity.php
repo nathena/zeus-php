@@ -13,21 +13,20 @@ use zeus\base\logger\Logger;
  */
 abstract class AbstractEntity extends AbstractComponent
 {
-    private $data = [];
-    private $update_data = [];//更新未来提交的数据
-    private $idFiled;//uuid key
+    protected $data = [];
+    protected $update_data = [];//更新未来提交的数据
+    protected $idFiled = 'id';//uuid key
+    protected $schema = "test";
 
-    public function __construct($data, $idFiled = 'id')
+    public function getSchema()
     {
-        $this->idFiled = $idFiled;
-        $this->setProperties($data);
+        return $this->schema;
     }
 
     public function getIdFiled()
     {
         return $this->idFiled;
     }
-
     public function getId()
     {
         return $this->data[$this->idFiled];
@@ -121,13 +120,13 @@ abstract class AbstractEntity extends AbstractComponent
         unset($this->{$offset});
     }
 
-    protected function setProperties($data)
+    public function setProperties($data)
     {
         if(!empty($data) && is_array($data)){
             $this->data = array_merge($this->data,$data);
         }
     }
-    protected function setProperty($key,$val)
+    public function setProperty($key,$val)
     {
         $this->data[$key] = $val;
     }
