@@ -12,10 +12,7 @@ use zeus\domain\AggregateRoot;
 
 class Account extends AggregateRoot
 {
-    public function __construct($data, $idFiled = 'id')
-    {
-        parent::__construct($data, $idFiled);
-    }
+    protected $schema = "t_account";
 
     public function check_passwd($passwd)
     {
