@@ -26,13 +26,16 @@ return [
         'account_auth'=> $application.DS."account_auth",
         'booking'=> $application.DS."booking",
         'bus'=> $application.DS."bus",
-        'driver'=> $application.DS."driver",
-        'supplier'=> $application.DS."supplier",
+        'gps'=> $application.DS."gps",
+        'nav'=> $application.DS."nav",
+        'sms'=> $application.DS."sms",
+        'report'=> $application.DS."report",
+        'customer'=> $application.DS."customer",
     ],
 
     //router
     'router.default_controller' => 'base\\IndexPlatformController',
-    'router.default_controller_action' => 'Index',
+    'router.default_controller_action' => 'index',
     'router.rewrite' => [],
 
     //view

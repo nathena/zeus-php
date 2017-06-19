@@ -2,17 +2,16 @@
 /**
  * User: nathena
  * Date: 2017/6/19 0019
- * Time: 16:01
+ * Time: 16:03
  */
 
 namespace booking;
 
+use zeus\domain\AbstractEntity;
 
-use zeus\domain\AggregateRoot;
-
-class Order extends AggregateRoot
+class OrderVehicle extends AbstractEntity
 {
-    protected $schema = "t_order";
+    protected $schema = "t_order_vehicle";
 
     private $store_engine;
 

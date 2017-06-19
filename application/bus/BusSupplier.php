@@ -1,17 +1,15 @@
 <?php
+namespace bus;
+use zeus\domain\AggregateRoot;
+
 /**
  * User: nathena
  * Date: 2017/6/19 0019
- * Time: 16:03
+ * Time: 20:24
  */
-
-namespace booking;
-
-use zeus\domain\AggregateRoot;
-
-class VehicleOrder extends AggregateRoot
+class BusSupplier extends AggregateRoot
 {
-    protected $schema = "t_order_vehicle";
+    protected $schema = "t_supplier";
 
     public function __construct($data = null)
     {
