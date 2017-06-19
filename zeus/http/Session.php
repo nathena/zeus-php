@@ -11,7 +11,7 @@ namespace zeus\http;
 use zeus\http\exception\InitSessionSaveHandlerException;
 use zeus\sandbox\ConfigManager;
 
-class Session
+class Session implements \ArrayAccess
 {
     private static $instance = null;
     private $sessionId;

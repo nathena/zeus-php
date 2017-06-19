@@ -11,7 +11,7 @@ use zeus\base\logger\Logger;
  * Date: 2017/6/2
  * Time: 19:25
  */
-abstract class AbstractEntity extends AbstractComponent
+abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
 {
     protected $data = [];
     protected $update_data = [];//更新未来提交的数据

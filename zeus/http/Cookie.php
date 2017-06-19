@@ -9,7 +9,7 @@
 namespace zeus\http;
 
 
-class Cookie
+class Cookie implements \ArrayAccess
 {
     /**
      * @var \zeus\http\Request

@@ -4,7 +4,7 @@ namespace zeus\http;
 
 use zeus\sandbox\ApplicationContext;
 
-class Request
+class Request implements \ArrayAccess
 {
     protected $data = [];
     protected $headers = [];
