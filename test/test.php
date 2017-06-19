@@ -11,7 +11,7 @@ use zeus\database\specification\UpdateSpecification;
 include_once 'bootstrap.php';
 
 $q = new QueryRowSpecification();
-$q->select("*")->from("t_test")->where("id",1);
+$q->from("t_test");
 $c = new QuerySpecification();
 $c->where("b > ",2);
 $c->where("d < ",3);
