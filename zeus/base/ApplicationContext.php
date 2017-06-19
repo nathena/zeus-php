@@ -116,7 +116,7 @@ class ApplicationContext
         foreach ($components as $ns => $path) {
             if (is_dir($path)) {
                 $this->loader->registerNamespaces($ns, $path);
-                $url = $path . DS . "init.php";
+                $url = $path . DS . "__init__.php";
                 if (is_file($url)) {
                     $data = include_once $url;
                     ConfigManager::addRouter($data);
