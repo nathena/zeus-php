@@ -25,7 +25,7 @@ class AuthController extends BaseAppController
             return;
         }
 
-        $view = $this->getView("auth/login");
+        $view = $this->getView("login");
         $view->display();
     }
 

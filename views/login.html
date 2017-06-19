@@ -2,7 +2,10 @@
 <body>
 这是登录页面
 <form action="/do_login" method="post">
-    <input hidden="crsf_token" value="<?=$crsf_token?>" />
+    <input type="text" name="csrf_token" value="<?=$csrf_token?>" />
+    <input type="text" name="user_name" />
+    <input type="text" name="passwd" />
+    <input type="submit" value="提交" />
 </form>
 </body>
 </html>
