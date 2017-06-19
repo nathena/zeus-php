@@ -25,6 +25,10 @@ class DbRepository
     protected $pdo;
     protected $entity_schema;
 
+    /**
+     * @param $schema
+     * @return DbRepository
+     */
     public static function getSchema($schema)
     {
         $schema = strtolower(trim($schema));
@@ -97,17 +101,19 @@ class DbRepository
             throw new IllegalArgumentException("DbRepository class {$class} not found");
         }
 
-        $list = [];
+        $result = [];
         $data = $this->pdo->execute($specification);
         if (!empty($data)) {
             if (DmlType::DML_SELECT_ONE) {
                 $data = [$data];
-            }
-            foreach ($data as $item) {
-                $list[] = new $class($item);
+                foreach ($data as $item) {
+                    $result[] = new $class($item);
+                }
+            }else{
+                $result = $data;
             }
         }
-        return $list;
+        return $result;
     }
 
     /**

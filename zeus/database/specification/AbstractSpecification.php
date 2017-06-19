@@ -49,7 +49,7 @@ abstract class AbstractSpecification
         $sql = $this->getSql();
         $param = $this->getParams();
 
-        if (DmlType::DML_INSERT_BATCH == $this->dml) {
+        if (DmlType::DML_BATCH == $this->dml) {
             foreach ($param as $item) {
                 $sql_s[] = $this->_real_sql($sql, $item);
             }

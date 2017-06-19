@@ -76,8 +76,8 @@ abstract class AbstractEntity extends AbstractComponent
 
     public function __get($key)
     {
-        if (isset($this->update_data[$key])) {
-            return $this->update_data[$key];
+        if (isset($this->data[$key])) {
+            return $this->data[$key];
         }
         return '';
     }

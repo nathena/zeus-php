@@ -42,6 +42,11 @@ class Application
             if (!($controller instanceof Controller)) {
                 throw new ControllerNotFoundException("{$controllerClass} 控制器不是系统控制器子类");
             }
+            if( $controller instanceof NeedCheckedInterface){
+                if( !$controller->do_check()){
+                    return;
+                }
+            }
             call_user_func_array(array($controller, $router->getAction()), $router->getParams());
         } catch (\Exception $e) {
             ob_clean();

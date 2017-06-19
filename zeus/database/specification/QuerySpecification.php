@@ -32,7 +32,7 @@ class QuerySpecification extends AbstractWhereSpecification
         if (empty($this->sql)) {
             $sql = [];
             $sql[] = "select ";
-            $sql[] = implode(",", $this->select_data);
+            $sql[] = empty($this->select_data) ? "* ": implode(",", $this->select_data);
             $sql[] = "from " . $this->table;
             if (!empty($this->join_data)) {
                 $sql[] = implode(" ", $this->join_data);
