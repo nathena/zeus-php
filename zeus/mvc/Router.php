@@ -63,6 +63,7 @@ class Router
         {
             foreach ($rewrite as $pattern => $replacement )
             {
+                $pattern = trim($pattern,"/");
                 if( preg_match("#^$pattern$#", $this->uri_path))
                 {
                     $rule = preg_replace("#^$pattern$#", $replacement, $this->uri_path);
