@@ -8,4 +8,10 @@ return [
     '/account/update/(\d+)' => '',
     //列表
     '/account' => '',
+
+    //登录
+    '/login' => \account\AuthController::class."@login",
+    '/do_login' => \account\AuthController::class."@do_login",
+    //退出
+    '/logout' => \account\AuthController::class."@logout",
 ];

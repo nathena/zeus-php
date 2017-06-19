@@ -5,7 +5,7 @@
  * Time: 10:09
  */
 
-namespace account_auth;
+namespace account;
 
 
 use account\domain\Account;
@@ -64,6 +64,7 @@ class AuthController extends BaseAppController
 
         $session = $this->request->getSession();
         $session['token'] = $account['id'];
+//        $session['token'] = 1;
 
         Response::redirect($follow);
     }
