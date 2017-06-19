@@ -12,13 +12,14 @@ namespace zeus\domain;
 use zeus\base\exception\IllegalArgumentException;
 use zeus\database\DbManager;
 use zeus\database\DmlType;
+use zeus\database\pdo\Pdo;
 use zeus\database\specification\AbstractSpecification;
 use zeus\database\specification\DeleteSpecification;
 use zeus\database\specification\InsertBatchSpecification;
 use zeus\database\specification\InsertSpecification;
 use zeus\database\specification\UpdateSpecification;
 
-class GeneralDbRepository
+abstract class GeneralDbRepository
 {
     public function save(AbstractEntity $entity)
     {
@@ -113,8 +114,8 @@ class GeneralDbRepository
         $this->openSession()->execute($specification);
     }
 
-    protected function openSession()
-    {
-        return DbManager::openSession();
-    }
+    /**
+     * @return Pdo
+     */
+    public abstract function openSession();
 }
