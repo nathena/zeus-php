@@ -18,6 +18,13 @@ abstract class AbstractEntity extends AbstractComponent
     protected $idFiled = 'id';//uuid key
     protected $schema = "test";
 
+    public function __construct($properties=null)
+    {
+        if(!empty($properties) && is_array($properties)){
+            $this->setProperties($properties);
+        }
+    }
+
     public function getSchema()
     {
         return $this->schema;

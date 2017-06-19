@@ -83,7 +83,7 @@ class GeneralDbRepository
                     $result[] = new $class($item);
                 }
             } else {
-                $result = $data;
+                $result = new $class($data);
             }
         }
         return $result;
