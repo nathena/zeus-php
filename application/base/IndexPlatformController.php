@@ -8,7 +8,7 @@
 namespace base;
 
 
-class IndexController extends MustLoginedController
+class IndexPlatformController extends LoginedPlatformController
 {
     public function index(){
         echo __CLASS__,'=>',__METHOD__;

@@ -12,15 +12,15 @@ use zeus\http\Response;
 use zeus\mvc\NeedCheckedInterface;
 use zeus\sandbox\ApplicationContext;
 
-class MustLoginedController extends BaseAppController implements NeedCheckedInterface
+class LoginedB2BController extends BaseAppController implements NeedCheckedInterface
 {
     public function do_check()
     {
         $session = $this->request->getSession();
         //已经登录
-        if(!isset($session['token'])){
+        if(!isset($session['b2b_token'])){
             Logger::debug("=====".ApplicationContext::currentContext()->ip().$_SERVER['REQUEST_URI']." not login");
-            Response::redirect("/login");
+            Response::redirect("/b2b/login");
 
             return false;
         }

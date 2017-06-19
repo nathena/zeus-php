@@ -8,7 +8,7 @@
 namespace base;
 
 
-class WelcomeController extends MustLoginedController
+class WelcomePlatformController extends LoginedPlatformController
 {
 
     public function index()
