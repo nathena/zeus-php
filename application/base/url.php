@@ -1,5 +1,6 @@
 <?php
-//account_auth 依赖account模块
+//base url rewrite
 return [
     '/favicon.ico' => \base\EmptyController::class,
+    '/welcome' => \base\WelcomeController::class,
 ];
