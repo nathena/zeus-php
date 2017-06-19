@@ -35,7 +35,7 @@ class DbRepository
         return self::$_instances;
     }
 
-    protected function __construct($schema)
+    protected function __construct()
     {
         $this->pdo = DbManager::openSession();
     }
