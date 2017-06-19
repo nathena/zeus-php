@@ -27,7 +27,9 @@ class Autoloader
 	
 	public function registerNamespaces($namespace, $directory)
 	{
-		$this->prefixes[$namespace] = realpath($directory);
+        $directory = realpath($directory);
+		$this->prefixes[$namespace] = $directory;
+		$this->registerDirs([$directory]);
 		
 		return $this;
 	}
@@ -43,7 +45,7 @@ class Autoloader
 	{
 		if( is_array($class))
 		{
-			$this->classmap = array_merge($this->classmap, $classmap);
+			$this->classmap = array_merge($this->classmap, $class);
 		}
 		else 
 		{
@@ -63,7 +65,7 @@ class Autoloader
 		$classFile = $this->findClassFileByClassMap($class);
 		//echo '1=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
-		{
+		{echo 2;
 			include_once $classFile;
 			return true;
 		}
