@@ -49,7 +49,7 @@ class Application
             }
             call_user_func_array(array($controller, $router->getAction()), $router->getParams());
         } catch (\Exception $e) {
-            ob_clean();
+            //ob_clean();
             if (is_null($controller) || !($controller instanceof Controller)) {
                 throw $e;
             }
