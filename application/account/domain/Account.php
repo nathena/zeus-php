@@ -14,6 +14,11 @@ class Account extends AggregateRoot
 {
     protected $schema = "t_account";
 
+    public function __construct($data = null)
+    {
+        parent::__construct($data);
+    }
+
     public function check_passwd($passwd)
     {
         $_passwd = md5($passwd.$this->data['user_name']);
