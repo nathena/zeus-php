@@ -12,6 +12,9 @@ class Request implements \ArrayAccess
 
     public function __construct()
     {
+        $this->server = $_SERVER;
+        $this->getAllHeaders();
+
         if ($this->isPost()) {
             $this->setData($_POST);
         } else if ($this->isPut() || $this->isPatch() || $this->isDelete()) {
@@ -19,9 +22,6 @@ class Request implements \ArrayAccess
         } else {
             $this->setData($_GET);
         }
-
-        $this->server = $_SERVER;
-        $this->getAllHeaders();
     }
 
     public function __get($key)

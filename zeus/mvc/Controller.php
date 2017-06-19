@@ -2,6 +2,7 @@
 
 namespace zeus\mvc;
 
+use zeus\base\logger\Logger;
 use zeus\utils\UUIDGenerator;
 
 abstract class Controller
@@ -24,19 +25,19 @@ abstract class Controller
         $csrf_token = UUIDGenerator::randChar(5);
 
         $session = $this->request->getSession();
-        $session->csrf_token = $csrf_token;
+        $session['csrf_token'] = $csrf_token;
 
         $view = new View($this->request, $this->response, $tpl_path);
-        $view->csrf_token = $csrf_token;
+        $view['csrf_token'] = $csrf_token;
 
         return $view;
     }
 
     public function errorHandler(\Exception $e)
     {
-        if($this->request->isAjax()){
+        if ($this->request->isAjax()) {
             $this->response->setBody($e->getMessage())->send("json");
-        }else{
+        } else {
             $str = '<style>body {font-size:12px;}</style>';
             $str .= '<h1>操作失败！</h1><br />';
             $str .= '<strong>错误信息：<strong><font color="red">' . $e->getMessage() . '</font><br />';
@@ -53,10 +54,10 @@ abstract class Controller
     protected function check_csrf_token()
     {
         $session = $this->request->getSession();
-        $req_csrf_token = $this->request->csrf_token;
-        $session_csrf_token = $session->csrf_token;
+        $req_csrf_token = $this->request['csrf_token'];
+        $session_csrf_token = $session['csrf_token'];
 
-        unset($session->csrf_token);
+        unset($session['csrf_token']);
 
         if (empty($req_csrf_token)) {
             return false;
