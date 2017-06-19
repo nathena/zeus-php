@@ -8,6 +8,7 @@
 namespace base;
 
 use zeus\base\logger\Logger;
+use zeus\http\Response;
 use zeus\mvc\NeedCheckedInterface;
 use zeus\sandbox\ApplicationContext;
 
@@ -18,7 +19,7 @@ class MustLoginedController extends BaseAppController implements NeedCheckedInte
         $session = $this->request->getSession();
         //已经登录
         if(!isset($session['token'])){
-            Logger::debug("=====".ApplicationContext::currentContext()->ip()." not login");
+            Logger::debug("=====".ApplicationContext::currentContext()->ip().$_SERVER['REQUEST_URI']." not login");
             Response::redirect("/login");
 
             return false;
