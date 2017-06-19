@@ -21,9 +21,9 @@ return [
 
     //application namespace
     'app_ns' => [
-        'base' => $application,
-        'account'=> $application,
-        'account_auth'=> $application,
+        'base' => $application.DS."base",
+        'account'=> $application.DS."account",
+        'account_auth'=> $application.DS."account_auth",
     ],
 
     //router
