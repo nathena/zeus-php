@@ -1,23 +1,33 @@
 <?php
 namespace zeus\mvc;
 
+use zeus\mvc\exception\RoutingRepeatedException;
 use zeus\sandbox\ConfigManager;
 use zeus\utils\XssCleaner;
 
 class Router
 {
+    private static $all_routers = [];
+
 	protected $controller;
 	protected $action;
 	protected $params = [];
 
     private $uri_path;
-	private $config;
+
+	public static function addRouter($router,$handler)
+    {
+        $router = trim(strtolower($router),"/");
+        if(isset(self::$all_routers[$router])){
+            throw new RoutingRepeatedException();
+        }
+
+        self::$all_routers[$router] = $handler;
+    }
 
 	public function __construct($uri_path)
 	{
-	    $this->config = ConfigManager::config("router");
 		$this->uri_path = trim($uri_path,"/");
-
 		$this->route();
 	}
 	
@@ -58,7 +68,7 @@ class Router
 
     private function routerUriRewrite()
     {
-        $rewrite = $this->config['router.rewrite'];
+        $rewrite = self::$all_routers;
         if( !empty($rewrite) && is_array($rewrite) && !in_array($this->uri_path,["","/"]))
         {
             foreach ($rewrite as $pattern => $replacement )
@@ -97,7 +107,7 @@ class Router
         $rule = explode("/", $this->uri_path);
         $count = count($rule);
 
-        $controller_packpage = $this->config['router.default_controller_ns'].'\\controller';
+        $controller_packpage = ConfigManager::config('router.default_controller_ns').'\\controller';
 
         $index = 0;
         do
@@ -122,7 +132,7 @@ class Router
                     else
                     {
                         $_params_index = $index+1;
-                        $this->action = $this->config['router.default_controller_action'];
+                        $this->action = ConfigManager::config('router.default_controller_action');
                     }
 
                     if( $_params_index < $count)
@@ -132,7 +142,7 @@ class Router
                 }
                 else
                 {
-                    $this->action = $this->config['router.default_controller_action'];
+                    $this->action = ConfigManager::config('router.default_controller_action');
                 }
 
                 return true;
@@ -147,11 +157,11 @@ class Router
 
     private function routeDefaultController()
     {
-        $controller = $this->config['router.default_controller'];
+        $controller = ConfigManager::config('router.default_controller');
         if( class_exists($controller) )
         {
             $this->controller = $controller;
-            $this->action     = $this->config['router.default_controller_action'];
+            $this->action     = ConfigManager::config('router.default_controller_action');
             $this->merge_params( explode("/", $this->uri_path));
             return true;
         }

@@ -1,6 +1,7 @@
 <?php
+namespace base;
 //base url rewrite
-return [
-    '/favicon.ico' => \base\EmptyController::class,
-    '/welcome' => \base\WelcomePlatformController::class,
-];
+use zeus\mvc\Router;
+
+Router::addRouter('/favicon.ico',EmptyController::class);
+Router::addRouter('/welcome',WelcomePlatformController::class);

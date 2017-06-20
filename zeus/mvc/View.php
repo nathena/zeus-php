@@ -9,7 +9,6 @@ use zeus\sandbox\ConfigManager;
 class View implements \ArrayAccess
 {
     private static $hook = [];
-    private static $config;
 
     private $tpl_path;
     private $tpl_args = [];
@@ -36,10 +35,6 @@ class View implements \ArrayAccess
 
     public function __construct(Request $request, Response $response, $tpl_path)
     {
-        if (!isset(self::$config)) {
-            self::$config = ConfigManager::config("view");
-        }
-
         $this->request = $request;
         $this->response = $response;
 
@@ -111,6 +106,6 @@ class View implements \ArrayAccess
     //模板内部include
     protected function template($template)
     {
-        $this->tpl_path = realpath(self::$config['view.template_path'] . DS . self::$config['view.template_lang_dir'] . DS . $template . self::$config['view.template_extension']);
+        $this->tpl_path = realpath(ConfigManager::config('view.template_path') . DS . ConfigManager::config('view.template_lang_dir') . DS . $template . ConfigManager::config('view.template_extension'));
     }
 }

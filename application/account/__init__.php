@@ -1,18 +1,19 @@
 <?php
-return [
-    //添加个人信息
-    '/account/add' => \account\AccountController::class."@add",
-    //个人信息
-    '/account/info/(\d+)' => \account\AccountController::class,"@index#$1",
-    //更新账户
-    '/account/update/(\d+)' => \account\AccountController::class."@update#$1",
-    //列表
-    '/account' => \account\AccountController::class."@list",
-    '/account/query' => \account\AccountController::class."@query",
+namespace account;
 
-    //登录
-    '/login' => \account\AuthController::class."@login",
-    '/do_login' => \account\AuthController::class."@do_login",
-    //退出
-    '/logout' => \account\AuthController::class."@logout",
-];
+use zeus\mvc\Router;
+
+//添加个人信息
+Router::addRouter('/account/add',AccountController::class."@add");
+//个人信息
+Router::addRouter('/account/info/(\d+)',AccountController::class."@index#$1");
+//更新账户
+Router::addRouter('/account/update/(\d+)',AccountController::class."@update#$1");
+//列表
+Router::addRouter('/account',AccountController::class."@list");
+Router::addRouter('/account/query',AccountController::class."@query");
+//登录
+Router::addRouter('/login',AuthController::class."@login");
+Router::addRouter('/do_login',AuthController::class."@do_login");
+//退出
+Router::addRouter('/logout',AuthController::class."@logout");

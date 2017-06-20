@@ -109,16 +109,14 @@ class ApplicationContext
 
     public function start()
     {
-        //config init
-        ConfigManager::init();
         //register components
         $components = ConfigManager::config("app_ns");
         foreach ($components as $ns => $path) {
             if (is_dir($path)) {
                 $this->loader->registerNamespaces($ns, $path);
-                $url = $path . DS . "__init__.php";
-                if (is_file($url)) {
-                    ConfigManager::addRouter(include_once $url);
+                $init = $path . DS . "__init__.php";
+                if (is_file($init)) {
+                    include_once $init;
                 }
             }
         }
