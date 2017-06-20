@@ -4,10 +4,7 @@ $root = dirname(ZEUS_PATH);
 $application = $root.DS.'application';
 
 return [
-	'debug' => true,
 	'default_timezone' => 'Asia/Shanghai',
-	//REQUEST_URI、QUERY_STRING、PATH_INFO
-	'uri_protocol' => 'REQUEST_URI',
 
     //upload
     'upload_tmp_dir'=>'',
@@ -36,7 +33,6 @@ return [
     //router
     'router.default_controller' => 'base\\IndexPlatformController',
     'router.default_controller_action' => 'index',
-    'router.rewrite' => [],
 
     //view
     'view.template_path' => $root.DS.'views',
