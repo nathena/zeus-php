@@ -16,6 +16,16 @@ abstract class Controller
         $this->response = Application::getInstance()->getResponse();
     }
 
+    public function beforeAction()
+    {
+
+    }
+
+    public function afterAction()
+    {
+
+    }
+
     /**
      * @param $tpl_path
      * @return View
@@ -35,15 +45,7 @@ abstract class Controller
 
     public function errorHandler(\Exception $e)
     {
-        if ($this->request->isAjax()) {
-            $this->response->setBody($e->getMessage())->send("json");
-        } else {
-            $str = '<style>body {font-size:12px;}</style>';
-            $str .= '<h1>操作失败！</h1><br />';
-            $str .= '<strong>错误信息：<strong><font color="red">' . $e->getMessage() . '</font><br />';
-
-            $this->response->setBody($str)->send();
-        }
+        echo $e->getMessage(),':',$e->getTraceAsString();
     }
 
     protected function forward($url_path)

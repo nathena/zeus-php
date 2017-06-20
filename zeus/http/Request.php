@@ -87,9 +87,12 @@ class Request implements \ArrayAccess
         return '';
     }
 
-    public function getServer()
+    public function getServer($key)
     {
-        return $this->server;
+        if (isset($this->server[$key])) {
+            return $this->server[$key];
+        }
+        return '';
     }
 
     public function getCookie()
@@ -108,18 +111,18 @@ class Request implements \ArrayAccess
             return false;
         }
 
-        $value = $this->server('HTTP_X_REQUESTED_WITH');
+        $value = $this->getServer('HTTP_X_REQUESTED_WITH');
         return (!is_null($value) && strtolower($value) == 'xmlhttprequest') ? true : false;
     }
 
     public function getHost()
     {
-        return ApplicationContext::isCli() ? "localhost" : $this->server["HTTP_HOST"];
+        return ApplicationContext::isCli() ? "localhost" : $this->getServer("HTTP_HOST");
     }
 
     public function getMethod()
     {
-        return ApplicationContext::isCli() ? "" : $this->server['REQUEST_METHOD'];
+        return ApplicationContext::isCli() ? "" : $this->getServer('REQUEST_METHOD');
     }
 
     /**
@@ -129,7 +132,7 @@ class Request implements \ArrayAccess
      */
     public function isGet()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'GET');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'GET');
     }
 
     /**
@@ -139,7 +142,7 @@ class Request implements \ArrayAccess
      */
     public function isHead()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'HEAD');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'HEAD');
     }
 
     /**
@@ -149,7 +152,7 @@ class Request implements \ArrayAccess
      */
     public function isPost()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'POST');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'POST');
     }
 
     /**
@@ -159,7 +162,7 @@ class Request implements \ArrayAccess
      */
     public function isPut()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'PUT');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'PUT');
     }
 
     /**
@@ -169,7 +172,7 @@ class Request implements \ArrayAccess
      */
     public function isDelete()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'DELETE');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'DELETE');
     }
 
     /**
@@ -179,7 +182,7 @@ class Request implements \ArrayAccess
      */
     public function isTrace()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'TRACE');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'TRACE');
     }
 
     /**
@@ -189,7 +192,7 @@ class Request implements \ArrayAccess
      */
     public function isOptions()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'OPTIONS');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'OPTIONS');
     }
 
     /**
@@ -199,7 +202,7 @@ class Request implements \ArrayAccess
      */
     public function isConnect()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'CONNECT');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'CONNECT');
     }
 
     /**
@@ -209,7 +212,7 @@ class Request implements \ArrayAccess
      */
     public function isPatch()
     {
-        return ApplicationContext::isCli() ? false : ($this->server['REQUEST_METHOD'] == 'PATCH');
+        return ApplicationContext::isCli() ? false : ($this->getServer('REQUEST_METHOD') == 'PATCH');
     }
 
     protected function parseData()

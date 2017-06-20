@@ -47,7 +47,9 @@ class Application
                     return;
                 }
             }
+            call_user_func_array(array($controller, "beforeAction"),[$router->getAction()]);
             call_user_func_array(array($controller, $router->getAction()), $router->getParams());
+            call_user_func_array(array($controller, "afterAction"),[$router->getAction()]);
         } catch (\Exception $e) {
             //ob_clean();
             if (is_null($controller) || !($controller instanceof Controller)) {
