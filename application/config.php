@@ -28,6 +28,8 @@ return [
         'sms'=> $application.DS."sms",
         'report'=> $application.DS."report",
         'customer'=> $application.DS."customer",
+        'il8n'=> $application.DS."il8n",
+        'util'=> $application.DS."util",
     ],
 
     //router
