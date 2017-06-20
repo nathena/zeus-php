@@ -12,15 +12,13 @@ use zeus\mvc\Controller;
 
 class BaseAppController extends Controller
 {
-    public function __construct()
+    public function beforeAction()
     {
-        parent::__construct();
+        parent::beforeAction();
 
-        if( $this->request->getMethod() == 'POST' )
+        if( $this->request->getMethod() == 'POST' && !$this->check_csrf_token())
         {
-            if(!$this->check_csrf_token()){
-                throw new \RuntimeException("非法的提交请求");
-            }
+            throw new \RuntimeException("非法的提交请求");
         }
     }
 
