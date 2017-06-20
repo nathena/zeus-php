@@ -7,9 +7,9 @@
 
 namespace booking;
 
-use zeus\domain\AbstractEntity;
+use zeus\domain\AggregateRoot;
 
-class OrderVehicle extends AbstractEntity
+class OrderVehicle extends AggregateRoot
 {
     protected $schema = "t_order_vehicle";
 
@@ -19,6 +19,6 @@ class OrderVehicle extends AbstractEntity
     {
         parent::__construct($data);
 
-        $this->store_engine = OrderRepository::getInstance();
+        $this->store_engine = OrderVehicleRepository::getInstance();
     }
 }

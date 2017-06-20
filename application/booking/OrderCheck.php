@@ -8,9 +8,9 @@
 namespace booking;
 
 
-use zeus\domain\AbstractEntity;
+use zeus\domain\AggregateRoot;
 
-class OrderCheck extends AbstractEntity
+class OrderCheck extends AggregateRoot
 {
     protected $schema = "t_order_check";
 
@@ -20,7 +20,7 @@ class OrderCheck extends AbstractEntity
     {
         parent::__construct($data);
 
-        $this->store_engine = OrderRepository::getInstance();
+        $this->store_engine = OrderCheckRepository::getInstance();
     }
 
 
