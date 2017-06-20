@@ -38,6 +38,8 @@ class Account extends AggregateRoot
             return 0;
         }
 
+        unset($data['passwd']);
+
         $this->setData($data);
 
         $rowCount = $this->store_engine->save($this);
@@ -46,5 +48,13 @@ class Account extends AggregateRoot
         return $rowCount;
     }
 
+    public function update_passwd($old_passwd,$new_passwd)
+    {
 
+    }
+
+    public function real_update_passwd($new_passwd)
+    {
+
+    }
 }
