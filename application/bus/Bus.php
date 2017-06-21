@@ -14,5 +14,8 @@ class Bus extends AggregateRoot
 {
     protected $schema = "t_bus";
 
-
+    public function __construct($data = null)
+    {
+        parent::__construct($data);
+    }
 }

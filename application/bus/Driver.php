@@ -14,5 +14,8 @@ class Driver extends AggregateRoot
 {
     protected $schema = "t_driver";
 
-
+    public function __construct($data = null)
+    {
+        parent::__construct($data);
+    }
 }

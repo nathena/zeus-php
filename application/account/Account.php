@@ -14,13 +14,9 @@ class Account extends AggregateRoot
 {
     protected $schema = "t_account";
 
-    private $store_engine;
-
     public function __construct($data = null)
     {
         parent::__construct($data);
-
-        $this->store_engine = AccountRepository::getInstance();
     }
 
     //验证密码是否正确
@@ -39,10 +35,11 @@ class Account extends AggregateRoot
         }
 
         unset($data['passwd']);
-
         $this->setData($data);
 
-        $rowCount = $this->store_engine->save($this);
+        $repo = AccountRepository::getInstance();
+        $rowCount = $repo->save($this);
+
         $this->update_properties();
 
         return $rowCount;

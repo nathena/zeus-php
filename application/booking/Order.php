@@ -14,12 +14,8 @@ class Order extends AggregateRoot
 {
     protected $schema = "t_order";
 
-    private $store_engine;
-
     public function __construct($data = null)
     {
         parent::__construct($data);
-
-        $this->store_engine = OrderRepository::getInstance();
     }
 }

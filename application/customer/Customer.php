@@ -14,12 +14,8 @@ class Customer extends AggregateRoot
 {
     protected $schema = "t_customer";
 
-    private $stored_engine;
-
     public function __construct($data = null)
     {
         parent::__construct($data);
-
-
     }
 }
