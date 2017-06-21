@@ -80,7 +80,7 @@ abstract class AggregateRoot extends AbstractEntity
      * @param AbstractSpecification $specification
      * @return array|null|static
      */
-    protected static function load(AbstractSpecification $specification)
+    public static function load(AbstractSpecification $specification)
     {
         $entity = new static();
         $data = $entity->openSession()->execute($specification);
@@ -114,7 +114,7 @@ abstract class AggregateRoot extends AbstractEntity
      * @see InsertBatchSpecification
      * @param AbstractSpecification $specification
      */
-    protected static function batchCommand(AbstractSpecification $specification)
+    public static function batchCommand(AbstractSpecification $specification)
     {
         $entity = new static();
         if (DmlType::DML_BATCH == $specification->getDml()) {
