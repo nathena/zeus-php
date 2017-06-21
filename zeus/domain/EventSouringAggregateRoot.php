@@ -29,7 +29,7 @@ abstract class EventSouringAggregateRoot extends AbstractEntity
 
     protected function raise(AbstractEvent $event)
     {
-        $this->domainEvents[] = new EventMessage($event);
+        $this->domainEvents[] = $event;
         $this->handle($event);
     }
 
