@@ -35,19 +35,6 @@ class AccountRepository extends GeneralDbRepository
         return DbManager::openSession();
     }
 
-    /**
-     * create account factory
-     * @param $data
-     * @return Account
-     */
-    public function createAccount($data){
-
-        $account = new Account($data);
-        $this->save($account);
-
-        return $account;
-    }
-
     public function load(AbstractSpecification $specification)
     {
         $result = [];

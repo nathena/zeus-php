@@ -19,42 +19,47 @@ use zeus\database\specification\UpdateSpecification;
 
 abstract class GeneralDbRepository
 {
-    public function save(AbstractEntity $entity)
+    public function add(AbstractEntity $entity)
     {
         if (null == $entity) {
-            throw new IllegalArgumentException("DbRepository save not found entity");
-        }
-
-        $id = $entity->getId();
-        $schema = $entity->getSchema();
-
-        $pdo = $this->openSession();
-        if (!empty($id)) {
-            //update
-            $fields = $entity->getData();
-            $sepc = new UpdateSpecification($schema, $fields);
-            $sepc->where($entity->getIdFiled(), $id);
-            //cas并发
-            $old_fields = $entity->getProperties();
-            foreach ($old_fields as $key => $val) {
-                $sepc->where($key, $val);
-            }
-
-            return $pdo->execute($sepc);
+            throw new IllegalArgumentException(get_class($this)." is empty ,cannot to be added");
         }
 
         $fields = $entity->getProperties();
         $sepc = new InsertSpecification($this->entity_schema, $fields);
-        $id = $pdo->execute($sepc);
+        $id = $this->openSession()->execute($sepc);
         $entity->setId($id);
 
         return $id;
     }
 
-    public function remove(AbstractEntity $entity)
+    public function update(AbstractEntity $entity)
+    {
+        if (null == $entity) {
+            throw new IllegalArgumentException("update entity had was not found");
+        }
+
+        $id = $entity->getId();
+        if(empty($id)){
+            throw new IllegalArgumentException("update entity not found the id key");
+        }
+
+        //update
+        $sepc = new UpdateSpecification($entity->getSchema(), $entity->getData());
+        $sepc->where($entity->getIdFiled(), $id);
+        //cas并发
+        $old_fields = $entity->getProperties();
+        foreach ($old_fields as $key => $val) {
+            $sepc->where($key, $val);
+        }
+
+        return $this->openSession()->execute($sepc);
+    }
+
+    public function delete(AbstractEntity $entity)
     {
         if (null == $entity || empty($entity->getId())) {
-            throw new IllegalArgumentException("DbRepository remove not found entity");
+            throw new IllegalArgumentException("remove entity had was not found or not found id key");
         }
 
         $sepc = new DeleteSpecification($entity->getSchema());
@@ -83,14 +88,14 @@ abstract class GeneralDbRepository
      * @see InsertBatchSpecification
      * @param AbstractSpecification $specification
      */
-    public function updateBatch(AbstractSpecification $specification)
+    public function batch(AbstractSpecification $specification)
     {
         if (null == $specification) {
-            throw new IllegalArgumentException("DbRepository updateBatch : specification");
+            throw new IllegalArgumentException("batch unknow specification");
         }
 
         if (DmlType::DML_BATCH != $specification->getDml()) {
-            throw new IllegalArgumentException("DbRepository updateBatch : {$specification->getDml()} not support");
+            throw new IllegalArgumentException("specification dml : {$specification->getDml()} not support");
         }
 
         $this->openSession()->execute($specification);
