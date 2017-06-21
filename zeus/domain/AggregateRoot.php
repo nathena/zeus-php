@@ -61,6 +61,26 @@ abstract class AggregateRoot extends AbstractEntity
         return $this->openSession()->execute($sepc);
     }
 
+    /**
+     *
+     * UpdateBatch extends AbstractSpecification {
+     *      //TDOO;; setSql,setParams,dml
+     * }
+     *
+     * RemoveBach the same as UpdateBatch
+     *
+     * @see InsertBatchSpecification
+     * @param AbstractSpecification $specification
+     * @return array|int|mixed|string
+     */
+    public function batchCommand(AbstractSpecification $specification)
+    {
+        if (DmlType::DML_BATCH == $specification->getDml()) {
+            return $this->openSession()->execute($specification);
+        }
+        return 0;
+    }
+
     public static function get($id)
     {
         $entity = new static();
@@ -101,24 +121,5 @@ abstract class AggregateRoot extends AbstractEntity
             $result[] = $entity;
         }
         return $result;
-    }
-
-    /**
-     *
-     * UpdateBatch extends AbstractSpecification {
-     *      //TDOO;; setSql,setParams,dml
-     * }
-     *
-     * RemoveBach the same as UpdateBatch
-     *
-     * @see InsertBatchSpecification
-     * @param AbstractSpecification $specification
-     */
-    public static function batchCommand(AbstractSpecification $specification)
-    {
-        $entity = new static();
-        if (DmlType::DML_BATCH == $specification->getDml()) {
-            $entity->openSession()->execute($specification);
-        }
     }
 }
