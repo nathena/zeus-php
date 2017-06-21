@@ -15,6 +15,7 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
 {
     protected $data = [];
     protected $update_data = [];//更新未来提交的数据
+
     protected $idFiled = 'id';//uuid key
     protected $schema = "test";
 
@@ -104,7 +105,15 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
 
     public function __unset($name)
     {
-        unset($this->data[$name]);
+        //unset($this->data[$name]);
+    }
+
+    public function __clone()
+    {
+        $entity = new static();
+        $entity->setProperties($this->getProperties());
+
+        return $entity;
     }
 
     public function offsetExists($offset)

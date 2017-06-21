@@ -1,8 +1,17 @@
 <?php
 namespace test_bus;
 
-use zeus\sandbox\ApplicationContext;
+class a
+{
+    public static function test()
+    {
+        print_r(get_class(new self()));
+    }
+}
 
-include_once "bootstrap.php";
+class  b extends a
+{
 
-ApplicationContext::currentContext()->getEventBus()->subscribe("","");
+}
+
+b::test();

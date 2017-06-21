@@ -14,6 +14,18 @@ class Account extends AggregateRoot
 {
     protected $schema = "t_account";
 
+    /**
+     * @param $name
+     * @return null|static
+     */
+    public static function getByUserName($name)
+    {
+        $spec = new QueryRowSpecification();
+        $spec->from("t_account")->where("user_name", trim($name));
+
+        return parent::load($spec);
+    }
+
     public function __construct($data = null)
     {
         parent::__construct($data);
@@ -22,7 +34,7 @@ class Account extends AggregateRoot
     //验证密码是否正确
     public function check_passwd($passwd)
     {
-        $_passwd = md5($passwd.$this->data['user_name']);
+        $_passwd = md5($passwd . $this->data['user_name']);
 
         return $_passwd === $passwd;
     }
@@ -30,7 +42,7 @@ class Account extends AggregateRoot
     //更新数据
     public function update_info(array $data)
     {
-        if(empty($data)){
+        if (empty($data)) {
             return 0;
         }
 
@@ -45,7 +57,7 @@ class Account extends AggregateRoot
         return $rowCount;
     }
 
-    public function update_passwd($old_passwd,$new_passwd)
+    public function update_passwd($old_passwd, $new_passwd)
     {
 
     }

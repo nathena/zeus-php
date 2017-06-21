@@ -9,7 +9,6 @@ namespace account;
 
 
 use base\BaseAppController;
-use zeus\database\specification\QueryRowSpecification;
 use zeus\http\Response;
 
 class AuthController extends BaseAppController
@@ -44,11 +43,11 @@ class AuthController extends BaseAppController
             throw new \RuntimeException("登录账户密码不能为空");
         }
 
-        $rep = AccountRepository::getInstance();
-        $account = $rep->getByUserName($account);
+        $account = Account::getByUserName($account);
         if(empty($account)){
             throw new \RuntimeException("登录账户不存在");
         }
+
         if(!$account->check_passwd($passwd))
         {
             throw new \RuntimeException("登录账户密码不存在");

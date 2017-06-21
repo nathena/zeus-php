@@ -2,6 +2,7 @@
 /**
  * EventSouring。
  */
+
 namespace zeus\domain;
 
 
@@ -9,34 +10,27 @@ use zeus\base\event\AbstractEvent;
 use zeus\base\event\EventMessage;
 use zeus\sandbox\ApplicationContext;
 
-abstract class EventSouringAggregateRoot extends AggregateRoot
+abstract class EventSouringAggregateRoot extends AbstractEntity
 {
-	private $domainEvents = [];
+    private $domainEvents = [];
 
-	public function __construct($data=null)
+    public function __construct($data = null)
     {
         parent::__construct($data);
     }
 
-    public function getEvents()
+    public function commit()
     {
-        $domainEvents       = $this->domainEvents;
-        $this->domainEvents = [];
-
-        return $domainEvents;
-    }
-
-    public function commit(){
         $events = $this->getEvents();
-        foreach ($events as $event){
-            ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this,$event));
+        foreach ($events as $event) {
+            ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this, $event));
         }
     }
 
-    protected function raise(AbstractEvent $domainEvent)
+    protected function raise(AbstractEvent $event)
     {
-        $this->domainEvents[] = $domainEvent;
-        $this->handle($domainEvent);
+        $this->domainEvents[] = new EventMessage($event);
+        $this->handle($event);
     }
 
     protected function handle(AbstractEvent $domainEvent)
@@ -44,4 +38,11 @@ abstract class EventSouringAggregateRoot extends AggregateRoot
 
     }
 
+    protected function getEvents()
+    {
+        $domainEvents = $this->domainEvents;
+        $this->domainEvents = [];
+
+        return $domainEvents;
+    }
 }
