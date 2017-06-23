@@ -101,21 +101,50 @@ abstract class AggregateRoot extends AbstractEntity
      * @param AbstractSpecification $specification
      * @return array|null|static
      */
-    public static function load(AbstractSpecification $specification)
+    public static function fetch(AbstractSpecification $specification)
     {
         $entity = new static();
         $data = $entity->openSession()->execute($specification);
 
-        if (empty($data)) {
-            return null;
-        }
-
-        if (DmlType::DML_SELECT_ONE == $specification->getDml()) {
+        if (!empty($data) && DmlType::DML_SELECT_ONE == $specification->getDml()) {
             $entity->setProperties($data);
             return $entity;
         }
 
-        if(DmlType::DML_PAGINATION == $specification->getDml()){
+        return null;
+    }
+
+    /**
+     * @param AbstractSpecification $specification
+     * @return array|null|static
+     */
+    public static function fetchAll(AbstractSpecification $specification)
+    {
+        $entity = new static();
+        $data = $entity->openSession()->execute($specification);
+
+        if (!empty($data)) {
+            $result = [];
+            foreach ($data as $item) {
+                $entity = new static();
+                $entity->setProperties($item);
+                $result[] = $entity;
+            }
+            return $result;
+        }
+        return null;
+    }
+
+    /**
+     * @param AbstractSpecification $specification
+     * @return array|null|static
+     */
+    public static function paging(AbstractSpecification $specification)
+    {
+        $entity = new static();
+        $data = $entity->openSession()->execute($specification);
+
+        if(!empty($data) && DmlType::DML_PAGINATION == $specification->getDml()){
             $result = [];
             list($total,$data) = each($data);
             foreach ($data as $item) {
@@ -127,12 +156,6 @@ abstract class AggregateRoot extends AbstractEntity
             return [$total,$result];
         }
 
-        $result = [];
-        foreach ($data as $item) {
-            $entity = new static();
-            $entity->setProperties($item);
-            $result[] = $entity;
-        }
-        return $result;
+        return null;
     }
 }
