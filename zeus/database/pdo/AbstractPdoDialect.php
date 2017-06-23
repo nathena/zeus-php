@@ -100,11 +100,11 @@ abstract class AbstractPdoDialect
             return $this->_execute_batch($prepare, $params);
         }
 
-        if (DmlType::DML_PAGINATION == $dml) {
+        if (DmlType::DML_PAGINATION == $dml && is_array($prepare)) {
             //分页
             $result = $this->_execute($prepare[0], $params, DmlType::DML_SELECT_ONE);
             $total = $result[0];
-            $list = $this->_execute($prepare[0], $params, DmlType::DML_SELECT_LIST);
+            $list = $this->_execute($prepare[1], $params, DmlType::DML_SELECT_LIST);
 
             return [$total, $list];
         }

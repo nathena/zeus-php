@@ -75,7 +75,7 @@ abstract class AggregateRoot extends AbstractEntity
      * @param AbstractSpecification $specification
      * @return array|int|mixed|string
      */
-    public function batchCommand(AbstractSpecification $specification)
+    public function executeCommand(AbstractSpecification $specification)
     {
         if (DmlType::DML_BATCH == $specification->getDml()) {
             return $this->openSession()->execute($specification);
@@ -158,5 +158,15 @@ abstract class AggregateRoot extends AbstractEntity
         }
 
         return null;
+    }
+
+    /**
+     * @param AbstractSpecification $specification
+     * @return mixed
+     */
+    public static function command(AbstractSpecification $specification)
+    {
+        $entity = new static();
+        return $entity->openSession()->execute($specification);
     }
 }
