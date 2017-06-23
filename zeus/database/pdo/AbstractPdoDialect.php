@@ -98,9 +98,18 @@ abstract class AbstractPdoDialect
 
         if (DmlType::DML_BATCH == $dml) {
             return $this->_execute_batch($prepare, $params);
-        } else {
-            return $this->_execute($prepare, $params, $dml);
         }
+
+        if (DmlType::DML_PAGINATION == $dml) {
+            //分页
+            $result = $this->_execute($prepare[0], $params, DmlType::DML_SELECT_ONE);
+            $total = $result[0];
+            $list = $this->_execute($prepare[0], $params, DmlType::DML_SELECT_LIST);
+
+            return [$total, $list];
+        }
+
+        return $this->_execute($prepare, $params, $dml);
     }
 
     protected function _execute($prepare, $params, $dml)

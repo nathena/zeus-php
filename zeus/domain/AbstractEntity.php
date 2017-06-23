@@ -17,11 +17,12 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
     protected $update_data = [];//更新未来提交的数据
 
     protected $idFiled = 'id';//uuid key
+    protected $version = 'update_time';//版本号
     protected $schema = "test";
 
-    public function __construct($properties=null)
+    public function __construct($properties = null)
     {
-        if(!empty($properties) && is_array($properties)){
+        if (!empty($properties) && is_array($properties)) {
             $this->setProperties($properties);
         }
     }
@@ -31,10 +32,21 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
         return $this->schema;
     }
 
+    public function getVersionName()
+    {
+        return $this->version;
+    }
+
+    public function getVersion()
+    {
+        return $this->data[$this->version];
+    }
+
     public function getIdFiled()
     {
         return $this->idFiled;
     }
+
     public function getId()
     {
         return $this->data[$this->idFiled];
@@ -52,8 +64,8 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
 
     public function update_properties()
     {
-        if(!empty($this->update_data)){
-            $this->data = array_merge($this->data,$this->update_data);
+        if (!empty($this->update_data)) {
+            $this->data = array_merge($this->data, $this->update_data);
             $this->update_data = [];
         }
 
@@ -72,10 +84,8 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
      */
     public function setData($data)
     {
-        if(!empty($data) && is_array($data))
-        {
-            foreach($data as $key => $val)
-            {
+        if (!empty($data) && is_array($data)) {
+            foreach ($data as $key => $val) {
                 $this->{$key} = $val;
             }
         }
@@ -138,11 +148,18 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
 
     public function setProperties($data)
     {
-        if(!empty($data) && is_array($data)){
-            $this->data = array_merge($this->data,$data);
+        if (!empty($data) && is_array($data)) {
+            $this->data = array_merge($this->data, $data);
+        }
+        if (!isset($this->data[$this->version])) {
+            $this->data[$this->version] = time();
+        }
+        if (!isset($this->data["create_time"])) {
+            $this->data["create_time"] = time();
         }
     }
-    public function setProperty($key,$val)
+
+    public function setProperty($key, $val)
     {
         $this->data[$key] = $val;
     }

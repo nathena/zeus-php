@@ -21,9 +21,13 @@ class QuerySpecification extends AbstractWhereSpecification
     private $limit_data;
     private $offset_data;
 
-    public function __construct()
+    private $_from_sql;
+
+    public function __construct($table)
     {
         parent::__construct();
+
+        $this->from($table);
         $this->dml = DmlType::DML_SELECT_LIST;
     }
 
@@ -33,31 +37,9 @@ class QuerySpecification extends AbstractWhereSpecification
             $sql = [];
             $sql[] = "select ";
             $sql[] = empty($this->select_data) ? "* ": implode(",", $this->select_data);
-            $sql[] = "from " . $this->table;
-            if (!empty($this->join_data)) {
-                $sql[] = implode(" ", $this->join_data);
-            }
-            $sql[] = $this->getWhereFragment();
-            if (!empty($this->group_by_data)) {
-                $sql[] = "group by " . implode(",", $this->group_by_data);
-            }
-            if (!empty($this->having_data)) {
-                $having = [];
-                $having_data = $this->having_data;
-                foreach ($having_data as $index => $data) {
-                    list($key, $val) = each($data);
-                    if (0 == $index) {
-                        $having[] = $val;
-                    } else {
-                        $having[] = $key . " " . $val;
-                    }
-                }
-                if (!empty($having)) {
-                    $sql[] = " having " . implode(",", $having);
-                }
-            }
+            $sql[] = $this->_sql();
             if (!empty($this->order_by_data)) {
-                $sql[] = " having " . implode(",", $this->order_by_data);
+                $sql[] = " order by  " . implode(",", $this->order_by_data);
             }
 
             if ($this->offset_data > 0) {
@@ -185,6 +167,39 @@ class QuerySpecification extends AbstractWhereSpecification
             $this->offset_data = $offset;
         }
         return $this;
+    }
+
+    protected function _sql()
+    {
+        if(empty($this->_from_sql)){
+            $sql = [];
+            $sql[] = " from " . $this->table;
+            if (!empty($this->join_data)) {
+                $sql[] = implode(" ", $this->join_data);
+            }
+            $sql[] = $this->getWhereFragment();
+            if (!empty($this->group_by_data)) {
+                $sql[] = "group by " . implode(",", $this->group_by_data);
+            }
+            if (!empty($this->having_data)) {
+                $having = [];
+                $having_data = $this->having_data;
+                foreach ($having_data as $index => $data) {
+                    list($key, $val) = each($data);
+                    if (0 == $index) {
+                        $having[] = $val;
+                    } else {
+                        $having[] = $key . " " . $val;
+                    }
+                }
+                if (!empty($having)) {
+                    $sql[] = " having " . implode(",", $having);
+                }
+            }
+
+            $this->_from_sql = implode(" ", $sql);
+        }
+        return $this->_from_sql;
     }
 
     protected function _create_alias_from_item($item)

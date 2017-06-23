@@ -1,7 +1,9 @@
 <?php
+
 namespace zeus\domain;
 
 use zeus\database\DbManager;
+use zeus\database\DmlType;
 use zeus\database\pdo\Pdo;
 use zeus\database\specification\AbstractSpecification;
 use zeus\database\specification\DeleteSpecification;
@@ -12,7 +14,7 @@ use zeus\database\specification\UpdateSpecification;
 
 abstract class AggregateRoot extends AbstractEntity
 {
-    public function __construct($data=null)
+    public function __construct($data = null)
     {
         parent::__construct($data);
     }
@@ -37,18 +39,17 @@ abstract class AggregateRoot extends AbstractEntity
     public function update()
     {
         $id = $this->getId();
-        if(empty($id)){
+        if (empty($id)) {
             throw new IllegalArgumentException("update entity not found the id key");
         }
 
         //update
+        $data = $this->getData();
+        $data[$this->getVersionName()] = $this->getVersion();
         $sepc = new UpdateSpecification($this->schema, $this->getData());
         $sepc->where($this->getIdFiled(), $id);
         //cas并发
-        $old_fields = $this->getProperties();
-        foreach ($old_fields as $key => $val) {
-            $sepc->where($key, $val);
-        }
+        $sepc->where($this->getVersionName(), $this->getVersion());
 
         return $this->openSession()->execute($sepc);
     }
@@ -86,10 +87,10 @@ abstract class AggregateRoot extends AbstractEntity
         $entity = new static();
         $spec = new QueryRowSpecification();
         $spec->from($entity->getSchema());
-        $spec->where($entity->getIdFiled(),$id);
+        $spec->where($entity->getIdFiled(), $id);
 
         $data = $entity->openSession()->execute($spec);
-        if(!empty($data)){
+        if (!empty($data)) {
             $entity->setProperties($data);
             return $entity;
         }
@@ -105,13 +106,25 @@ abstract class AggregateRoot extends AbstractEntity
         $entity = new static();
         $data = $entity->openSession()->execute($specification);
 
-        if(empty($data)){
+        if (empty($data)) {
             return null;
         }
 
-        if (DmlType::DML_SELECT_ONE) {
+        if (DmlType::DML_SELECT_ONE == $specification->getDml()) {
             $entity->setProperties($data);
             return $entity;
+        }
+
+        if(DmlType::DML_PAGINATION == $specification->getDml()){
+            $result = [];
+            list($total,$data) = each($data);
+            foreach ($data as $item) {
+                $entity = new static();
+                $entity->setProperties($item);
+                $result[] = $entity;
+            }
+
+            return [$total,$result];
         }
 
         $result = [];

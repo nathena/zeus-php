@@ -45,18 +45,22 @@ abstract class AbstractSpecification
 
     public function log()
     {
-        $sql_s = [];
         $sql = $this->getSql();
+        if (!is_array($sql)) {
+            $sql = [$sql];
+        }
         $param = $this->getParams();
 
-        if (DmlType::DML_BATCH == $this->dml) {
-            foreach ($param as $item) {
-                $sql_s[] = $this->_real_sql($sql, $item);
+        $sql_s = [];
+        foreach ($sql as $_sql) {
+            if (DmlType::DML_BATCH == $this->dml) {
+                foreach ($param as $item) {
+                    $sql_s[] = $this->_real_sql($_sql, $item);
+                }
+            } else {
+                $sql_s[] = $this->_real_sql($_sql, $param);
             }
-        } else {
-            $sql_s[] = $this->_real_sql($sql, $param);
         }
-
         echo "\r\n" . implode(",", $sql_s) . "\r\n";
     }
 

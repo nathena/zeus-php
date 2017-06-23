@@ -16,4 +16,5 @@ class DmlType
     const DML_UPDATE        = "UPDATE";
     const DML_DELETE        = "DELETE";
     const DML_BATCH         = "UPDATE_BATCH";
+    const DML_PAGINATION    = "PAGING";
 }

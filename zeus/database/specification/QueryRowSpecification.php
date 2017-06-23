@@ -12,10 +12,11 @@ use zeus\database\DmlType;
  */
 class QueryRowSpecification extends QuerySpecification
 {
-    public function __construct()
+    public function __construct($table)
     {
         parent::__construct();
-
+        
+        $this->from($table);
         $this->dml = DmlType::DML_SELECT_ONE;
     }
 }
