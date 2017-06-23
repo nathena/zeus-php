@@ -9,6 +9,7 @@ use zeus\database\specification\AbstractSpecification;
 use zeus\database\specification\DeleteSpecification;
 use zeus\database\specification\InsertBatchSpecification;
 use zeus\database\specification\InsertSpecification;
+use zeus\database\specification\PaginationSpecification;
 use zeus\database\specification\QueryRowSpecification;
 use zeus\database\specification\UpdateSpecification;
 
@@ -116,7 +117,7 @@ abstract class AggregateRoot extends AbstractEntity
 
     /**
      * @param AbstractSpecification $specification
-     * @return array|null|static
+     * @return array|null
      */
     public static function fetchAll(AbstractSpecification $specification)
     {
@@ -136,24 +137,24 @@ abstract class AggregateRoot extends AbstractEntity
     }
 
     /**
-     * @param AbstractSpecification $specification
-     * @return array|null|static
+     * @param PaginationSpecification $specification
+     * @return array|null
      */
-    public static function paging(AbstractSpecification $specification)
+    public static function paging(PaginationSpecification $specification)
     {
         $entity = new static();
         $data = $entity->openSession()->execute($specification);
 
-        if(!empty($data) && DmlType::DML_PAGINATION == $specification->getDml()){
+        if (!empty($data) && DmlType::DML_PAGINATION == $specification->getDml()) {
             $result = [];
-            list($total,$data) = each($data);
+            list($total, $data) = each($data);
             foreach ($data as $item) {
                 $entity = new static();
                 $entity->setProperties($item);
                 $result[] = $entity;
             }
 
-            return [$total,$result];
+            return [$total, $result];
         }
 
         return null;
