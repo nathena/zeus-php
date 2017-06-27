@@ -25,6 +25,11 @@ class Router
         self::$all_routers[$router] = $handler;
     }
 
+    public static function getAllRouter()
+    {
+        return self::$all_routers;
+    }
+
 	public function __construct($uri_path)
 	{
 		$this->uri_path = trim($uri_path,"/");

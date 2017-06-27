@@ -61,7 +61,7 @@ class Autoloader
 		{
 			return true;
 		}
-		
+
 		$classFile = $this->findClassFileByClassMap($class);
 		//echo '1=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
@@ -70,10 +70,7 @@ class Autoloader
 			return true;
 		}
 		
-		$sep = (strpos($class, '\\') !== false) ? '\\' : '_';
-		$classNameFragment = explode($sep, $class);
-		
-		$classFile = $this->findClassByNamespace($classNameFragment);
+		$classFile = $this->findClassByNamespace($class);
 		//echo '2=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
 		{
@@ -81,7 +78,7 @@ class Autoloader
 			return true;
 		}
 		
-		$classFile = $this->findClassByIncludeDir($classNameFragment);
+		$classFile = $this->findClassByIncludeDir($class);
 		//echo '3=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
 		{
@@ -107,15 +104,18 @@ class Autoloader
 		return '';
 	}
 		
-	protected function findClassByNamespace($classNameFragment)
+	protected function findClassByNamespace($class)
 	{
-		$namespace_prefix = $classNameFragment[0];
+        $class = trim($class,'\\');
 		foreach( $this->prefixes as $ns => $dir )
 		{
-			if( $ns == $namespace_prefix )
+			if( ($index = strpos($class,$ns))!==false )
 			{
-				$_classNameFragment = array_slice($classNameFragment,1);
-				$_classFile = $dir.DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $_classNameFragment).'.php';
+                $class = str_replace($ns,'',$class);
+                $class = trim($class,'\\');
+                $class = str_replace('\\',DIRECTORY_SEPARATOR,$class);
+
+				$_classFile = $dir.DIRECTORY_SEPARATOR.$class.'.php';
 				//register namespace
 				if( file_exists($_classFile) )
 				{
@@ -126,11 +126,13 @@ class Autoloader
 		return '';
 	}
 	
-	protected function findClassByIncludeDir($classNameFragment)
+	protected function findClassByIncludeDir($class)
 	{
+        $class = trim($class,'\\');
+        $class = str_replace('\\',DIRECTORY_SEPARATOR,$class);
 		foreach( $this->_includeDir as $dir)
 		{
-			$_classFile = $dir.DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $classNameFragment).'.php';
+			$_classFile = $dir.DIRECTORY_SEPARATOR.$class.'.php';
 			if( file_exists($_classFile) )
 			{
 				return $_classFile;
