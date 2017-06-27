@@ -24,6 +24,12 @@ class ConfigManager implements \ArrayAccess
         return $cfg[$key];
     }
 
+    public function setConfig(array $config)
+    {
+        if(!empty($config)){
+            $this->config = array_merge($this->config,$config);
+        }
+    }
 
     public function __get($key)
     {
@@ -71,17 +77,6 @@ class ConfigManager implements \ArrayAccess
     private function __construct()
     {
         $config = include_once ZEUS_PATH . DS . "config.php";
-        if(!empty($config)){
-            $config = [];
-        }
-        if (defined("APP_ENV_PATH")) {
-            if (is_file(APP_ENV_PATH)) {
-                $app_config = include_once APP_ENV_PATH;
-                if(!empty($app_config)){
-                    $config = array_merge($config, $app_config);
-                }
-            }
-        }
-        $this->config = array_merge($this->config,$config);
+        $this->config = $config;
     }
 }

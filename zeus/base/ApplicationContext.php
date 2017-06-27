@@ -109,6 +109,15 @@ class ApplicationContext
 
     public function start()
     {
+        if (defined("APP_ENV_PATH")) {
+            if (is_file(APP_ENV_PATH)) {
+                $app_config = include_once APP_ENV_PATH;
+                if(!empty($app_config)){
+                    ConfigManager::getInstance()->setConfig($app_config);
+                }
+            }
+        }
+
         //register components
         $components = ConfigManager::config("app_ns");
         foreach ($components as $ns => $path) {
