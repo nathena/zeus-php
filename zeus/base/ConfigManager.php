@@ -76,7 +76,6 @@ class ConfigManager implements \ArrayAccess
 
     private function __construct()
     {
-        $config = include_once ZEUS_PATH . DS . "config.php";
-        $this->config = $config;
+        $this->config = include_once ZEUS_PATH . DS . "config.php";
     }
 }
