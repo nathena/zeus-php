@@ -14,8 +14,6 @@ use base\IndexPlatformController;
 use base\WelcomePlatformController;
 use zeus\mvc\Application;
 use zeus\mvc\Router;
-use zeus\sandbox\ApplicationContext;
-use zeus\base\ModelOption;
 use zeus\sandbox\Autoloader;
 
 define("__APPLICATION__",dirname(__FILE__));
