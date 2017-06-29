@@ -14,5 +14,6 @@ class EmptyController extends BaseAppController
 {
     public function index(){
         Logger::debug($_SERVER['REQUEST_URI']);
+        echo 111;
     }
 }

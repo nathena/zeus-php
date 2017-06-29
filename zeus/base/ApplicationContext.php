@@ -15,7 +15,6 @@ use zeus\base\logger\Logger;
 class ApplicationContext
 {
     private static $context;
-    private $loader;
     private $containers = [];
 
     /**
@@ -117,18 +116,6 @@ class ApplicationContext
                 }
             }
         }
-
-        //register components
-        $components = ConfigManager::config("app_ns");
-        foreach ($components as $ns => $path) {
-            if (is_dir($path)) {
-                $this->loader->registerNamespaces($ns, $path);
-                $init = $path . DS . "__init__.php";
-                if (is_file($init)) {
-                    include_once $init;
-                }
-            }
-        }
         //timezone
         date_default_timezone_set(empty(ConfigManager::config('default_timezone')) ? 'Asia/Shanghai' : ConfigManager::config('default_timezone'));
         //upload
@@ -147,8 +134,7 @@ class ApplicationContext
         include_once "Autoloader.php";
         include_once "ConfigManager.php";
 
-        $this->loader = new Autoloader();
-        $this->loader->registerNamespaces('zeus', ZEUS_PATH);
+        Autoloader::getInstance()->registerNamespaces('zeus', ZEUS_PATH);
     }
 
     private function getCgiIp()

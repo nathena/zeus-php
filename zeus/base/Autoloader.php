@@ -3,6 +3,8 @@ namespace zeus\sandbox;
 
 class Autoloader
 {
+    private static $_instance;
+
 	/**
 	 * Array of available namespaces prefixes.
 	 * @var array
@@ -19,8 +21,16 @@ class Autoloader
 	 * @var array
 	 */
 	private $_includeDir = array();
-	
-	public function __construct()
+
+	public static function getInstance()
+    {
+        if(!isset(self::$_instance)){
+            self::$_instance = new self();
+        }
+        return self::$_instance;
+    }
+
+	private function __construct()
 	{
 		spl_autoload_register($this, true, true);
 	}
@@ -29,8 +39,7 @@ class Autoloader
 	{
         $directory = realpath($directory);
 		$this->prefixes[$namespace] = $directory;
-		$this->registerDirs([$directory]);
-		
+
 		return $this;
 	}
 	
@@ -65,7 +74,7 @@ class Autoloader
 		$classFile = $this->findClassFileByClassMap($class);
 		//echo '1=>'.$classFile.':'.$class.'<br>';
 		if( !is_null($classFile) && !empty($classFile) )
-		{echo 2;
+		{
 			include_once $classFile;
 			return true;
 		}

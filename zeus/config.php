@@ -16,13 +16,8 @@ return [
     'session.session_name'=>'zeus',
     'session.session_save_path'=>'',
 
-    //application namespace
-    'app_ns' => [
-        'app' => $application,
-    ],
-
     //router
-    'router.default_controller' => 'app\\IndexController',
+    'router.default_controller' => 'IndexController',
     'router.default_controller_action' => 'Index',
 
     //view

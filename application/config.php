@@ -33,7 +33,7 @@ return [
     ],
 
     //router
-    'router.default_controller' => 'base\\IndexPlatformController',
+    'router.default_controller' => 'IndexController',
     'router.default_controller_action' => 'index',
 
     //view
