@@ -16,25 +16,10 @@ return [
     'session.session_name'=>'zeus',
     'session.session_save_path'=>'',
 
-    //application namespace
-    'app_ns' => [
-        'base' => $application.DS."base",
-        'account'=> $application.DS."account",
-        'account_auth'=> $application.DS."account_auth",
-        'booking'=> $application.DS."booking",
-        'bus'=> $application.DS."bus",
-        'gps'=> $application.DS."gps",
-        'nav'=> $application.DS."nav",
-        'sms'=> $application.DS."sms",
-        'report'=> $application.DS."report",
-        'customer'=> $application.DS."customer",
-        'il8n'=> $application.DS."il8n",
-        'util'=> $application.DS."util",
-    ],
-
     //router
+    'router.default_model' => 'base',
     'router.default_controller' => 'IndexController',
-    'router.default_controller_action' => 'index',
+    'router.default_controller_action' => 'Index',
 
     //view
     'view.template_path' => $root.DS.'views',

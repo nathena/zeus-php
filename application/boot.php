@@ -19,11 +19,12 @@ use zeus\sandbox\Autoloader;
 define("__APPLICATION__",dirname(__FILE__));
 define("__ROOT__",dirname(__APPLICATION__));
 define("__WEBROOT__",__ROOT__.DIRECTORY_SEPARATOR."webroot");
-define("APP_ENV_PATH",__APPLICATION__.DIRECTORY_SEPARATOR.'config.php');
+define("APP_ENV_PATH",__APPLICATION__.DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'config.php');
 
 include_once __ROOT__.DIRECTORY_SEPARATOR."zeus".DIRECTORY_SEPARATOR."bootstrap.php";
 Autoloader::getInstance()->registerDirs([__APPLICATION__]);
 Autoloader::getInstance()->registerNamespaces("com\\oa",__APPLICATION__);
+Autoloader::getInstance()->registerNamespaces("base",__APPLICATION__);
 
 //defout
 Router::addRouter('/',IndexPlatformController::class);
