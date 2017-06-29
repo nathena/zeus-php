@@ -1,4 +1,5 @@
 <?php
+
 namespace zeus\mvc;
 
 use zeus\mvc\exception\ControllerNotFoundException;
@@ -11,23 +12,23 @@ class Router
     private static $all_routers = [];
     private static $all_module_routers = [];
 
-	protected $controller;
-	protected $action;
-	protected $params = [];
+    protected $controller;
+    protected $action;
+    protected $params = [];
 
     private $uri_path;
 
-	public static function addRouter($router,$handler)
+    public static function addRouter($router, $handler)
     {
-        if(isset(self::$all_routers[$router])){
+        if (isset(self::$all_routers[$router])) {
             throw new RoutingRepeatedException();
         }
         self::$all_routers[$router] = $handler;
     }
 
-    public static function addModule($module,$ns_prefix)
+    public static function addModule($module, $ns_prefix)
     {
-        if(isset(self::$all_module_routers[$module])){
+        if (isset(self::$all_module_routers[$module])) {
             throw new RoutingRepeatedException();
         }
         self::$all_module_routers[$module] = $ns_prefix;
@@ -43,46 +44,43 @@ class Router
         return self::$all_module_routers;
     }
 
-	public function __construct($uri_path)
-	{
-        $uri_path = trim($uri_path,"/");
-		$this->uri_path = empty($uri_path) ? "/" : $uri_path;
-		$this->route();
-	}
-	
-	public function getController()
-	{
-		return $this->controller;
-	}
-	
-	public function getAction()
-	{
-		return $this->action;
-	}
-	
-	public function getParams()
-	{
-		return $this->params;
-	}
+    public function __construct($uri_path)
+    {
+        $uri_path = trim($uri_path, "/");
+        $this->uri_path = empty($uri_path) ? "/" : $uri_path;
+        $this->route();
+    }
+
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    public function getParams()
+    {
+        return $this->params;
+    }
 
     private function route()
     {
-        if( "/" == $this->uri_path && isset(self::$all_routers["/"]))
-        {
+        if ("/" == $this->uri_path && isset(self::$all_routers["/"])) {
             $this->controller = self::$all_routers["/"];
-            $this->action     = ConfigManager::config("router.default_controller_action");
+            $this->action = ConfigManager::config("router.default_controller_action");
             return;
         }
 
         //rewrite
-        if( $this->routerUriRewrite() )
-        {
+        if ($this->routerUriRewrite()) {
             return;
         }
 
         ///module/controller?/action?/params?
-        if( $this->routeModulePath() )
-        {
+        if ($this->routeModulePath()) {
             return;
         }
 
@@ -91,32 +89,28 @@ class Router
 
     private function routerUriRewrite()
     {
-        if( "/" == $this->uri_path ){
+        if ("/" == $this->uri_path) {
             return false;
         }
 
         $rewrite = self::$all_routers;
-        if( !empty($rewrite) && is_array($rewrite) )
-        {
-            foreach ($rewrite as $pattern => $replacement )
-            {
-                $pattern = trim($pattern,"/");
-                if( preg_match("#^$pattern$#", $this->uri_path))
-                {
+        if (!empty($rewrite) && is_array($rewrite)) {
+            foreach ($rewrite as $pattern => $replacement) {
+                $pattern = trim($pattern, "/");
+                if (preg_match("#^$pattern$#", $this->uri_path)) {
                     $rule = preg_replace("#^$pattern$#", $replacement, $this->uri_path);
                     $rule = explode("@", $rule);
 
-                    if( class_exists($rule[0]))//autoload
+                    if (class_exists($rule[0]))//autoload
                     {
                         $this->controller = $rule[0];
-                        if(count($rule)>1){
-                            $rule = explode("#",$rule[1]);
+                        if (count($rule) > 1) {
+                            $rule = explode("#", $rule[1]);
                             $this->action = $rule[0];
-                            if( count($rule)>1 )
-                            {
+                            if (count($rule) > 1) {
                                 $this->merge_params(explode(",", $rule[1]));
                             }
-                        }else{
+                        } else {
                             $this->action = ConfigManager::config("router.default_controller_action");
                         }
 
@@ -135,25 +129,25 @@ class Router
      */
     private function routeModulePath()
     {
-        if( "/" == $this->uri_path ){
+        if ("/" == $this->uri_path) {
             return false;
         }
 
-        $seg_fragment= explode("/", $this->uri_path);
-        if(empty($seg_fragment)){
+        $seg_fragment = explode("/", $this->uri_path);
+        if (empty($seg_fragment)) {
             return false;
         }
 
         $fragment = array_shift($seg_fragment);
-        if(!isset(self::$all_module_routers[$fragment])){
-            $controller = ConfigManager::config("router.default_model")."\\".ucfirst($fragment)."Controller";
-            if(class_exists($controller)){
+        if (!isset(self::$all_module_routers[$fragment])) {
+            $controller = ConfigManager::config("router.default_model") . "\\" . ucfirst($fragment) . "Controller";
+            if (class_exists($controller)) {
                 $this->controller = $controller;
-                if(empty($seg_fragment)){
+                if (empty($seg_fragment)) {
                     $this->action = ConfigManager::config("router.default_controller_action");
-                }else{
+                } else {
                     $this->action = array_shift($seg_fragment);
-                    if(!empty($seg_fragment)){
+                    if (!empty($seg_fragment)) {
                         $this->merge_params($seg_fragment);
                     }
                 }
@@ -163,9 +157,9 @@ class Router
         }
 
         $controller_packpage = self::$all_module_routers[$fragment];
-        if(empty($seg_fragment)){
-            $controller = $controller_packpage."\\".ConfigManager::config("router.default_controller");
-            if(class_exists($controller)){
+        if (empty($seg_fragment)) {
+            $controller = $controller_packpage . "\\" . ConfigManager::config("router.default_controller");
+            if (class_exists($controller)) {
                 $this->controller = $controller;
                 $this->action = ConfigManager::config("router.default_controller_action");
                 return true;
@@ -174,14 +168,14 @@ class Router
         }
 
         $fragment = array_shift($seg_fragment);
-        $controller = $controller_packpage."\\".ucfirst($fragment)."Controller";
-        if(class_exists($controller)){
+        $controller = $controller_packpage . "\\" . ucfirst($fragment) . "Controller";
+        if (class_exists($controller)) {
             $this->controller = $controller;
-            if(empty($seg_fragment)){
+            if (empty($seg_fragment)) {
                 $this->action = ConfigManager::config("router.default_controller_action");
-            }else{
+            } else {
                 $this->action = array_shift($seg_fragment);
-                if(!empty($seg_fragment)){
+                if (!empty($seg_fragment)) {
                     $this->merge_params($seg_fragment);
                 }
             }
@@ -189,11 +183,11 @@ class Router
             return true;
         }
 
-        $controller = $controller_packpage."\\".ConfigManager::config("router.default_controller");
-        if(class_exists($controller)){
+        $controller = $controller_packpage . "\\" . ConfigManager::config("router.default_controller");
+        if (class_exists($controller)) {
             $this->controller = $controller;
             $this->action = $fragment;
-            if(!empty($seg_fragment)){
+            if (!empty($seg_fragment)) {
                 $this->merge_params($seg_fragment);
             }
             return true;
@@ -205,6 +199,6 @@ class Router
     private function merge_params(array $params)
     {
         $params = XssCleaner::doClean($params);
-        $this->params = array_merge($this->params,$params);
+        $this->params = array_merge($this->params, $params);
     }
 }
