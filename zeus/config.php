@@ -17,6 +17,7 @@ return [
     'session.session_save_path'=>'',
 
     //router
+    'router.default_model' => 'api',
     'router.default_controller' => 'IndexController',
     'router.default_controller_action' => 'Index',
 

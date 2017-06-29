@@ -144,15 +144,27 @@ class Router
             return false;
         }
 
-        $module = array_shift($seg_fragment);
-        if(!isset(self::$all_module_routers[$module])){
+        $fragment = array_shift($seg_fragment);
+        if(!isset(self::$all_module_routers[$fragment])){
+            $controller = ConfigManager::config("router.default_model")."\\".ucfirst($fragment)."Controller";
+            if(class_exists($controller)){
+                $this->controller = $controller;
+                if(empty($seg_fragment)){
+                    $this->action = ConfigManager::config("router.default_controller_action");
+                }else{
+                    $this->action = array_shift($seg_fragment);
+                    if(!empty($seg_fragment)){
+                        $this->merge_params($seg_fragment);
+                    }
+                }
+                return true;
+            }
             return false;
         }
 
-        $controller_packpage = self::$all_module_routers[$module];
+        $controller_packpage = self::$all_module_routers[$fragment];
         if(empty($seg_fragment)){
             $controller = $controller_packpage."\\".ConfigManager::config("router.default_controller");
-            echo $controller;
             if(class_exists($controller)){
                 $this->controller = $controller;
                 $this->action = ConfigManager::config("router.default_controller_action");
