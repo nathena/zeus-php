@@ -140,19 +140,19 @@ class Router
 
         $fragment = array_shift($seg_fragment);
         if (!isset(self::$all_module_routers[$fragment])) {
-            $controller = ConfigManager::config("router.default_model") . "\\" . ucfirst($fragment) . "Controller";
-            if (class_exists($controller)) {
-                $this->controller = $controller;
-                if (empty($seg_fragment)) {
-                    $this->action = ConfigManager::config("router.default_controller_action");
-                } else {
-                    $this->action = array_shift($seg_fragment);
-                    if (!empty($seg_fragment)) {
-                        $this->merge_params($seg_fragment);
-                    }
-                }
-                return true;
-            }
+//            $controller = ConfigManager::config("router.default_model") . "\\" . ucfirst($fragment) . "Controller";
+//            if (class_exists($controller)) {
+//                $this->controller = $controller;
+//                if (empty($seg_fragment)) {
+//                    $this->action = ConfigManager::config("router.default_controller_action");
+//                } else {
+//                    $this->action = array_shift($seg_fragment);
+//                    if (!empty($seg_fragment)) {
+//                        $this->merge_params($seg_fragment);
+//                    }
+//                }
+//                return true;
+//            }
             return false;
         }
 
