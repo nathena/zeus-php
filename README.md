@@ -65,6 +65,11 @@ zeus使用两种路由方式，1、正则表达式；2、模块约定路径。
     - controller约定的格式为“ucfirst($fragment)Controller"”，
       如果约定格式的controller文件不存在，则判定此controller fragment为action，
       忽略原定的action fragment(第三项)并当作params。
+    - controller的匹配格式为模块定义的命名空间前缀+controller名称。
+      例如Router::addModule("test","com\\oa\\test");，
+      假设router.default_controller为“indexController”、router.default_controller_action为“index”
+      url为“/test/echo”，默认匹配com\oa\test\EchoController并调用index方法，如果com\oa\test\EchoController则匹配
+      com\oa\test\IndexController并调用echo方法。
 
 
 url rewrite
