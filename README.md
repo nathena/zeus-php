@@ -56,15 +56,34 @@ define("ROOT",dirname(CURRENT_DIR));//项目目录与框架目录所在的根目
 include_once ROOT.DIRECTORY_SEPARATOR."zeus".DIRECTORY_SEPARATOR."bootstrap.php";//加载框架
 ```
 #### 路由
-每个模块根目录，都可以通过“url.php”定义路由映射规则。规则为正则表达式。
+zeus使用两种路由方式，1、正则表达式；2、模块约定路径。
+- 正则表达式，即传统的URL重写方式，并通过正则分组获取url中的参数。
+- 模块约定路径，预定路由方式为/module/[controller]/[action]/[params options][?query_string]
+    - module 必须的，且已注册到路由中的模块。第一项；
+    - controller 可选。如果未指定则使用router.default_controller。第二项；
+    - actioin 可选。如果未指定则使用router.default_controller_action。第三项目。
+    - controller约定的格式为“ucfirst($fragment)Controller"”，
+      如果约定格式的controller文件不存在，则判定此controller fragment为action，
+      忽略原定的action fragment(第三项)并当作params。
+
+
+url rewrite
 ```
 <?php
-return [
-    'test' => \test_router\IndexController::class,
-    'test/(\d+)' => \test_router\IndexController::class."@test2#$1",//其中$1，将来作为controller action的参数
-];
+Router::addRouter('/',IndexPlatformController::class); 
+Router::addRouter('/welcome',WelcomePlatformController::class);
 ```
-controller
+模块约定
+```aidl
+Router::addModule("account","account");
+Router::addModule("account_auth","account_auth");
+Router::addModule("bus","bus");
+Router::addModule("report","report");
+Router::addModule("customer","customer");
+Router::addModule("test","com\\oa\\test");
+```
+
+#### controller
 ```
 class IndexController extends Controller
 {
