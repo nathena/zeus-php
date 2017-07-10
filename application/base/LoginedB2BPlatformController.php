@@ -12,7 +12,7 @@ use zeus\http\Response;
 use zeus\mvc\NeedCheckedInterface;
 use zeus\sandbox\ApplicationContext;
 
-class LoginedB2BController extends BaseAppController implements NeedCheckedInterface
+class LoginedB2BPlatformController extends BaseAppController implements NeedCheckedInterface
 {
     public function do_check()
     {
