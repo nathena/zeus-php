@@ -103,7 +103,7 @@ class Response
     public function setCode($code)
     {
         if (!array_key_exists($code, self::$responseCodes)) {
-            throw new Exception('That header code ' . $code . ' is not allowed.');
+            throw new \Exception('That header code ' . $code . ' is not allowed.');
         }
 
         $this->code = $code;
