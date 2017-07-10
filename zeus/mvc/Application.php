@@ -53,7 +53,7 @@ class Application
 
             if( $result instanceof View){
                 $this->response->setCode($result->getCode())->setBody($result->fetch())->setHeader("Content-Type", $result->getContentType())->send();
-            }else if(is_string($result)){
+            }else if(!empty($result)){
                 echo $result;
             }
 
