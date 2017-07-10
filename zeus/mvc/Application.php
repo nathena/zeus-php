@@ -33,6 +33,8 @@ class Application
             $this->request->setData($data);
         }
 
+        $modelMap = new ModelMap();
+        $error = false;
         $controller = null;
         $result = null;
         try {
@@ -43,28 +45,67 @@ class Application
             if (!($controller instanceof Controller)) {
                 throw new ControllerNotFoundException("{$controllerClass} 控制器不是系统控制器子类");
             }
-            if( $controller instanceof NeedCheckedInterface){
-                if( !$controller->do_check()){
+            $controller->setModelMap($modelMap);
+
+            if ($controller instanceof NeedCheckedInterface) {
+                if (!$controller->do_check()) {
                     return;
                 }
             }
 
-            call_user_func_array(array($controller, "beforeAction"),[$router->getAction()]);
+            call_user_func_array(array($controller, "beforeAction"), [$router->getAction()]);
             $result = call_user_func_array(array($controller, $router->getAction()), $router->getParams());
-            call_user_func_array(array($controller, "afterAction"),[$router->getAction()]);
+            call_user_func_array(array($controller, "afterAction"), [$router->getAction()]);
 
         } catch (\Exception $e) {
             //ob_clean();
+            $error = true;
             if (is_null($controller) || !($controller instanceof Controller)) {
                 throw $e;
             }
             $result = $controller->errorHandler($e);
         }
 
-        if( $result instanceof View){
-            $this->response->setCode($result->getCode())->setBody($result->fetch())->setHeader("Content-Type", $result->getContentType())->send();
-        }else if(!empty($result)){
-            echo $result;
+
+        //handle result
+        if(!empty($result)){
+            $needle = 'redirect:';
+            $len = strlen($needle);
+            if( substr_compare($result, $needle,0, $len) === 0){
+                $redirect = substr($result,$len);
+                if(!empty($redirect)){
+                    Response::redirect(substr($result,$len));
+                }
+                return;
+            }
+
+            $needle = 'forward:';
+            $len = strlen($needle);
+            if( substr_compare($result, $needle,0, $len) === 0){
+                $forward = substr($result,$len);
+                if(!empty($forward)){
+                    $this->dispatch(substr($result,$len));
+                }
+                return;
+            }
+
+
+            $needle = 'json:';
+            $len = strlen($needle);
+            if( substr_compare($result, $needle,0, $len) === 0){
+                $this->response->sendJson($modelMap->getData(),$error ? -1 : 1);
+                return;
+            }
+
+            $needle = 'xml:';
+            $len = strlen($needle);
+            if( substr_compare($result, $needle,0, $len) === 0){
+                $this->response->sendXml($modelMap->getData(),$error ? -1 : 1);
+                return;
+            }
+
+            $view = new View($result,$modelMap->getData());
+            $this->response->send($view->fetch());
         }
     }
 

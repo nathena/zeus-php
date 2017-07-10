@@ -66,4 +66,9 @@ class ModelMap implements \ArrayAccess
     {
         return $this->data;
     }
+
+    public function clear()
+    {
+        $this->data = [];
+    }
 }

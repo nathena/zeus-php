@@ -11,8 +11,6 @@ class View implements \ArrayAccess
     private $tpl_path;
     private $tpl_args = [];
 
-    private $code;
-    private $content_type;
 
     /**
      * Hook 方法注入
@@ -31,11 +29,12 @@ class View implements \ArrayAccess
     }
 
 
-    public function __construct($tpl_path,$code = 200,$content_type = "text/html")
+    public function __construct($tpl_path,$data=null)
     {
-        $this->code = 200;
-        $this->content_type = $content_type;
         $this->template($tpl_path);
+        if(!empty($data) && is_array($data)){
+            $this->tpl_args = array_merge($this->tpl_args,$data);
+        }
     }
 
     public function __call($method, $args)
@@ -80,7 +79,6 @@ class View implements \ArrayAccess
 
 
     /**
-     * @param $template
      * @return string
      */
     public function fetch()
@@ -93,16 +91,6 @@ class View implements \ArrayAccess
         $content = ob_get_contents();
         ob_clean();
         return $content;
-    }
-
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    public function getContentType()
-    {
-        return $this->content_type;
     }
 
     //模板内部include
