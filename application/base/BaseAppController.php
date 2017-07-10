@@ -14,14 +14,15 @@ class BaseAppController extends Controller
 {
     public function errorHandler(\Exception $e)
     {
-        if($this->request->isAjax()){
-            $this->response->setCode($e->getCode())->setBody($e->getMessage())->send("json");
-        }else{
-            $str = '<style>body {font-size:12px;}</style>';
-            $str .= '<h1>操作失败！</h1><br />';
-            $str .= '<strong>错误信息：<strong><font color="red">' . $e->getMessage() . '</font><br />';
+        $this->modelMap['err_code'] = $e->getCode();
+        $this->modelMap['err_message']  =  $e->getMessage();
+        $this->modelMap['err']  =  $e;
 
-            $this->response->setBody($str)->send();
+        if($this->request->isAjax()){
+            return "json:";
+
         }
+
+        return "error";
     }
 }
