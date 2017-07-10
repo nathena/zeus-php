@@ -161,8 +161,18 @@ class Response
         $this->sendHeaders();
         $data = [
             'code' => $code,
-            'message' => $body,
         ];
+        if(is_array($body)){
+            foreach ($body as $key => $val){
+                if(is_object($val) && method_exists($val,"__toString")){
+                    $data[$key] = $val->__toString();
+                }else{
+                    $data[$key] = $val;
+                }
+            }
+        }else{
+            $data["message"] = "$body";
+        }
         echo json_encode($data);
     }
 
@@ -170,9 +180,19 @@ class Response
     {
         $this->headers["Content-Type"] = "application/xml";
         $this->sendHeaders();
-        $xml = "<xml><code>{$code}</code><message><![CDATA[{$body}]]></message></xml>";
+        $xml = ["<xml>"];
+        $xml[] = "<code>{$code}</code>";
+        if(is_array($body)){
+            foreach ($body as $key => $val){
+                $xml[] = "<{$key}><![CDATA[{$val}]]></{$key}>";
+            }
+        }else{
+            $xml[] = "<message><![CDATA[{$body}]]></message>";
+        }
+        $xml[] = "</xml>";
 
-        echo $xml;
+
+        echo implode("",$xml);
     }
 
     protected function sendHeaders()
