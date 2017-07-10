@@ -5,7 +5,7 @@
  * Time: 11:17
  */
 
-namespace com\oa\test;
+namespace test;
 
 
 use zeus\mvc\Controller;
