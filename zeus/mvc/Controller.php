@@ -2,13 +2,17 @@
 
 namespace zeus\mvc;
 
-use zeus\base\logger\Logger;
 use zeus\utils\UUIDGenerator;
 
 abstract class Controller
 {
     protected $request;
     protected $response;
+
+    /**
+     * @var ModelMap
+     */
+    protected $modelMap;
 
     public function __construct()
     {
@@ -31,21 +35,16 @@ abstract class Controller
 
     }
 
-    /**
-     * @param $tpl_path
-     * @return View
-     */
-    public function getView($tpl_path)
+    public function setModelMap(ModelMap $modelMap)
     {
         $csrf_token = UUIDGenerator::randChar(5);
 
         $session = $this->request->getSession();
         $session['csrf_token'] = $csrf_token;
 
-        $view = new View($tpl_path);
-        $view['csrf_token'] = $csrf_token;
+        $modelMap['csrf_token'] = $csrf_token;
 
-        return $view;
+        $this->modelMap = $modelMap;
     }
 
     public function errorHandler(\Exception $e)
@@ -53,10 +52,6 @@ abstract class Controller
         echo $e->getMessage(),':',$e->getTraceAsString();
     }
 
-    protected function forward($url_path)
-    {
-        Application::getInstance()->dispatch($url_path);
-    }
 
     protected function check_csrf_token()
     {
