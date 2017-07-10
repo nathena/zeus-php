@@ -59,14 +59,6 @@ class Response
     private $version;
     private $headers;
 
-    public function __construct($version = '1.1')
-    {
-        $this->version = $version;
-        $this->code = 200;
-        $this->message = self::$responseCodes[$this->code];
-    }
-
-
     /**
      * Send redirect
      *
@@ -86,6 +78,12 @@ class Response
         header("Location: {$url}");
     }
 
+    public function __construct($version = '1.1')
+    {
+        $this->version = $version;
+        $this->code = 200;
+        $this->message = self::$responseCodes[$this->code];
+    }
 
     public function getHeadersAsString($status = true, $br = "\n")
     {
@@ -143,67 +141,52 @@ class Response
         return $this;
     }
 
-    public function sendHeaders()
+
+    public function send($body)
     {
+        if (!isset($this->headers["Content-Type"])) {
+            $this->headers["Content-Type"] = "text/html";
+        }
+        if (array_key_exists('Content-Encoding', $this->headers)) {
+            $body = $this->encodeBody($body, $this->headers['Content-Encoding']);
+        }
+        $this->headers['Content-Length'] = strlen($body);
+        $this->sendHeaders();
+        echo $body;
+    }
+
+    public function sendJson($body,$code=1)
+    {
+        $this->headers["Content-Type"] = "application/json";
+        $this->sendHeaders();
+        $data = [
+            'code' => $code,
+            'message' => $body,
+        ];
+        echo json_encode($data);
+    }
+
+    public function sendXml($body,$code=1)
+    {
+        $this->headers["Content-Type"] = "application/xml";
+        $this->sendHeaders();
+        $xml = "<xml><code>{$code}</code><message><![CDATA[{$body}]]></message></xml>";
+
+        echo $xml;
+    }
+
+    protected function sendHeaders()
+    {
+        if (headers_sent()) {
+            throw new \RuntimeException('The headers have already been sent.');
+        }
+
         header("HTTP/{$this->version} {$this->code} {$this->message}");
         foreach ($this->headers as $name => $value) {
             header($name . ": " . $value);
         }
     }
 
-
-    public function send($type_name="html")
-    {
-        if (headers_sent()) {
-            throw new \RuntimeException('The headers have already been sent.');
-        }
-        switch ($type_name) {
-            case "json":
-                $this->sendJson();
-                break;
-            case "xml":
-                $this->sendXml();
-                break;
-            default:
-                $this->sendBody();
-        }
-    }
-
-    public function sendJson()
-    {
-        $this->headers["Content-Type"] = "application/json";
-        $this->sendHeaders();
-        $data = [
-            'code' => $this->code,
-            'message' => $this->message,
-            'body' => $this->body,
-        ];
-        echo json_encode($data);
-    }
-
-    public function sendXml()
-    {
-        $this->headers["Content-Type"] = "application/xml";
-        $this->sendHeaders();
-        $xml = "<xml><code>{$this->code}</code><message><![CDATA[{$this->message}]]></message><body><![CDATA[{$this->body}]]></body></xml>";
-
-        echo $xml;
-    }
-
-    protected function sendBody()
-    {
-        if (!isset($this->headers["Content-Type"])) {
-            $this->headers["Content-Type"] = "text/html";
-        }
-        if (array_key_exists('Content-Encoding', $this->headers)) {
-            $body = $this->encodeBody($this->body, $this->headers['Content-Encoding']);
-        } else {
-            $body = $this->body;
-        }
-        $this->headers['Content-Length'] = strlen($body);
-        $this->sendHeaders();
-        echo $body;
-    }
 
     protected function encodeBody($body, $encode = 'gzip')
     {
