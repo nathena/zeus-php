@@ -6,11 +6,10 @@
  */
 namespace boot;
 
-use account\AuthController;
-use account\B2BAuthController;
-use account\LogoutController;
 use base\EmptyController;
 use base\IndexPlatformController;
+use passport\LoginController;
+use passport\LogoutController;
 use zeus\mvc\Application;
 use zeus\mvc\Router;
 use zeus\sandbox\Autoloader;
@@ -28,8 +27,8 @@ Router::addRouter('/',IndexPlatformController::class);
 Router::addRouter('/favicon.ico',EmptyController::class);
 
 //登录
-Router::addRouter('/login',AuthController::class."@login");
-Router::addRouter('/do_login',AuthController::class."@do_login");
+Router::addRouter('/login',LoginController::class."@login");
+Router::addRouter('/do_login',LoginController::class."@do_login");
 //退出
 Router::addRouter('/logout',LogoutController::class);
 

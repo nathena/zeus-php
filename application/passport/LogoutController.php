@@ -5,7 +5,7 @@
  * Time: 14:40
  */
 
-namespace account;
+namespace passport;
 
 
 use base\BaseAppController;

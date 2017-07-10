@@ -5,13 +5,13 @@
  * Time: 10:09
  */
 
-namespace account;
+namespace passport;
 
 
 use base\BaseAppController;
 use zeus\http\Response;
 
-class AuthController extends BaseAppController
+class LoginController extends BaseAppController
 {
     public function login()
     {
