@@ -11,22 +11,11 @@ namespace zeus\mvc;
 
 class ModelMap implements \ArrayAccess
 {
-    private $code = 1;
     private $data = [];
 
     public function __construct()
     {
 
-    }
-
-    public function setCode($code)
-    {
-        $this->code = $code;
-    }
-
-    public function getCode()
-    {
-        return $this->code;
     }
 
 
