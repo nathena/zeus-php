@@ -48,8 +48,15 @@ class Application
                 }
             }
             call_user_func_array(array($controller, "beforeAction"),[$router->getAction()]);
-            call_user_func_array(array($controller, $router->getAction()), $router->getParams());
+            $result = call_user_func_array(array($controller, $router->getAction()), $router->getParams());
             call_user_func_array(array($controller, "afterAction"),[$router->getAction()]);
+
+            if( $result instanceof View){
+                $this->response->setCode($result->getCode())->setBody($result->fetch())->setHeader("Content-Type", $result->getContentType())->send();
+            }else if(is_string($result)){
+                echo $result;
+            }
+
         } catch (\Exception $e) {
             //ob_clean();
             if (is_null($controller) || !($controller instanceof Controller)) {

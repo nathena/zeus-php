@@ -2,8 +2,6 @@
 
 namespace zeus\mvc;
 
-use zeus\http\Request;
-use zeus\http\Response;
 use zeus\sandbox\ConfigManager;
 
 class View implements \ArrayAccess
@@ -13,8 +11,8 @@ class View implements \ArrayAccess
     private $tpl_path;
     private $tpl_args = [];
 
-    private $request;
-    private $response;
+    private $code;
+    private $content_type;
 
     /**
      * Hook 方法注入
@@ -33,11 +31,10 @@ class View implements \ArrayAccess
     }
 
 
-    public function __construct(Request $request, Response $response, $tpl_path)
+    public function __construct($tpl_path,$code = 200,$content_type = "text/html")
     {
-        $this->request = $request;
-        $this->response = $response;
-
+        $this->code = 200;
+        $this->content_type = $content_type;
         $this->template($tpl_path);
     }
 
@@ -98,9 +95,14 @@ class View implements \ArrayAccess
         return $content;
     }
 
-    public function display($content_type = "text/html", $code = 200)
+    public function getCode()
     {
-        $this->response->setCode($code)->setBody($this->fetch())->setHeader("Content-Type", $content_type)->send();
+        return $this->code;
+    }
+
+    public function getContentType()
+    {
+        return $this->content_type;
     }
 
     //模板内部include

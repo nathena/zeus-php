@@ -37,7 +37,7 @@ abstract class Controller
         $session = $this->request->getSession();
         $session['csrf_token'] = $csrf_token;
 
-        $view = new View($this->request, $this->response, $tpl_path);
+        $view = new View($tpl_path);
         $view['csrf_token'] = $csrf_token;
 
         return $view;
