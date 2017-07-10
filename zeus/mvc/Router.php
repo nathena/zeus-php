@@ -133,30 +133,19 @@ class Router
             return false;
         }
 
-        $seg_fragment = explode("/", $this->uri_path);
+        $uri_path = strtolower($this->uri_path);
+        $seg_fragment = explode("/", $uri_path);
         if (empty($seg_fragment)) {
             return false;
         }
 
         $fragment = array_shift($seg_fragment);
         if (!isset(self::$all_module_routers[$fragment])) {
-//            $controller = ConfigManager::config("router.default_model") . "\\" . ucfirst($fragment) . "Controller";
-//            if (class_exists($controller)) {
-//                $this->controller = $controller;
-//                if (empty($seg_fragment)) {
-//                    $this->action = ConfigManager::config("router.default_controller_action");
-//                } else {
-//                    $this->action = array_shift($seg_fragment);
-//                    if (!empty($seg_fragment)) {
-//                        $this->merge_params($seg_fragment);
-//                    }
-//                }
-//                return true;
-//            }
-            return false;
+            $controller_packpage = $fragment;
+        }else{
+            $controller_packpage = self::$all_module_routers[$fragment];
         }
 
-        $controller_packpage = self::$all_module_routers[$fragment];
         if (empty($seg_fragment)) {
             $controller = $controller_packpage . "\\" . ConfigManager::config("router.default_controller");
             if (class_exists($controller)) {
