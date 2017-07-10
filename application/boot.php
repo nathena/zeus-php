@@ -30,8 +30,6 @@ Router::addRouter('/favicon.ico',EmptyController::class);
 //登录
 Router::addRouter('/login',AuthController::class."@login");
 Router::addRouter('/do_login',AuthController::class."@do_login");
-Router::addRouter('/b2b/login',B2BAuthController::class."@login");
-Router::addRouter('/b2b/do_login',B2BAuthController::class."@do_login");
 //退出
 Router::addRouter('/logout',LogoutController::class);
 

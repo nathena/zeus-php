@@ -12,20 +12,10 @@ use zeus\mvc\Controller;
 
 class BaseAppController extends Controller
 {
-    public function beforeAction()
-    {
-        parent::beforeAction();
-
-        if( $this->request->getMethod() == 'POST' && !$this->check_csrf_token())
-        {
-            throw new \RuntimeException("非法的提交请求");
-        }
-    }
-
     public function errorHandler(\Exception $e)
     {
         if($this->request->isAjax()){
-            $this->response->setBody($e->getMessage())->send("json");
+            $this->response->setCode($e->getCode())->setBody($e->getMessage())->send("json");
         }else{
             $str = '<style>body {font-size:12px;}</style>';
             $str .= '<h1>操作失败！</h1><br />';
