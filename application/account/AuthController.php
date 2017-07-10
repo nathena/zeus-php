@@ -22,8 +22,7 @@ class AuthController extends BaseAppController
             return;
         }
 
-        $view = $this->getView("login");
-        $view->display();
+        return $this->getView("login");
     }
 
     public function do_login()
@@ -57,13 +56,5 @@ class AuthController extends BaseAppController
         $session['token'] = $account['id'];
 
         Response::redirect($follow);
-    }
-
-    public function logout()
-    {
-        $session = $this->request->getSession();
-        $session->kill();
-
-        Response::redirect("/");
     }
 }
