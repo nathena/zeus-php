@@ -18,11 +18,10 @@ class LoginController extends BaseAppController
         $session = $this->request->getSession();
         //已经登录
         if(isset($session['token'])){
-            Response::redirect("/");
-            return;
+            return "redirect:/";
         }
 
-        return $this->getView("login");
+        return "login";
     }
 
     public function do_login()
@@ -55,6 +54,7 @@ class LoginController extends BaseAppController
         $session = $this->request->getSession();
         $session['token'] = $account['id'];
 
-        Response::redirect($follow);
+
+        return "redirect:{$follow}";
     }
 }
