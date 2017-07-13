@@ -19,10 +19,7 @@ abstract class Controller
         $this->request = Application::getInstance()->getRequest();
         $this->response = Application::getInstance()->getResponse();
 
-        if( $this->request->getMethod() == 'POST' && !$this->check_csrf_token())
-        {
-            throw new \RuntimeException("Illegal requests");
-        }
+        $this->check_request();
     }
 
     public function beforeAction()
@@ -52,6 +49,13 @@ abstract class Controller
         echo $e->getMessage(),':',$e->getTraceAsString();
     }
 
+    protected function check_request()
+    {
+        if( $this->request->getMethod() == 'POST' && !$this->check_csrf_token())
+        {
+            throw new \RuntimeException("Illegal requests");
+        }
+    }
 
     protected function check_csrf_token()
     {
