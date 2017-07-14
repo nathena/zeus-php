@@ -17,7 +17,7 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
     protected $update_data = [];//更新未来提交的数据
 
     protected $idFiled = 'id';//uuid key
-    protected $version = 'update_time';//版本号
+    protected $version = '';//版本号
     protected $schema = "test";
 
     public function __construct($properties = null)
@@ -39,7 +39,7 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
 
     public function getVersion()
     {
-        return $this->data[$this->version];
+        return $this->{$this->version};
     }
 
     public function getIdFiled()
@@ -60,6 +60,18 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
     public function getProperties()
     {
         return $this->data;
+    }
+
+    public function setProperties($data)
+    {
+        if (!empty($data) && is_array($data)) {
+            $this->data = array_merge($this->data, $data);
+        }
+    }
+
+    public function setProperty($key, $val)
+    {
+        $this->data[$key] = $val;
     }
 
     public function update_properties()
@@ -93,7 +105,7 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
 
     public function __get($key)
     {
-        if (isset($this->data[$key])) {
+        if (!empty($key) && isset($this->data[$key])) {
             return $this->data[$key];
         }
         return '';
@@ -146,21 +158,5 @@ abstract class AbstractEntity extends AbstractComponent implements \ArrayAccess
         unset($this->{$offset});
     }
 
-    public function setProperties($data)
-    {
-        if (!empty($data) && is_array($data)) {
-            $this->data = array_merge($this->data, $data);
-        }
-        if (!isset($this->data[$this->version])) {
-            $this->data[$this->version] = time();
-        }
-        if (!isset($this->data["create_time"])) {
-            $this->data["create_time"] = time();
-        }
-    }
 
-    public function setProperty($key, $val)
-    {
-        $this->data[$key] = $val;
-    }
 }

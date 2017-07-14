@@ -45,12 +45,13 @@ abstract class AggregateRoot extends AbstractEntity
         }
 
         //update
-        $data = $this->getData();
-        $data[$this->getVersionName()] = $this->getVersion();
         $sepc = new UpdateSpecification($this->schema, $this->getData());
         $sepc->where($this->getIdFiled(), $id);
-        //cas并发
-        $sepc->where($this->getVersionName(), $this->getVersion());
+
+        if(!empty($this->getVersionName()) && !empty($this->getVersion())){
+            //cas并发
+            $sepc->where($this->getVersionName(), $this->getVersion());
+        }
 
         return $this->openSession()->execute($sepc);
     }
@@ -77,10 +78,7 @@ abstract class AggregateRoot extends AbstractEntity
      */
     public function executeCommand(AbstractSpecification $specification)
     {
-        if (DmlType::DML_BATCH == $specification->getDml()) {
-            return $this->openSession()->execute($specification);
-        }
-        return 0;
+        return $this->openSession()->execute($specification);
     }
 
     public static function get($id)
