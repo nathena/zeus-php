@@ -16,10 +16,20 @@ class Il8n
 
     public static function get()
     {
+        return call_user_func_array(array(self::getInstance(),'getKey'),func_get_args());
+    }
+
+    public static function currentData()
+    {
+        return self::getInstance()->data;
+    }
+
+    private static function getInstance()
+    {
         if(!isset(self::$_instance)){
             self::$_instance = new self();
         }
-        return call_user_func_array(array(self::$_instance,'getKey'),func_get_args());
+        return self::$_instance;
     }
 
     private $data = [];
