@@ -14,7 +14,7 @@ use zeus\database\specification\AbstractSpecification;
 abstract class AbstractPdoDialect
 {
     protected $pdo;
-    protected $benchmark = 0;
+    protected $benchmark = [];
     protected $sql = [];
 
     /**
@@ -172,8 +172,8 @@ abstract class AbstractPdoDialect
 
             list($em, $es) = explode(' ', microtime());
             $benchmark = ($em + $es) - ($sm + $ss);
-            $this->benchmark += $benchmark;
-            $this->sql[$benchmark] = $_sql;
+            $this->benchmark[] = $benchmark;
+            $this->sql[] = $_sql;
 
             return $result;
         } catch (\PDOException $e) {
