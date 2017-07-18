@@ -36,4 +36,6 @@ return [
     'database.pdo.pass' => '123456',
     'database.pdo.charset' => 'utf8',
 
+    //多语言
+    'il8n.config.path' => '',
 ];

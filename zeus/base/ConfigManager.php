@@ -41,7 +41,7 @@ class ConfigManager implements \ArrayAccess
 
     public function __set($key, $val)
     {
-        //$this->config[$key] = $val;
+        $this->config[$key] = $val;
     }
 
     public function __isset($name)
@@ -51,7 +51,7 @@ class ConfigManager implements \ArrayAccess
 
     public function __unset($name)
     {
-        //unset($this->config[$name]);
+        unset($this->config[$name]);
     }
 
     public function offsetExists($offset)
