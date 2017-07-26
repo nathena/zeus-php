@@ -5,7 +5,7 @@
  * Time: 9:05
  */
 
-$orgina_data = 150;
+$orgina_data = 300;
 //$orgina_data = 20170712;
 
 $pri_key = file_get_contents("./license_pri.key");
