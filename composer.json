@@ -1,0 +1,19 @@
+{
+    "name": "nathena/zeus-php",
+    "authors": [
+        {
+            "name": "nathena",
+            "email": "nathena@qq.com"
+        }
+    ],
+    "require": {},
+	"autoload": {
+        "psr-0": {"zeus\\": "zeus/"}
+    },
+	"repositories": {
+		"packagist": {
+			"type": "composer",
+			"url": "https://packagist.phpcomposer.com"
+		}
+	}
+}

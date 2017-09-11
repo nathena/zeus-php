@@ -3,6 +3,8 @@
 *.iml
 *.log
 .project
+.buildpath
 /vendor/autoload.php
 /vendor/composer/
 # Created by https://www.gitignore.io/api/jetbrains,eclipse,node,java,python,linux,c,c++
+
