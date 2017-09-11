@@ -8,7 +8,7 @@
     ],
     "require": {},
 	"autoload": {
-        "psr-0": {"zeus\\": "zeus/"}
+        "psr-0": {"zeus\\": ""}
     },
 	"repositories": {
 		"packagist": {
