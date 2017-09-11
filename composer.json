@@ -8,8 +8,9 @@
     ],
     "require": {},
 	"autoload": {
-        "psr-0": {"zeus\\": ""}
+        "psr-0": {"zeus\\": ""}		
     },
+	"target-dir": "zeus"
 	"repositories": {
 		"packagist": {
 			"type": "composer",
