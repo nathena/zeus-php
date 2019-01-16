@@ -5,8 +5,8 @@
  * Time: 9:05
  */
 
-$orgina_data = "1000";
-//$orgina_data = 20170712;
+//$orgina_data = "3000";
+$orgina_data = "2018-08-20";
 
 $pri_key = file_get_contents("./license_pri.key");
 $pub_key = file_get_contents("./licence_pub.key");
