@@ -2,8 +2,8 @@
 
 namespace zeus\sandbox;
 
-use zeus\base\command\CommandBus;
-use zeus\base\event\EventBus;
+use zeus\base\command\CommandDispatcher;
+use zeus\base\event\EventDispatcher;
 use zeus\base\logger\Logger;
 
 /**
@@ -48,19 +48,19 @@ class ApplicationContext
     }
 
     /**
-     * @return EventBus
+     * @return EventDispatcher
      */
     public function getEventBus()
     {
-        return EventBus::getInstance();
+        return EventDispatcher::getInstance();
     }
 
     /**
-     * @return CommandBus
+     * @return CommandDispatcher
      */
     public function getCommandBus()
     {
-        return CommandBus::getInstance();
+        return CommandDispatcher::getInstance();
     }
 
     public function ip()

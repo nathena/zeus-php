@@ -10,5 +10,5 @@ namespace zeus\base\command;
 
 interface CommandHandlerInterface
 {
-    public function execute(AbstractCommand $command);
+    public function execute(CommandInterface $command);
 }

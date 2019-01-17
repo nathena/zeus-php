@@ -2,7 +2,7 @@
 
 namespace zeus\base;
 
-use zeus\base\event\AbstractEvent;
+use zeus\base\event\EventInterface;
 use zeus\base\event\EventMessage;
 use zeus\sandbox\ApplicationContext;
 
@@ -15,10 +15,10 @@ use zeus\sandbox\ApplicationContext;
 abstract class AbstractComponent
 {
     /**
-     * @param AbstractEvent $event
+     * @param EventInterface $event
      * @param callable|null $callable
      */
-    protected function raise(AbstractEvent $event, callable $callable = null)
+    protected function raise(EventInterface $event, callable $callable = null)
     {
         ApplicationContext::currentContext()->getEventBus()->publish(new EventMessage($this, $event,$callable));
     }

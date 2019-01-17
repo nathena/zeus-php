@@ -10,5 +10,5 @@ namespace zeus\base\event;
 
 interface EventListenerInterface
 {
-    public function handler(EventMessage $eventMessage);
+    public function handler(EventInterface $event);
 }

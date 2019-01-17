@@ -6,7 +6,7 @@
 namespace zeus\domain;
 
 
-use zeus\base\event\AbstractEvent;
+use zeus\base\event\EventInterface;
 use zeus\base\event\EventMessage;
 use zeus\sandbox\ApplicationContext;
 
@@ -27,13 +27,13 @@ abstract class EventSouringAggregateRoot extends AbstractEntity
         }
     }
 
-    protected function raise(AbstractEvent $event)
+    protected function raise(EventInterface $event)
     {
         $this->domainEvents[] = $event;
         $this->handle($event);
     }
 
-    protected function handle(AbstractEvent $domainEvent)
+    protected function handle(EventInterface $domainEvent)
     {
 
     }
